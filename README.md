@@ -17,6 +17,7 @@ Full core flow: purchase request → threshold-based approval → purchase order
 - **Receiving**: partial/full receipt per line item with a pass/fail quality check; PO status advances automatically.
 - **Reports**: spend by department/category/vendor, 6-month spend trend, company-wide pending-approvals overview, CSV export on every chart.
 - **Notifications**: in-app notification center, plus email via Resend for request submitted, approval needed, approved/rejected, more-info-requested, PO sent, and items received. Email is optional infrastructure — the app works fine with `RESEND_API_KEY` unset, it just skips sending.
+- **Error monitoring**: Sentry captures server, edge, and client errors in production (source maps uploaded at build time). Optional — with `NEXT_PUBLIC_SENTRY_DSN` unset, `Sentry.init` just no-ops.
 
 Not built (stretch goal per the original spec, not attempted): WhatsApp notifications.
 
@@ -29,6 +30,7 @@ Not built (stretch goal per the original spec, not attempted): WhatsApp notifica
 5. **(Optional) Set up email** — sign up at [resend.com](https://resend.com), create an API key, paste it into `RESEND_API_KEY` in `.env.local`. Until you verify your own sending domain in Resend, you can only send to the email address you signed up with — fine for testing, not for real users yet.
 6. **Seed sample data**: `npm run seed` — creates 2 departments (Operations, Finance), 3 users (one per key role), 2 vendors, an approval threshold chain, and starter budgets. Prints sign-in credentials when done.
 7. **Run the app**: `npm run dev`, then sign in with one of the seeded accounts.
+8. **(Optional) Set up error monitoring** — create a Next.js project at [sentry.io](https://sentry.io), copy its DSN from Settings → Client Keys into `NEXT_PUBLIC_SENTRY_DSN`, and (for readable production stack traces) create an org auth token with the `org:ci` scope at Settings → Auth Tokens into `SENTRY_AUTH_TOKEN`. Update the `org`/`project` in `next.config.ts`'s `withSentryConfig` call to match your own Sentry org/project slugs.
 
 ## Notes / simplifications made for MVP speed
 

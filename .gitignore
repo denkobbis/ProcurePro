@@ -44,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# plaintext credentials notes — never commit
+ProcurePro Logins.txt
