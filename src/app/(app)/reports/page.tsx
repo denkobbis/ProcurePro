@@ -8,6 +8,7 @@ import {
   getSpendByVendor,
   getSpendTrend,
   getPendingApprovalsOverview,
+  getExpiringCertifications,
 } from "@/lib/reports";
 
 function ExportLink({ type }: { type: string }) {
@@ -23,12 +24,13 @@ export default async function ReportsPage() {
   requireRole(profile, PROCUREMENT_ROLES);
 
   const supabase = await createClient();
-  const [byDepartment, byCategory, byVendor, trend, pendingApprovals] = await Promise.all([
+  const [byDepartment, byCategory, byVendor, trend, pendingApprovals, expiringCerts] = await Promise.all([
     getSpendByDepartment(supabase),
     getSpendByCategory(supabase),
     getSpendByVendor(supabase),
     getSpendTrend(supabase, 6),
     getPendingApprovalsOverview(supabase),
+    getExpiringCertifications(supabase, 60),
   ]);
 
   const totalSpend = byDepartment.reduce((sum, r) => sum + r.amount, 0);
@@ -101,6 +103,45 @@ export default async function ReportsPage() {
               <tr>
                 <td colSpan={5} className="py-6 text-center text-zinc-400">
                   Nothing pending approval right now.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-zinc-200 bg-white p-5">
+        <h2 className="mb-3 font-medium text-zinc-900">Vendor certifications expiring within 60 days</h2>
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px] text-sm">
+          <thead className="border-b border-zinc-200 text-left text-zinc-500">
+            <tr>
+              <th className="py-2">Vendor</th>
+              <th>Certificate / document</th>
+              <th>Expiry date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expiringCerts.map((c, i) => (
+              <tr key={i} className="border-b border-zinc-100">
+                <td className="py-2">{c.vendor_name}</td>
+                <td>{c.label}</td>
+                <td>{c.expiry_date}</td>
+                <td>
+                  {c.daysUntilExpiry < 0 ? (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Expired</span>
+                  ) : (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">{c.daysUntilExpiry}d left</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {expiringCerts.length === 0 && (
+              <tr>
+                <td colSpan={4} className="py-6 text-center text-zinc-400">
+                  Nothing expiring soon.
                 </td>
               </tr>
             )}

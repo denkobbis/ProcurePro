@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { updateVendorApproval, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
+import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
+import NcdmbFields from "@/components/NcdmbFields";
+import type { VendorDocument } from "@/lib/database.types";
 
-interface VendorDocument {
-  file_path: string;
-  file_name: string;
-  uploaded_at: string;
+function expiryBadge(expiryDate?: string | null) {
+  if (!expiryDate) return null;
+  const daysLeft = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+  if (daysLeft < 0) return <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Expired</span>;
+  if (daysLeft <= 60) return <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Expires in {daysLeft}d</span>;
+  return null;
 }
 
 export default async function VendorDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -57,6 +61,24 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6">
+        <h2 className="mb-2 font-medium text-zinc-900">Currency &amp; Nigerian Content compliance</h2>
+        <form action={updateVendorCompliance} className="space-y-3">
+          <input type="hidden" name="vendor_id" value={vendor.id} />
+          <NcdmbFields
+            defaultCurrency={vendor.default_currency}
+            defaultCompliant={vendor.ncdmb_compliant}
+            defaultCertificateNumber={vendor.ncdmb_certificate_number ?? ""}
+            defaultCertificateExpiry={vendor.ncdmb_certificate_expiry ?? ""}
+            defaultLocalContentPercentage={vendor.local_content_percentage ?? ""}
+          />
+          {expiryBadge(vendor.ncdmb_certificate_expiry) && (
+            <p className="text-sm text-zinc-600">NCDMB certificate {expiryBadge(vendor.ncdmb_certificate_expiry)}</p>
+          )}
+          <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">Save</button>
+        </form>
+      </div>
+
+      <div className="rounded-lg border border-zinc-200 bg-white p-6">
         <h2 className="mb-2 font-medium text-zinc-900">Performance notes</h2>
         <form action={updatePerformanceNotes} className="space-y-2">
           <input type="hidden" name="vendor_id" value={vendor.id} />
@@ -78,19 +100,22 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             <li key={d.file_path} className="text-zinc-700">
               {documentUrls.has(d.file_path) ? (
                 <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
-                  {d.file_name}
+                  {d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name}
                 </a>
               ) : (
-                d.file_name
+                d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name
               )}
+              {expiryBadge(d.expiry_date)}
             </li>
           ))}
-          {documents.length === 0 && <li className="text-zinc-400">No documents uploaded (e.g. CAC certificate, tax ID).</li>}
+          {documents.length === 0 && <li className="text-zinc-400">No documents uploaded (e.g. CAC certificate, tax ID, insurance).</li>}
         </ul>
-        <form action={uploadVendorDocument} className="flex items-center gap-2">
+        <form action={uploadVendorDocument} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
           <input type="hidden" name="vendor_id" value={vendor.id} />
+          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm sm:col-span-2" />
+          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm" />
           <input type="file" name="document" className="text-sm" />
-          <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50">Upload</button>
+          <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 sm:col-span-4">Upload</button>
         </form>
       </div>
     </div>

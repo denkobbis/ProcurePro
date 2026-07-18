@@ -45,12 +45,19 @@ export async function checkBudget(
   const { data: committedRows } = await committedQuery;
   const committed = (committedRows ?? []).reduce((sum, r) => sum + r.qty * r.est_unit_cost, 0);
 
+  // total_amount_ngn + freight/duty gives the true landed cost regardless of
+  // the PO's own currency, so multi-currency POs roll up correctly into a
+  // single NGN-denominated budget.
   const { data: poRows } = await supabase
     .from("purchase_orders")
-    .select("total_amount, requests!inner(department_id, category)")
+    .select("total_amount_ngn, freight_cost_ngn, customs_duty_ngn, requests!inner(department_id, category)")
     .eq("requests.department_id", departmentId)
     .eq("requests.category", category);
-  const spent = (poRows ?? []).reduce((sum: number, r: { total_amount: number }) => sum + r.total_amount, 0);
+  const spent = (poRows ?? []).reduce(
+    (sum: number, r: { total_amount_ngn: number; freight_cost_ngn: number; customs_duty_ngn: number }) =>
+      sum + r.total_amount_ngn + r.freight_cost_ngn + r.customs_duty_ngn,
+    0
+  );
 
   const available = budget.allocated_amount - committed - spent;
   const wouldExceed = additionalAmount > available;

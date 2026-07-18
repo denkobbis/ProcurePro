@@ -44,6 +44,8 @@ export async function createRequest(formData: FormData) {
   const vendorId = String(formData.get("vendor_id") ?? "") || null;
   const justification = String(formData.get("justification") ?? "").trim() || null;
   const urgency = String(formData.get("urgency") ?? "normal");
+  const mpn = String(formData.get("mpn") ?? "").trim() || null;
+  const oemBrand = String(formData.get("oem_brand") ?? "").trim() || null;
   const submitNow = formData.get("submit_now") === "on";
 
   if (!description || !category || qty <= 0 || estUnitCost < 0) {
@@ -66,6 +68,8 @@ export async function createRequest(formData: FormData) {
       vendor_id: vendorId,
       justification,
       urgency,
+      mpn,
+      oem_brand: oemBrand,
       status: "draft",
     })
     .select()

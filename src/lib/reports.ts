@@ -6,17 +6,23 @@ export interface SpendRow {
 }
 
 interface PoWithRequest {
-  total_amount: number;
+  total_amount_ngn: number;
+  freight_cost_ngn: number;
+  customs_duty_ngn: number;
   department_id: string;
   vendor_id: string;
   created_at: string;
   requests: { category: string } | { category: string }[] | null;
 }
 
+function landedCost(po: PoWithRequest): number {
+  return po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
+}
+
 async function fetchPosWithContext(supabase: SupabaseClient) {
   const { data } = await supabase
     .from("purchase_orders")
-    .select("total_amount, department_id, vendor_id, created_at, requests(category)");
+    .select("total_amount_ngn, freight_cost_ngn, customs_duty_ngn, department_id, vendor_id, created_at, requests(category)");
   return (data ?? []) as PoWithRequest[];
 }
 
@@ -37,12 +43,12 @@ export async function getSpendByDepartment(supabase: SupabaseClient): Promise<Sp
     supabase.from("departments").select("id, name"),
   ]);
   const nameMap = new Map((departments ?? []).map((d) => [d.id, d.name]));
-  return groupSum(pos.map((po) => ({ key: nameMap.get(po.department_id) ?? "Unknown", amount: po.total_amount })));
+  return groupSum(pos.map((po) => ({ key: nameMap.get(po.department_id) ?? "Unknown", amount: landedCost(po) })));
 }
 
 export async function getSpendByCategory(supabase: SupabaseClient): Promise<SpendRow[]> {
   const pos = await fetchPosWithContext(supabase);
-  return groupSum(pos.map((po) => ({ key: categoryOf(po), amount: po.total_amount })));
+  return groupSum(pos.map((po) => ({ key: categoryOf(po), amount: landedCost(po) })));
 }
 
 export async function getSpendByVendor(supabase: SupabaseClient): Promise<SpendRow[]> {
@@ -51,7 +57,7 @@ export async function getSpendByVendor(supabase: SupabaseClient): Promise<SpendR
     supabase.from("vendors").select("id, name"),
   ]);
   const nameMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
-  return groupSum(pos.map((po) => ({ key: nameMap.get(po.vendor_id) ?? "Unknown", amount: po.total_amount })));
+  return groupSum(pos.map((po) => ({ key: nameMap.get(po.vendor_id) ?? "Unknown", amount: landedCost(po) })));
 }
 
 export async function getSpendTrend(supabase: SupabaseClient, months = 6): Promise<SpendRow[]> {
@@ -66,7 +72,7 @@ export async function getSpendTrend(supabase: SupabaseClient, months = 6): Promi
         const created = new Date(po.created_at);
         return created.getFullYear() === d.getFullYear() && created.getMonth() === d.getMonth();
       })
-      .reduce((sum, po) => sum + po.total_amount, 0);
+      .reduce((sum, po) => sum + landedCost(po), 0);
     buckets.push({ label, amount });
   }
   return buckets;
@@ -104,6 +110,56 @@ export async function getPendingApprovalsOverview(supabase: SupabaseClient): Pro
         amount: (req?.qty ?? 0) * (req?.est_unit_cost ?? 0),
       };
     });
+}
+
+export interface ExpiringCertRow {
+  vendor_id: string;
+  vendor_name: string;
+  label: string;
+  expiry_date: string;
+  daysUntilExpiry: number;
+}
+
+// Surfaces NCDMB certs plus any vendor document with an expiry_date, within
+// the given window — a "what needs renewing soon" list for admins.
+export async function getExpiringCertifications(supabase: SupabaseClient, daysAhead = 60): Promise<ExpiringCertRow[]> {
+  const { data: vendors } = await supabase
+    .from("vendors")
+    .select("id, name, ncdmb_certificate_expiry, documents");
+
+  const now = Date.now();
+  const cutoff = now + daysAhead * 24 * 60 * 60 * 1000;
+  const rows: ExpiringCertRow[] = [];
+
+  for (const v of vendors ?? []) {
+    if (v.ncdmb_certificate_expiry) {
+      const t = new Date(v.ncdmb_certificate_expiry).getTime();
+      if (t <= cutoff) {
+        rows.push({
+          vendor_id: v.id,
+          vendor_name: v.name,
+          label: "NCDMB Certificate",
+          expiry_date: v.ncdmb_certificate_expiry,
+          daysUntilExpiry: Math.ceil((t - now) / (24 * 60 * 60 * 1000)),
+        });
+      }
+    }
+    for (const doc of (v.documents ?? []) as { document_type?: string; file_name: string; expiry_date?: string | null }[]) {
+      if (!doc.expiry_date) continue;
+      const t = new Date(doc.expiry_date).getTime();
+      if (t <= cutoff) {
+        rows.push({
+          vendor_id: v.id,
+          vendor_name: v.name,
+          label: doc.document_type || doc.file_name,
+          expiry_date: doc.expiry_date,
+          daysUntilExpiry: Math.ceil((t - now) / (24 * 60 * 60 * 1000)),
+        });
+      }
+    }
+  }
+
+  return rows.sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
 }
 
 export function toCsv(rows: SpendRow[]): string {

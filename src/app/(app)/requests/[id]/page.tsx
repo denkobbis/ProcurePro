@@ -102,6 +102,18 @@ export default async function RequestDetailPage({
               <dd className="text-zinc-900">{(vendor as Vendor).name}</dd>
             </div>
           )}
+          {request.mpn && (
+            <div>
+              <dt className="text-zinc-500">Manufacturer part number</dt>
+              <dd className="text-zinc-900">{request.mpn}</dd>
+            </div>
+          )}
+          {request.oem_brand && (
+            <div>
+              <dt className="text-zinc-500">OEM brand</dt>
+              <dd className="text-zinc-900">{request.oem_brand}</dd>
+            </div>
+          )}
           {request.justification && (
             <div className="sm:col-span-2">
               <dt className="text-zinc-500">Justification</dt>
@@ -120,12 +132,20 @@ export default async function RequestDetailPage({
             </form>
           )}
           {canConvertToPo && (
-            <Link
-              href={`/purchase-orders/new?request_id=${request.id}`}
-              className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800"
-            >
-              Convert to Purchase Order
-            </Link>
+            <>
+              <Link
+                href={`/purchase-orders/new?request_id=${request.id}`}
+                className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800"
+              >
+                Convert to Purchase Order
+              </Link>
+              <Link
+                href={`/rfqs/new?request_id=${request.id}`}
+                className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
+              >
+                Get quotes first (RFQ)
+              </Link>
+            </>
           )}
         </div>
       </div>

@@ -27,6 +27,7 @@ export default async function VendorsPage() {
               <th className="px-4 py-2">Category</th>
               <th className="px-4 py-2">Contact</th>
               <th className="px-4 py-2">Payment terms</th>
+              <th className="px-4 py-2">Currency</th>
               <th className="px-4 py-2">Approved</th>
             </tr>
           </thead>
@@ -37,10 +38,14 @@ export default async function VendorsPage() {
                   <Link href={`/vendors/${v.id}`} className="font-medium text-zinc-900 hover:underline">
                     {v.name}
                   </Link>
+                  {v.ncdmb_compliant && (
+                    <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">NCDMB</span>
+                  )}
                 </td>
                 <td className="px-4 py-2 text-zinc-700">{v.category ?? "—"}</td>
                 <td className="px-4 py-2 text-zinc-700">{v.contact_email ?? "—"}</td>
                 <td className="px-4 py-2 text-zinc-700">{v.payment_terms ?? "—"}</td>
+                <td className="px-4 py-2 text-zinc-700">{v.default_currency}</td>
                 <td className="px-4 py-2">
                   {v.is_approved ? (
                     <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
@@ -52,7 +57,7 @@ export default async function VendorsPage() {
             ))}
             {(vendors ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-zinc-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-zinc-400">
                   No vendors yet.
                 </td>
               </tr>

@@ -3,6 +3,7 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { convertToPo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
+import CurrencyFields from "@/components/CurrencyFields";
 import type { Vendor } from "@/lib/database.types";
 
 export default async function NewPurchaseOrderPage({
@@ -40,7 +41,7 @@ export default async function NewPurchaseOrderPage({
             <option value="">Select a vendor...</option>
             {(vendors ?? []).map((v: Vendor) => (
               <option key={v.id} value={v.id}>
-                {v.name}
+                {v.name} {v.ncdmb_compliant ? "· NCDMB compliant" : ""}
               </option>
             ))}
           </select>
@@ -55,10 +56,21 @@ export default async function NewPurchaseOrderPage({
         </div>
 
         <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; landed cost</label>
+          <CurrencyFields />
+        </div>
+
+        <div>
           <label className="mb-2 block text-sm font-medium text-zinc-700">Line items</label>
           <LineItemsEditor
             initialItems={[
-              { description: request.description, qty: String(request.qty), unitPrice: String(request.est_unit_cost) },
+              {
+                description: request.description,
+                qty: String(request.qty),
+                unitPrice: String(request.est_unit_cost),
+                mpn: request.mpn ?? "",
+                oemBrand: request.oem_brand ?? "",
+              },
             ]}
           />
           <p className="mt-2 text-xs text-zinc-400">

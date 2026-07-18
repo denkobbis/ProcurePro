@@ -11,6 +11,8 @@ const ALL_LINKS = [
   { href: "/approvals", label: "Approvals", roles: ["approver", "finance_admin", "super_admin"] },
   { href: "/purchase-orders", label: "Purchase Orders", roles: ["procurement_officer", "finance_admin", "super_admin"] },
   { href: "/vendors", label: "Vendors", roles: ["procurement_officer", "finance_admin", "super_admin"] },
+  { href: "/equipment", label: "Equipment", roles: ["procurement_officer", "finance_admin", "super_admin"] },
+  { href: "/rfqs", label: "RFQs", roles: ["procurement_officer", "finance_admin", "super_admin"] },
   { href: "/budgets", label: "Budgets", roles: null },
   { href: "/reports", label: "Reports", roles: ["procurement_officer", "finance_admin", "super_admin"] },
   { href: "/users", label: "Users & Departments", roles: ["finance_admin", "super_admin"] },

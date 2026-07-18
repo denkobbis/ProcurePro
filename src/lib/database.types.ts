@@ -19,8 +19,19 @@ export type RequestStatus =
 
 export type RequestUrgency = "low" | "normal" | "high" | "critical";
 export type ApprovalStatus = "pending" | "approved" | "rejected" | "info_requested";
-export type PoStatus = "draft" | "sent_to_vendor" | "partially_received" | "fully_received" | "closed";
+export type PoStatus =
+  | "draft"
+  | "sent_to_vendor"
+  | "in_transit"
+  | "customs_clearance"
+  | "partially_received"
+  | "fully_received"
+  | "closed";
 export type BudgetPeriod = "monthly" | "quarterly" | "annual";
+export type CurrencyCode = "NGN" | "USD" | "EUR" | "GBP";
+export type EquipmentStatus = "available" | "on_lease" | "maintenance" | "retired";
+export type LeaseStatus = "active" | "returned" | "overdue";
+export type RfqStatus = "open" | "awarded" | "cancelled";
 
 export interface Department {
   id: string;
@@ -38,6 +49,14 @@ export interface Profile {
   created_at: string;
 }
 
+export interface VendorDocument {
+  file_path: string;
+  file_name: string;
+  uploaded_at: string;
+  document_type?: string;
+  expiry_date?: string | null;
+}
+
 export interface Vendor {
   id: string;
   name: string;
@@ -46,9 +65,14 @@ export interface Vendor {
   contact_phone: string | null;
   payment_terms: string | null;
   bank_details: Record<string, unknown> | null;
-  documents: unknown[];
+  documents: VendorDocument[];
   is_approved: boolean;
   performance_notes: string | null;
+  default_currency: CurrencyCode;
+  ncdmb_compliant: boolean;
+  ncdmb_certificate_number: string | null;
+  ncdmb_certificate_expiry: string | null;
+  local_content_percentage: number | null;
   created_by: string | null;
   created_at: string;
 }
@@ -90,6 +114,8 @@ export interface PurchaseRequest {
   urgency: RequestUrgency;
   status: RequestStatus;
   current_step: number;
+  mpn: string | null;
+  oem_brand: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -141,6 +167,18 @@ export interface PurchaseOrder {
   status: PoStatus;
   total_amount: number;
   delivery_terms: string | null;
+  currency: CurrencyCode;
+  fx_rate_to_ngn: number;
+  total_amount_ngn: number;
+  freight_cost_ngn: number;
+  customs_duty_ngn: number;
+  carrier: string | null;
+  tracking_number: string | null;
+  eta: string | null;
+  customs_reference: string | null;
+  customs_cleared_at: string | null;
+  local_content_percentage: number | null;
+  ncdmb_certificate_number: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -154,6 +192,56 @@ export interface PoLineItem {
   unit_price: number;
   received_qty: number;
   quality_pass: boolean | null;
+  mpn: string | null;
+  oem_brand: string | null;
+  created_at: string;
+}
+
+export interface EquipmentAsset {
+  id: string;
+  asset_tag: string;
+  name: string;
+  category: string;
+  status: EquipmentStatus;
+  day_rate_ngn: number;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface EquipmentLease {
+  id: string;
+  asset_id: string;
+  client_name: string;
+  start_date: string;
+  expected_return_date: string;
+  actual_return_date: string | null;
+  day_rate_ngn: number;
+  status: LeaseStatus;
+  return_condition: string | null;
+  return_inspection_pass: boolean | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface Rfq {
+  id: string;
+  request_id: string;
+  status: RfqStatus;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface RfqQuote {
+  id: string;
+  rfq_id: string;
+  vendor_id: string;
+  unit_price: number;
+  currency: CurrencyCode;
+  lead_time_days: number | null;
+  notes: string | null;
+  is_winner: boolean;
+  created_by: string | null;
   created_at: string;
 }
 

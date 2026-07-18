@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatNaira } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import type { PurchaseOrder, Vendor } from "@/lib/database.types";
 
@@ -42,7 +42,7 @@ export default async function PurchaseOrdersPage() {
                   </Link>
                 </td>
                 <td className="px-4 py-2 text-zinc-700">{vendorMap.get(po.vendor_id) ?? "—"}</td>
-                <td className="px-4 py-2 text-zinc-700">{formatNaira(po.total_amount)}</td>
+                <td className="px-4 py-2 text-zinc-700">{formatMoney(po.total_amount, po.currency)}</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={po.status} />
                 </td>

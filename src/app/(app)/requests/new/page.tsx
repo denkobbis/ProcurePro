@@ -70,6 +70,17 @@ export default async function NewRequestPage() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-zinc-700">Manufacturer part number (optional)</label>
+            <input name="mpn" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" placeholder="e.g. HT-4500-XL" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-700">OEM brand (optional)</label>
+            <input name="oem_brand" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" placeholder="e.g. Hytorc, Emerson, Ludecke" />
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-zinc-700">Preferred vendor (optional)</label>
           <select name="vendor_id" defaultValue="" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">

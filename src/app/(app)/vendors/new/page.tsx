@@ -1,5 +1,6 @@
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createVendor } from "@/app/actions/vendors";
+import NcdmbFields from "@/components/NcdmbFields";
 
 export default async function NewVendorPage() {
   const profile = await getCurrentProfile();
@@ -35,6 +36,12 @@ export default async function NewVendorPage() {
           <input type="checkbox" name="is_approved" className="rounded border-zinc-300" />
           Mark as approved (can be used on purchase orders immediately)
         </label>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; compliance</label>
+          <NcdmbFields />
+        </div>
+
         <button className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
           Save vendor
         </button>

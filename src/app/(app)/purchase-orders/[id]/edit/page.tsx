@@ -3,6 +3,7 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { updatePo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
+import CurrencyFields from "@/components/CurrencyFields";
 import type { PoLineItem, Vendor } from "@/lib/database.types";
 
 export default async function EditPurchaseOrderPage({ params }: { params: Promise<{ id: string }> }) {
@@ -52,12 +53,24 @@ export default async function EditPurchaseOrderPage({ params }: { params: Promis
         </div>
 
         <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; landed cost</label>
+          <CurrencyFields
+            defaultCurrency={po.currency}
+            defaultFxRate={po.fx_rate_to_ngn}
+            defaultFreightCost={po.freight_cost_ngn}
+            defaultCustomsDuty={po.customs_duty_ngn}
+          />
+        </div>
+
+        <div>
           <label className="mb-2 block text-sm font-medium text-zinc-700">Line items</label>
           <LineItemsEditor
             initialItems={(lineItems ?? []).map((li: PoLineItem) => ({
               description: li.description,
               qty: String(li.qty),
               unitPrice: String(li.unit_price),
+              mpn: li.mpn ?? "",
+              oemBrand: li.oem_brand ?? "",
             }))}
           />
         </div>
