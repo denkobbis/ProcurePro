@@ -10,15 +10,15 @@ export default function BarList({ rows, limit }: { rows: SpendRow[]; limit?: num
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-3">
       {shown.map((r) => (
         <li key={r.label}>
           <div className="flex items-baseline justify-between text-sm">
             <span className="text-zinc-700">{r.label}</span>
-            <span className="text-zinc-900">{formatNaira(r.amount)}</span>
+            <span className="font-medium text-zinc-900">{formatNaira(r.amount)}</span>
           </div>
-          <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-            <div className="h-full bg-zinc-900" style={{ width: `${(r.amount / max) * 100}%` }} />
+          <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+            <div className="h-full rounded-full bg-blue-600" style={{ width: `${(r.amount / max) * 100}%` }} />
           </div>
         </li>
       ))}

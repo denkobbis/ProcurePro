@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { convertToPo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
 import CurrencyFields from "@/components/CurrencyFields";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/Button";
 import type { Vendor } from "@/lib/database.types";
 
 export default async function NewPurchaseOrderPage({
@@ -25,19 +27,17 @@ export default async function NewPurchaseOrderPage({
 
   return (
     <div className="max-w-2xl space-y-4">
-      <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Create Purchase Order</h1>
-        <p className="text-sm text-zinc-500">
-          From request {request.request_number}: {request.description}
-        </p>
-      </div>
+      <PageHeader
+        title="Create Purchase Order"
+        description={`From request ${request.request_number}: ${request.description}`}
+      />
 
-      <form action={convertToPo} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+      <form action={convertToPo} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <input type="hidden" name="request_id" value={request.id} />
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Vendor</label>
-          <select name="vendor_id" required defaultValue={request.vendor_id ?? ""} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
+          <select name="vendor_id" required defaultValue={request.vendor_id ?? ""} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
             <option value="">Select a vendor...</option>
             {(vendors ?? []).map((v: Vendor) => (
               <option key={v.id} value={v.id}>
@@ -52,7 +52,7 @@ export default async function NewPurchaseOrderPage({
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Delivery terms</label>
-          <textarea name="delivery_terms" rows={2} placeholder="e.g. Deliver to Port Harcourt yard within 10 days" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" />
+          <textarea name="delivery_terms" rows={2} placeholder="e.g. Deliver to Port Harcourt yard within 10 days" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
         </div>
 
         <div>
@@ -78,9 +78,9 @@ export default async function NewPurchaseOrderPage({
           </p>
         </div>
 
-        <button className="rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800">
+        <Button type="submit" variant="success">
           Create Purchase Order
-        </button>
+        </Button>
       </form>
     </div>
   );

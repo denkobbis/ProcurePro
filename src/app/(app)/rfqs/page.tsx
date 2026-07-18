@@ -2,6 +2,9 @@ import Link from "next/link";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import StatusBadge from "@/components/StatusBadge";
+import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
+import { ScaleIcon } from "@/components/icons";
 import type { Rfq } from "@/lib/database.types";
 
 export default async function RfqsPage() {
@@ -25,42 +28,39 @@ export default async function RfqsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-zinc-900">Requests for Quote</h1>
+      <PageHeader title="Requests for Quote" description="Compare vendor quotes before committing to a purchase order." />
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-        <table className="w-full min-w-[560px] text-sm">
-          <thead className="bg-zinc-50 text-left text-zinc-500">
-            <tr>
-              <th className="px-4 py-2">Request #</th>
-              <th className="px-4 py-2">Description</th>
-              <th className="px-4 py-2">Quotes</th>
-              <th className="px-4 py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((rfq) => (
-              <tr key={rfq.id} className="border-t border-zinc-100 hover:bg-zinc-50">
-                <td className="px-4 py-2">
-                  <Link href={`/rfqs/${rfq.id}`} className="font-medium text-zinc-900 hover:underline">
-                    {rfq.requests?.request_number ?? "—"}
-                  </Link>
-                </td>
-                <td className="max-w-xs truncate px-4 py-2 text-zinc-700">{rfq.requests?.description ?? "—"}</td>
-                <td className="px-4 py-2 text-zinc-700">{countMap.get(rfq.id) ?? 0}</td>
-                <td className="px-4 py-2">
-                  <StatusBadge status={rfq.status} />
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
+      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+        {rows.length === 0 ? (
+          <EmptyState icon={<ScaleIcon />} title="No RFQs yet" description="Start one from an approved request to compare vendor quotes." />
+        ) : (
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-zinc-400">
-                  No RFQs yet. Start one from an approved request.
-                </td>
+                <th className="px-4 py-3">Request #</th>
+                <th className="px-4 py-3">Description</th>
+                <th className="px-4 py-3">Quotes</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {rows.map((rfq) => (
+                <tr key={rfq.id} className="transition-colors hover:bg-blue-50/40">
+                  <td className="px-4 py-3">
+                    <Link href={`/rfqs/${rfq.id}`} className="font-medium text-blue-700 hover:underline">
+                      {rfq.requests?.request_number ?? "—"}
+                    </Link>
+                  </td>
+                  <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{rfq.requests?.description ?? "—"}</td>
+                  <td className="px-4 py-3 text-zinc-700">{countMap.get(rfq.id) ?? 0}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={rfq.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

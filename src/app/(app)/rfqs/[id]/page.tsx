@@ -4,6 +4,9 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
+import { Button } from "@/components/Button";
+import EmptyState from "@/components/EmptyState";
+import { ScaleIcon } from "@/components/icons";
 import { addRfqQuote } from "@/app/actions/rfq";
 import type { RfqQuote, Vendor } from "@/lib/database.types";
 
@@ -31,65 +34,62 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">RFQ for {request?.request_number}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">RFQ for {request?.request_number}</h1>
           <p className="text-sm text-zinc-500">{request?.description}</p>
         </div>
         <StatusBadge status={rfq.status} />
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-3 font-medium text-zinc-900">Quotes</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <h2 className="border-b border-zinc-200 px-6 py-3 text-sm font-semibold text-zinc-900">Quotes</h2>
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="border-b border-zinc-200 text-left text-zinc-500">
-            <tr>
-              <th className="py-2">Vendor</th>
-              <th>Unit price</th>
-              <th>Lead time</th>
-              <th>Notes</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {quoteList.map((q) => (
-              <tr key={q.id} className="border-b border-zinc-100">
-                <td className="py-2">
-                  {vendorMap.get(q.vendor_id) ?? "—"}
-                  {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
-                </td>
-                <td>{formatMoney(q.unit_price, q.currency)}</td>
-                <td>{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
-                <td className="max-w-xs truncate text-zinc-500">{q.notes ?? "—"}</td>
-                <td>
-                  {rfq.status === "open" && (
-                    <Link
-                      href={`/rfqs/${rfq.id}/award?quote_id=${q.id}`}
-                      className="rounded-md bg-green-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-green-800"
-                    >
-                      Award
-                    </Link>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {quoteList.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-6 text-center text-zinc-400">
-                  No quotes yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          {quoteList.length === 0 ? (
+            <EmptyState icon={<ScaleIcon />} title="No quotes yet" />
+          ) : (
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <tr>
+                  <th className="px-6 py-3">Vendor</th>
+                  <th className="px-4 py-3">Unit price</th>
+                  <th className="px-4 py-3">Lead time</th>
+                  <th className="px-4 py-3">Notes</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {quoteList.map((q) => (
+                  <tr key={q.id} className="transition-colors hover:bg-blue-50/40">
+                    <td className="px-6 py-3 font-medium text-zinc-900">
+                      {vendorMap.get(q.vendor_id) ?? "—"}
+                      {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
+                    </td>
+                    <td className="px-4 py-3 text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
+                    <td className="px-4 py-3 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
+                    <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{q.notes ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      {rfq.status === "open" && (
+                        <Link
+                          href={`/rfqs/${rfq.id}/award?quote_id=${q.id}`}
+                          className="rounded-md bg-green-700 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-green-800"
+                        >
+                          Award
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
       {rfq.status === "open" && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="mb-3 font-medium text-zinc-900">Add a quote</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Add a quote</h2>
           <form action={addRfqQuote} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="rfq_id" value={rfq.id} />
-            <select name="vendor_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm sm:col-span-2">
+            <select name="vendor_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:col-span-2">
               <option value="">Vendor...</option>
               {(vendors ?? []).map((v: Vendor) => (
                 <option key={v.id} value={v.id}>
@@ -97,19 +97,17 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                 </option>
               ))}
             </select>
-            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <select name="currency" defaultValue="NGN" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm">
+            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <select name="currency" defaultValue="NGN" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
             </select>
-            <input name="lead_time_days" type="number" min="0" placeholder="Lead time (days)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <input name="notes" placeholder="Notes (optional)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 sm:col-span-2">
-              Add quote
-            </button>
+            <input name="lead_time_days" type="number" min="0" placeholder="Lead time (days)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="notes" placeholder="Notes (optional)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <Button type="submit" className="sm:col-span-2">Add quote</Button>
           </form>
         </div>
       )}

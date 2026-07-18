@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { checkBudget } from "@/lib/budget";
 import { formatNaira } from "@/lib/money";
 import { createBudget } from "@/app/actions/budgets";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/Button";
+import EmptyState from "@/components/EmptyState";
+import { WalletIcon } from "@/components/icons";
 import type { Budget, Department } from "@/lib/database.types";
 
 export default async function BudgetsPage() {
@@ -25,63 +29,68 @@ export default async function BudgetsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-zinc-900">Budgets</h1>
+      <PageHeader title="Budgets" />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {rows.map(({ budget, usage }) => {
-          const used = usage.committed + usage.spent;
-          const pct = budget.allocated_amount > 0 ? Math.min(100, (used / budget.allocated_amount) * 100) : 0;
-          const over = used > budget.allocated_amount;
-          return (
-            <div key={budget.id} className="rounded-lg border border-zinc-200 bg-white p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium text-zinc-900">{budget.category}</div>
-                  <div className="text-xs text-zinc-500">
-                    {deptMap.get(budget.department_id) ?? "—"} · {budget.period_start} → {budget.period_end}
+      {rows.length === 0 ? (
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <EmptyState icon={<WalletIcon />} title="No budgets set up yet" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {rows.map(({ budget, usage }) => {
+            const used = usage.committed + usage.spent;
+            const pct = budget.allocated_amount > 0 ? Math.min(100, (used / budget.allocated_amount) * 100) : 0;
+            const over = used > budget.allocated_amount;
+            return (
+              <div key={budget.id} className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-zinc-900">{budget.category}</div>
+                    <div className="text-xs text-zinc-500">
+                      {deptMap.get(budget.department_id) ?? "—"} · {budget.period_start} → {budget.period_end}
+                    </div>
                   </div>
+                  {budget.hard_block && (
+                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">Hard block</span>
+                  )}
                 </div>
-                {budget.hard_block && (
-                  <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">Hard block</span>
-                )}
-              </div>
 
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-                <div
-                  className={`h-full ${over ? "bg-red-600" : pct > 80 ? "bg-amber-500" : "bg-green-600"}`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+                  <div
+                    className={`h-full transition-all ${over ? "bg-red-600" : pct > 80 ? "bg-amber-500" : "bg-blue-600"}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
 
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <div className="flex justify-between col-span-2">
-                  <dt className="text-zinc-500">Allocated</dt>
-                  <dd className="text-zinc-900">{formatNaira(budget.allocated_amount)}</dd>
-                </div>
-                <div className="flex justify-between col-span-2">
-                  <dt className="text-zinc-500">Committed (pending requests)</dt>
-                  <dd className="text-zinc-900">{formatNaira(usage.committed)}</dd>
-                </div>
-                <div className="flex justify-between col-span-2">
-                  <dt className="text-zinc-500">Spent (POs raised)</dt>
-                  <dd className="text-zinc-900">{formatNaira(usage.spent)}</dd>
-                </div>
-                <div className="flex justify-between col-span-2 border-t border-zinc-100 pt-1 font-medium">
-                  <dt className={over ? "text-red-600" : "text-zinc-700"}>Remaining</dt>
-                  <dd className={over ? "text-red-600" : "text-zinc-900"}>
-                    {formatNaira(budget.allocated_amount - used)}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          );
-        })}
-        {rows.length === 0 && <p className="text-zinc-400">No budgets set up yet.</p>}
-      </div>
+                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                  <div className="flex justify-between col-span-2">
+                    <dt className="text-zinc-500">Allocated</dt>
+                    <dd className="text-zinc-900">{formatNaira(budget.allocated_amount)}</dd>
+                  </div>
+                  <div className="flex justify-between col-span-2">
+                    <dt className="text-zinc-500">Committed (pending requests)</dt>
+                    <dd className="text-zinc-900">{formatNaira(usage.committed)}</dd>
+                  </div>
+                  <div className="flex justify-between col-span-2">
+                    <dt className="text-zinc-500">Spent (POs raised)</dt>
+                    <dd className="text-zinc-900">{formatNaira(usage.spent)}</dd>
+                  </div>
+                  <div className="flex justify-between col-span-2 border-t border-zinc-100 pt-1 font-medium">
+                    <dt className={over ? "text-red-600" : "text-zinc-700"}>Remaining</dt>
+                    <dd className={over ? "text-red-600" : "text-zinc-900"}>
+                      {formatNaira(budget.allocated_amount - used)}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {isAdmin && (
-        <section className="rounded-lg border border-zinc-200 bg-white p-5">
-          <h2 className="mb-3 font-medium text-zinc-900">Allocate a budget</h2>
+        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Allocate a budget</h2>
           <form action={createBudget} className="grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
             <select name="department_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm">
               <option value="">Department...</option>
@@ -110,9 +119,7 @@ export default async function BudgetsPage() {
               <input type="checkbox" name="hard_block" className="rounded border-zinc-300" />
               Hard block — refuse submission once this budget is exceeded (otherwise it&apos;s a soft warning)
             </label>
-            <button className="sm:col-span-2 rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-              Save budget
-            </button>
+            <Button type="submit" className="sm:col-span-2">Save budget</Button>
           </form>
         </section>
       )}

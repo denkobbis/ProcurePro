@@ -3,6 +3,10 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
+import PageHeader from "@/components/PageHeader";
+import { ButtonLink } from "@/components/Button";
+import EmptyState from "@/components/EmptyState";
+import { TruckIcon } from "@/components/icons";
 import type { EquipmentAsset } from "@/lib/database.types";
 
 export default async function EquipmentPage() {
@@ -11,52 +15,45 @@ export default async function EquipmentPage() {
 
   const supabase = await createClient();
   const { data: assets } = await supabase.from("equipment_assets").select("*").order("name");
+  const rows = assets ?? [];
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Equipment</h1>
-        <Link href="/equipment/new" className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-          Add asset
-        </Link>
-      </div>
+      <PageHeader title="Equipment" actions={<ButtonLink href="/equipment/new">Add asset</ButtonLink>} />
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-        <table className="w-full min-w-[560px] text-sm">
-          <thead className="bg-zinc-50 text-left text-zinc-500">
-            <tr>
-              <th className="px-4 py-2">Asset tag</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Category</th>
-              <th className="px-4 py-2">Day rate</th>
-              <th className="px-4 py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(assets ?? []).map((a: EquipmentAsset) => (
-              <tr key={a.id} className="border-t border-zinc-100 hover:bg-zinc-50">
-                <td className="px-4 py-2">
-                  <Link href={`/equipment/${a.id}`} className="font-medium text-zinc-900 hover:underline">
-                    {a.asset_tag}
-                  </Link>
-                </td>
-                <td className="px-4 py-2 text-zinc-700">{a.name}</td>
-                <td className="px-4 py-2 text-zinc-700">{a.category}</td>
-                <td className="px-4 py-2 text-zinc-700">{formatNaira(a.day_rate_ngn)}/day</td>
-                <td className="px-4 py-2">
-                  <StatusBadge status={a.status} />
-                </td>
-              </tr>
-            ))}
-            {(assets ?? []).length === 0 && (
+      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+        {rows.length === 0 ? (
+          <EmptyState icon={<TruckIcon />} title="No equipment on file yet" action={<ButtonLink href="/equipment/new" size="sm">Add asset</ButtonLink>} />
+        ) : (
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-zinc-400">
-                  No equipment on file yet.
-                </td>
+                <th className="px-4 py-3">Asset tag</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Category</th>
+                <th className="px-4 py-3">Day rate</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {rows.map((a: EquipmentAsset) => (
+                <tr key={a.id} className="transition-colors hover:bg-blue-50/40">
+                  <td className="px-4 py-3">
+                    <Link href={`/equipment/${a.id}`} className="font-medium text-blue-700 hover:underline">
+                      {a.asset_tag}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-zinc-700">{a.name}</td>
+                  <td className="px-4 py-3 text-zinc-700">{a.category}</td>
+                  <td className="px-4 py-3 text-zinc-700">{formatNaira(a.day_rate_ngn)}/day</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={a.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

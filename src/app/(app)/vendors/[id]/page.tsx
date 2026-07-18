@@ -3,6 +3,8 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/Button";
 import type { VendorDocument } from "@/lib/database.types";
 
 function expiryBadge(expiryDate?: string | null) {
@@ -31,12 +33,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{vendor.name}</h1>
-        <p className="text-sm text-zinc-500">{vendor.category ?? "No category set"}</p>
-      </div>
+      <PageHeader title={vendor.name} description={vendor.category ?? "No category set"} />
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 space-y-4">
+      <div className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-zinc-500">Contact email</dt>
@@ -56,12 +55,12 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <input type="checkbox" name="is_approved" defaultChecked={vendor.is_approved} className="rounded border-zinc-300" />
           <label className="text-sm text-zinc-700">Approved for use on purchase orders</label>
-          <button className="ml-auto rounded-md border border-zinc-300 px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-50">Save</button>
+          <Button type="submit" variant="secondary" size="sm" className="ml-auto">Save</Button>
         </form>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-2 font-medium text-zinc-900">Currency &amp; Nigerian Content compliance</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Currency &amp; Nigerian Content compliance</h2>
         <form action={updateVendorCompliance} className="space-y-3">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <NcdmbFields
@@ -74,12 +73,12 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           {expiryBadge(vendor.ncdmb_certificate_expiry) && (
             <p className="text-sm text-zinc-600">NCDMB certificate {expiryBadge(vendor.ncdmb_certificate_expiry)}</p>
           )}
-          <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">Save</button>
+          <Button type="submit" size="sm">Save</Button>
         </form>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-2 font-medium text-zinc-900">Performance notes</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Performance notes</h2>
         <form action={updatePerformanceNotes} className="space-y-2">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <textarea
@@ -87,14 +86,14 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             rows={3}
             defaultValue={vendor.performance_notes ?? ""}
             placeholder="e.g. Late delivery on PO#123, otherwise reliable"
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           />
-          <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">Save notes</button>
+          <Button type="submit" size="sm">Save notes</Button>
         </form>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-2 font-medium text-zinc-900">Documents</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Documents</h2>
         <ul className="mb-3 space-y-1 text-sm">
           {documents.map((d) => (
             <li key={d.file_path} className="text-zinc-700">
@@ -112,10 +111,10 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
         </ul>
         <form action={uploadVendorDocument} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
           <input type="hidden" name="vendor_id" value={vendor.id} />
-          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm sm:col-span-2" />
-          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm" />
+          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:col-span-2" />
+          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
           <input type="file" name="document" className="text-sm" />
-          <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 sm:col-span-4">Upload</button>
+          <Button type="submit" variant="secondary" size="sm" className="sm:col-span-4">Upload</Button>
         </form>
       </div>
     </div>

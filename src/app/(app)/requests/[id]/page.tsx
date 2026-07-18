@@ -4,6 +4,7 @@ import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
+import { Button, ButtonLink } from "@/components/Button";
 import { submitRequest, addRequestComment, addRequestAttachment } from "@/app/actions/requests";
 import type { Approval, RequestComment, RequestAttachment, Profile, Vendor } from "@/lib/database.types";
 
@@ -53,7 +54,7 @@ export default async function RequestDetailPage({
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{request.request_number}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{request.request_number}</h1>
           <p className="text-sm text-zinc-500">{(department as { name?: string } | null)?.name}</p>
         </div>
         <StatusBadge status={request.status} />
@@ -66,7 +67,7 @@ export default async function RequestDetailPage({
         </div>
       )}
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div className="sm:col-span-2">
             <dt className="text-zinc-500">Description</dt>
@@ -126,32 +127,27 @@ export default async function RequestDetailPage({
           {canSubmit && (
             <form action={submitRequest}>
               <input type="hidden" name="request_id" value={request.id} />
-              <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-                Submit for approval
-              </button>
+              <Button type="submit" size="sm">Submit for approval</Button>
             </form>
           )}
           {canConvertToPo && (
             <>
               <Link
                 href={`/purchase-orders/new?request_id=${request.id}`}
-                className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-green-700 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1"
               >
                 Convert to Purchase Order
               </Link>
-              <Link
-                href={`/rfqs/new?request_id=${request.id}`}
-                className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
-              >
+              <ButtonLink href={`/rfqs/new?request_id=${request.id}`} variant="secondary" size="sm">
                 Get quotes first (RFQ)
-              </Link>
+              </ButtonLink>
             </>
           )}
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-3 font-medium text-zinc-900">Approval trail</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900">Approval trail</h2>
         {(approvals ?? []).length === 0 && <p className="text-sm text-zinc-400">Not submitted yet.</p>}
         <ol className="space-y-2">
           {(approvals ?? []).map((a: Approval) => (
@@ -166,8 +162,8 @@ export default async function RequestDetailPage({
         </ol>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-3 font-medium text-zinc-900">Attachments</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900">Attachments</h2>
         <ul className="mb-3 space-y-1 text-sm">
           {attachmentList.map((a) => (
             <li key={a.id} className="text-zinc-700">
@@ -185,12 +181,12 @@ export default async function RequestDetailPage({
         <form action={addRequestAttachment} className="flex items-center gap-2">
           <input type="hidden" name="request_id" value={request.id} />
           <input type="file" name="attachment" className="text-sm" />
-          <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50">Upload</button>
+          <Button type="submit" variant="secondary" size="sm">Upload</Button>
         </form>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="mb-3 font-medium text-zinc-900">Comments</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900">Comments</h2>
         <ul className="mb-4 space-y-3">
           {(comments ?? []).map((c: RequestComment) => (
             <li key={c.id} className="text-sm">
@@ -203,8 +199,8 @@ export default async function RequestDetailPage({
         </ul>
         <form action={addRequestComment} className="flex gap-2">
           <input type="hidden" name="request_id" value={request.id} />
-          <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-          <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">Post</button>
+          <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+          <Button type="submit" size="sm">Post</Button>
         </form>
       </div>
     </div>

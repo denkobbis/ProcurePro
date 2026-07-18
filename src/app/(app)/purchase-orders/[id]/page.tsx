@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira, formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import PrintButton from "@/components/PrintButton";
+import { Button, ButtonLink } from "@/components/Button";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
 import type { PoLineItem } from "@/lib/database.types";
 
@@ -30,7 +30,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{po.po_number}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{po.po_number}</h1>
           <p className="text-sm text-zinc-500">{(department as { name?: string } | null)?.name}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -39,7 +39,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-zinc-500">Vendor</dt>
@@ -110,101 +110,90 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
           </dl>
         )}
 
-        <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="border-b border-zinc-200 text-left text-zinc-500">
-            <tr>
-              <th className="py-2">Description</th>
-              <th>MPN / Brand</th>
-              <th>Qty</th>
-              <th>Unit price</th>
-              <th>Line total</th>
-              <th>Received</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((li) => (
-              <tr key={li.id} className="border-b border-zinc-100">
-                <td className="py-2">{li.description}</td>
-                <td className="text-zinc-500">
-                  {li.mpn || li.oem_brand ? `${li.mpn ?? ""}${li.mpn && li.oem_brand ? " · " : ""}${li.oem_brand ?? ""}` : "—"}
-                </td>
-                <td>{li.qty}</td>
-                <td>{formatMoney(li.unit_price, po.currency)}</td>
-                <td>{formatMoney(li.qty * li.unit_price, po.currency)}</td>
-                <td>
-                  {li.received_qty} / {li.qty}
-                  {li.quality_pass !== null && (
-                    <span className={`ml-2 text-xs ${li.quality_pass ? "text-green-700" : "text-red-600"}`}>
-                      {li.quality_pass ? "Pass" : "Fail"}
-                    </span>
-                  )}
-                </td>
+        <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-200">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <tr>
+                <th className="px-4 py-3">Description</th>
+                <th className="px-4 py-3">MPN / Brand</th>
+                <th className="whitespace-nowrap px-4 py-3 text-right">Qty</th>
+                <th className="whitespace-nowrap px-4 py-3 text-right">Unit price</th>
+                <th className="whitespace-nowrap px-4 py-3 text-right">Line total</th>
+                <th className="whitespace-nowrap px-4 py-3">Received</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {items.map((li) => (
+                <tr key={li.id} className="transition-colors hover:bg-blue-50/40">
+                  <td className="px-4 py-3 text-zinc-900">{li.description}</td>
+                  <td className="px-4 py-3 text-zinc-500">
+                    {li.mpn || li.oem_brand ? `${li.mpn ?? ""}${li.mpn && li.oem_brand ? " · " : ""}${li.oem_brand ?? ""}` : "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right text-zinc-700">{li.qty}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right text-zinc-700">{formatMoney(li.unit_price, po.currency)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-zinc-900">{formatMoney(li.qty * li.unit_price, po.currency)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-zinc-700">
+                    {li.received_qty} / {li.qty}
+                    {li.quality_pass !== null && (
+                      <span className={`ml-2 text-xs font-medium ${li.quality_pass ? "text-green-700" : "text-red-600"}`}>
+                        {li.quality_pass ? "Pass" : "Fail"}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 print:hidden">
           {po.status === "draft" && (
             <>
-              <Link
-                href={`/purchase-orders/${po.id}/edit`}
-                className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
-              >
+              <ButtonLink href={`/purchase-orders/${po.id}/edit`} variant="secondary" size="sm">
                 Edit
-              </Link>
+              </ButtonLink>
               <form action={markPoSent}>
                 <input type="hidden" name="po_id" value={po.id} />
-                <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-                  Mark sent to vendor
-                </button>
+                <Button type="submit" size="sm">Mark sent to vendor</Button>
               </form>
             </>
           )}
           {po.status === "fully_received" && (
             <form action={closePo}>
               <input type="hidden" name="po_id" value={po.id} />
-              <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50">
-                Close PO
-              </button>
+              <Button type="submit" variant="secondary" size="sm">Close PO</Button>
             </form>
           )}
         </div>
       </div>
 
       {po.status === "sent_to_vendor" && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 print:hidden">
-          <h2 className="mb-3 font-medium text-zinc-900">Shipping</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm print:hidden">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Shipping</h2>
           <form action={markPoInTransit} className="grid grid-cols-1 gap-3 sm:grid-cols-4">
             <input type="hidden" name="po_id" value={po.id} />
-            <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-              Mark in transit
-            </button>
+            <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <Button type="submit" size="sm">Mark in transit</Button>
           </form>
         </div>
       )}
 
       {(po.status === "sent_to_vendor" || po.status === "in_transit") && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 print:hidden">
-          <h2 className="mb-3 font-medium text-zinc-900">Customs</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm print:hidden">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Customs</h2>
           <form action={markPoCustomsCleared} className="flex flex-wrap gap-3">
             <input type="hidden" name="po_id" value={po.id} />
-            <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-            <button className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-              Mark cleared customs
-            </button>
+            <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <Button type="submit" size="sm">Mark cleared customs</Button>
           </form>
         </div>
       )}
 
       {po.status !== "draft" && po.status !== "closed" && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 print:hidden">
-          <h2 className="mb-3 font-medium text-zinc-900">Receive items</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm print:hidden">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Receive items</h2>
           <div className="space-y-3">
             {items
               .filter((li) => li.received_qty < li.qty)
@@ -224,16 +213,14 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                       step="0.01"
                       max={li.qty - li.received_qty}
                       required
-                      className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm"
+                      className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <label className="flex items-center gap-1 text-sm text-zinc-700">
                     <input type="checkbox" name="quality_pass" defaultChecked className="rounded border-zinc-300" />
                     Quality pass
                   </label>
-                  <button className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800">
-                    Record
-                  </button>
+                  <Button type="submit" variant="success" size="sm">Record</Button>
                 </form>
               ))}
             {items.every((li) => li.received_qty >= li.qty) && (

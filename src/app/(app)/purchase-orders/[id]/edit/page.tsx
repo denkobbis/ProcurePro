@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { updatePo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
 import CurrencyFields from "@/components/CurrencyFields";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/Button";
 import type { PoLineItem, Vendor } from "@/lib/database.types";
 
 export default async function EditPurchaseOrderPage({ params }: { params: Promise<{ id: string }> }) {
@@ -23,17 +25,17 @@ export default async function EditPurchaseOrderPage({ params }: { params: Promis
 
   return (
     <div className="max-w-2xl space-y-4">
-      <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Edit {po.po_number}</h1>
-        <p className="text-sm text-zinc-500">Only draft purchase orders can be edited — changes are recorded in the audit log.</p>
-      </div>
+      <PageHeader
+        title={`Edit ${po.po_number}`}
+        description="Only draft purchase orders can be edited — changes are recorded in the audit log."
+      />
 
-      <form action={updatePo} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+      <form action={updatePo} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <input type="hidden" name="po_id" value={po.id} />
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Vendor</label>
-          <select name="vendor_id" required defaultValue={po.vendor_id} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
+          <select name="vendor_id" required defaultValue={po.vendor_id} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
             {(vendors ?? []).map((v: Vendor) => (
               <option key={v.id} value={v.id}>
                 {v.name}
@@ -48,7 +50,7 @@ export default async function EditPurchaseOrderPage({ params }: { params: Promis
             name="delivery_terms"
             rows={2}
             defaultValue={po.delivery_terms ?? ""}
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           />
         </div>
 
@@ -75,9 +77,7 @@ export default async function EditPurchaseOrderPage({ params }: { params: Promis
           />
         </div>
 
-        <button className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
-          Save changes
-        </button>
+        <Button type="submit">Save changes</Button>
       </form>
     </div>
   );

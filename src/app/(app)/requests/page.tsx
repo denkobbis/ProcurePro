@@ -3,6 +3,10 @@ import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
+import PageHeader from "@/components/PageHeader";
+import { ButtonLink } from "@/components/Button";
+import EmptyState from "@/components/EmptyState";
+import { DocumentIcon } from "@/components/icons";
 import type { PurchaseRequest, Profile } from "@/lib/database.types";
 
 export default async function RequestsPage() {
@@ -21,54 +25,52 @@ export default async function RequestsPage() {
     ? await supabase.from("profiles").select("id, full_name").in("id", requesterIds)
     : { data: [] as Pick<Profile, "id" | "full_name">[] };
   const nameMap = new Map((requesters ?? []).map((p) => [p.id, p.full_name]));
+  const rows = requests ?? [];
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Purchase requests</h1>
-        <Link href="/requests/new" className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800">
-          New request
-        </Link>
-      </div>
+      <PageHeader title="Purchase requests" actions={<ButtonLink href="/requests/new">New request</ButtonLink>} />
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="bg-zinc-50 text-left text-zinc-500">
-            <tr>
-              <th className="px-4 py-2">Request #</th>
-              <th className="px-4 py-2">Description</th>
-              <th className="px-4 py-2">Requester</th>
-              <th className="px-4 py-2">Total est.</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(requests ?? []).map((r: PurchaseRequest) => (
-              <tr key={r.id} className="border-t border-zinc-100 hover:bg-zinc-50">
-                <td className="px-4 py-2">
-                  <Link href={`/requests/${r.id}`} className="font-medium text-zinc-900 hover:underline">
-                    {r.request_number}
-                  </Link>
-                </td>
-                <td className="max-w-xs truncate px-4 py-2 text-zinc-700">{r.description}</td>
-                <td className="px-4 py-2 text-zinc-700">{nameMap.get(r.requester_id) ?? "—"}</td>
-                <td className="px-4 py-2 text-zinc-700">{formatNaira(r.qty * r.est_unit_cost)}</td>
-                <td className="px-4 py-2">
-                  <StatusBadge status={r.status} />
-                </td>
-                <td className="px-4 py-2 text-zinc-500">{new Date(r.created_at).toLocaleDateString()}</td>
-              </tr>
-            ))}
-            {(requests ?? []).length === 0 && (
+      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+        {rows.length === 0 ? (
+          <EmptyState
+            icon={<DocumentIcon />}
+            title="No requests yet"
+            description="Once you or your team submit a purchase request, it'll show up here."
+            action={<ButtonLink href="/requests/new" size="sm">New request</ButtonLink>}
+          />
+        ) : (
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-zinc-400">
-                  No requests yet.
-                </td>
+                <th className="px-4 py-3">Request #</th>
+                <th className="px-4 py-3">Description</th>
+                <th className="px-4 py-3">Requester</th>
+                <th className="px-4 py-3">Total est.</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Created</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {rows.map((r: PurchaseRequest) => (
+                <tr key={r.id} className="transition-colors hover:bg-blue-50/40">
+                  <td className="px-4 py-3">
+                    <Link href={`/requests/${r.id}`} className="font-medium text-blue-700 hover:underline">
+                      {r.request_number}
+                    </Link>
+                  </td>
+                  <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{r.description}</td>
+                  <td className="px-4 py-3 text-zinc-700">{nameMap.get(r.requester_id) ?? "—"}</td>
+                  <td className="px-4 py-3 text-zinc-700">{formatNaira(r.qty * r.est_unit_cost)}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={r.status} />
+                  </td>
+                  <td className="px-4 py-3 text-zinc-500">{new Date(r.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
