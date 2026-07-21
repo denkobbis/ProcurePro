@@ -47,6 +47,7 @@ export interface Profile {
   department_id: string | null;
   is_active: boolean;
   created_at: string;
+  rigsource_invited_at: string | null;
 }
 
 export interface VendorDocument {

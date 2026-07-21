@@ -55,3 +55,20 @@ export async function deactivateUser(formData: FormData) {
 
   revalidatePath("/users");
 }
+
+// Doesn't touch RigSource at all — just records that an admin shared the
+// invite link with this person, so the table can show who's been told.
+export async function grantRigSourceAccess(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+
+  const userId = String(formData.get("user_id") ?? "");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ rigsource_invited_at: new Date().toISOString() })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/users");
+}
