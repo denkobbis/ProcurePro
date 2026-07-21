@@ -15,8 +15,11 @@ import {
   WalletIcon,
   ChartBarIcon,
   UsersIcon,
+  ExternalLinkIcon,
   LogoMarkIcon,
 } from "./icons";
+
+const RIGSOURCE_URL = "https://rigsource.vercel.app";
 
 const GROUPS = [
   {
@@ -36,6 +39,7 @@ const GROUPS = [
       { href: "/purchase-orders", label: "Purchase Orders", icon: CartIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
       { href: "/vendors", label: "Vendors", icon: BuildingIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
       { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
+      { href: RIGSOURCE_URL, label: "AI Sourcing", icon: ExternalLinkIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], external: true },
       { href: "/rfqs", label: "RFQs", icon: ScaleIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
     ],
   },
@@ -83,18 +87,29 @@ export default function Sidebar({ profile }: { profile: Profile }) {
               )}
               <ul className="flex flex-col gap-0.5">
                 {group.links.map((link) => {
-                  const active = pathname === link.href || pathname.startsWith(link.href + "/");
+                  const isExternal = "external" in link && link.external;
+                  const active = !isExternal && (pathname === link.href || pathname.startsWith(link.href + "/"));
                   const Icon = link.icon;
+                  const linkClassName = `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    active ? "bg-blue-50 text-blue-700" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                  }`;
+                  const iconClassName = `h-[18px] w-[18px] shrink-0 ${active ? "text-blue-600" : "text-zinc-400"}`;
+
+                  if (isExternal) {
+                    return (
+                      <li key={link.href}>
+                        <a href={link.href} target="_blank" rel="noopener noreferrer" className={linkClassName}>
+                          <Icon className={iconClassName} />
+                          {link.label}
+                        </a>
+                      </li>
+                    );
+                  }
+
                   return (
                     <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                          active ? "bg-blue-50 text-blue-700" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-                        }`}
-                      >
-                        <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-blue-600" : "text-zinc-400"}`} />
+                      <Link href={link.href} onClick={() => setOpen(false)} className={linkClassName}>
+                        <Icon className={iconClassName} />
                         {link.label}
                       </Link>
                     </li>

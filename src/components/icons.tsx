@@ -158,6 +158,16 @@ export function InboxIcon(props: IconProps) {
   );
 }
 
+export function ExternalLinkIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 6H5.5a2 2 0 0 0-2 2V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5" />
+      <path d="M13.5 4H20v6.5" />
+      <path d="M10 14 20 4" />
+    </svg>
+  );
+}
+
 export function LogoMarkIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" {...props}>
