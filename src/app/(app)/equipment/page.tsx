@@ -45,7 +45,7 @@ export default async function EquipmentPage() {
                   </td>
                   <td className="px-4 py-3 text-zinc-700">{a.name}</td>
                   <td className="px-4 py-3 text-zinc-700">{a.category}</td>
-                  <td className="px-4 py-3 text-zinc-700">{formatNaira(a.day_rate_ngn)}/day</td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{formatNaira(a.day_rate_ngn)}/day</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={a.status} />
                   </td>

@@ -65,19 +65,19 @@ export default async function BudgetsPage() {
                 <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <div className="flex justify-between col-span-2">
                     <dt className="text-zinc-500">Allocated</dt>
-                    <dd className="text-zinc-900">{formatNaira(budget.allocated_amount)}</dd>
+                    <dd className="tabular-nums text-zinc-900">{formatNaira(budget.allocated_amount)}</dd>
                   </div>
                   <div className="flex justify-between col-span-2">
                     <dt className="text-zinc-500">Committed (pending requests)</dt>
-                    <dd className="text-zinc-900">{formatNaira(usage.committed)}</dd>
+                    <dd className="tabular-nums text-zinc-900">{formatNaira(usage.committed)}</dd>
                   </div>
                   <div className="flex justify-between col-span-2">
                     <dt className="text-zinc-500">Spent (POs raised)</dt>
-                    <dd className="text-zinc-900">{formatNaira(usage.spent)}</dd>
+                    <dd className="tabular-nums text-zinc-900">{formatNaira(usage.spent)}</dd>
                   </div>
                   <div className="flex justify-between col-span-2 border-t border-zinc-100 pt-1 font-medium">
                     <dt className={over ? "text-red-600" : "text-zinc-700"}>Remaining</dt>
-                    <dd className={over ? "text-red-600" : "text-zinc-900"}>
+                    <dd className={`tabular-nums ${over ? "text-red-600" : "text-zinc-900"}`}>
                       {formatNaira(budget.allocated_amount - used)}
                     </dd>
                   </div>

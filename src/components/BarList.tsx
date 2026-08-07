@@ -15,7 +15,7 @@ export default function BarList({ rows, limit }: { rows: SpendRow[]; limit?: num
         <li key={r.label}>
           <div className="flex items-baseline justify-between text-sm">
             <span className="text-zinc-700">{r.label}</span>
-            <span className="font-medium text-zinc-900">{formatNaira(r.amount)}</span>
+            <span className="tabular-nums font-medium text-zinc-900">{formatNaira(r.amount)}</span>
           </div>
           <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
             <div className="h-full rounded-full bg-brand-600" style={{ width: `${(r.amount / max) * 100}%` }} />

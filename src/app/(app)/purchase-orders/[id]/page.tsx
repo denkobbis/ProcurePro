@@ -129,10 +129,10 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                   <td className="px-4 py-3 text-zinc-500">
                     {li.mpn || li.oem_brand ? `${li.mpn ?? ""}${li.mpn && li.oem_brand ? " · " : ""}${li.oem_brand ?? ""}` : "—"}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-zinc-700">{li.qty}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-zinc-700">{formatMoney(li.unit_price, po.currency)}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-zinc-900">{formatMoney(li.qty * li.unit_price, po.currency)}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-zinc-700">
+                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-zinc-700">{li.qty}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-zinc-700">{formatMoney(li.unit_price, po.currency)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums font-medium text-zinc-900">{formatMoney(li.qty * li.unit_price, po.currency)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">
                     {li.received_qty} / {li.qty}
                     {li.quality_pass !== null && (
                       <span className={`ml-2 text-xs font-medium ${li.quality_pass ? "text-green-700" : "text-red-600"}`}>

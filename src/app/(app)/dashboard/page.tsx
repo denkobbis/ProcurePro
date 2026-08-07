@@ -35,8 +35,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="relative overflow-hidden rounded-xl bg-brand-950 px-6 py-7 sm:px-8">
-        <div className="bg-blueprint-grid pointer-events-none absolute inset-0 opacity-20" aria-hidden="true" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-800/40 via-transparent to-transparent" aria-hidden="true" />
+        <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <h1 className="relative text-2xl font-semibold tracking-tight text-white">
           Welcome, {profile.full_name.split(" ")[0]}
         </h1>

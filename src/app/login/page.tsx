@@ -29,7 +29,7 @@ export default async function LoginPage({
   return (
     <div className="grid flex-1 grid-cols-1 lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden bg-brand-950 p-10 lg:flex xl:p-14">
-        <div className="bg-blueprint-grid pointer-events-none absolute inset-0 opacity-30" aria-hidden="true" />
+        <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-brand-900/40"
           aria-hidden="true"

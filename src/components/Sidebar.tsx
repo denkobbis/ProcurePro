@@ -98,7 +98,7 @@ export default function Sidebar({ profile }: { profile: Profile }) {
 
                   if (isExternal) {
                     return (
-                      <li key={link.href} className="relative">
+                      <li key={link.href}>
                         <a href={link.href} target="_blank" rel="noopener noreferrer" className={linkClassName}>
                           <Icon className={iconClassName} />
                           {link.label}
@@ -108,10 +108,7 @@ export default function Sidebar({ profile }: { profile: Profile }) {
                   }
 
                   return (
-                    <li key={link.href} className="relative">
-                      {active && (
-                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brand-600" aria-hidden="true" />
-                      )}
+                    <li key={link.href}>
                       <Link href={link.href} onClick={() => setOpen(false)} className={linkClassName}>
                         <Icon className={iconClassName} />
                         {link.label}

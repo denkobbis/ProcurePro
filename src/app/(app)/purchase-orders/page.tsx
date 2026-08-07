@@ -39,7 +39,7 @@ export default async function PurchaseOrdersPage() {
               <tr>
                 <th className="px-4 py-3">PO #</th>
                 <th className="px-4 py-3">Vendor</th>
-                <th className="px-4 py-3">Total</th>
+                <th className="whitespace-nowrap px-4 py-3 text-right">Total</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Created</th>
               </tr>
@@ -53,7 +53,7 @@ export default async function PurchaseOrdersPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-zinc-700">{vendorMap.get(po.vendor_id) ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{formatMoney(po.total_amount, po.currency)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-zinc-700">{formatMoney(po.total_amount, po.currency)}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={po.status} />
                   </td>

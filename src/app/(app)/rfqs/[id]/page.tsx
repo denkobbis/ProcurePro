@@ -63,7 +63,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                       {vendorMap.get(q.vendor_id) ?? "—"}
                       {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
                     </td>
-                    <td className="px-4 py-3 text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
                     <td className="px-4 py-3 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
                     <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{q.notes ?? "—"}</td>
                     <td className="px-4 py-3">

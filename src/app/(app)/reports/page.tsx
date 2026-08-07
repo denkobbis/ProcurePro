@@ -94,7 +94,7 @@ export default async function ReportsPage() {
                   <th className="px-4 py-3">Description</th>
                   <th className="px-4 py-3">Step</th>
                   <th className="px-4 py-3">Waiting on</th>
-                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3 text-right">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -104,7 +104,7 @@ export default async function ReportsPage() {
                     <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{a.description}</td>
                     <td className="px-4 py-3 text-zinc-700">{a.step_order}</td>
                     <td className="px-4 py-3 capitalize text-zinc-700">{a.approver_role.replace(/_/g, " ")}</td>
-                    <td className="px-4 py-3 text-zinc-700">{formatNaira(a.amount)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-zinc-700">{formatNaira(a.amount)}</td>
                   </tr>
                 ))}
               </tbody>
