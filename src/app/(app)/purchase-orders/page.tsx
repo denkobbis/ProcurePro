@@ -46,9 +46,9 @@ export default async function PurchaseOrdersPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {rows.map((po: PurchaseOrder) => (
-                <tr key={po.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={po.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-4 py-3">
-                    <Link href={`/purchase-orders/${po.id}`} className="font-medium text-blue-700 hover:underline">
+                    <Link href={`/purchase-orders/${po.id}`} className="font-medium text-brand-700 hover:underline">
                       {po.po_number}
                     </Link>
                   </td>

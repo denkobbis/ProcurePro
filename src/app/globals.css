@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -10,17 +11,31 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Brand: a deep engineering-blueprint blue — steadier and more industrial
+     than a flat SaaS blue-600, fitting an oil & gas / heavy-equipment tool. */
+  --color-brand-50: #eff4fc;
+  --color-brand-100: #dce7f8;
+  --color-brand-200: #b8cff0;
+  --color-brand-300: #8cb0e4;
+  --color-brand-400: #5c8bd3;
+  --color-brand-500: #3b69be;
+  --color-brand-600: #2c4f9e;
+  --color-brand-700: #223d7c;
+  --color-brand-800: #1c3163;
+  --color-brand-900: #172750;
+  --color-brand-950: #0e1830;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.bg-blueprint-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

@@ -86,7 +86,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             rows={3}
             defaultValue={vendor.performance_notes ?? ""}
             placeholder="e.g. Late delivery on PO#123, otherwise reliable"
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           />
           <Button type="submit" size="sm">Save notes</Button>
         </form>
@@ -98,7 +98,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           {documents.map((d) => (
             <li key={d.file_path} className="text-zinc-700">
               {documentUrls.has(d.file_path) ? (
-                <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline">
                   {d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name}
                 </a>
               ) : (
@@ -111,8 +111,8 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
         </ul>
         <form action={uploadVendorDocument} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
           <input type="hidden" name="vendor_id" value={vendor.id} />
-          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:col-span-2" />
-          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2" />
+          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
           <input type="file" name="document" className="text-sm" />
           <Button type="submit" variant="secondary" size="sm" className="sm:col-span-4">Upload</Button>
         </form>

@@ -168,7 +168,7 @@ export default async function RequestDetailPage({
           {attachmentList.map((a) => (
             <li key={a.id} className="text-zinc-700">
               {attachmentUrls.has(a.id) ? (
-                <a href={attachmentUrls.get(a.id)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                <a href={attachmentUrls.get(a.id)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline">
                   {a.file_name}
                 </a>
               ) : (
@@ -199,7 +199,7 @@ export default async function RequestDetailPage({
         </ul>
         <form action={addRequestComment} className="flex gap-2">
           <input type="hidden" name="request_id" value={request.id} />
-          <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+          <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
           <Button type="submit" size="sm">Post</Button>
         </form>
       </div>

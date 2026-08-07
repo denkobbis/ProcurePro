@@ -38,7 +38,7 @@ export default async function Header({ profile }: { profile: Profile }) {
           )}
         </a>
         <div className="flex items-center gap-2.5 border-l border-zinc-200 pl-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-semibold text-white ring-2 ring-white shadow-sm">
             {initials(profile.full_name)}
           </div>
           <div className="text-sm leading-tight">

@@ -1,6 +1,5 @@
 import { getCurrentProfile, APPROVER_ROLES, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
 import { ButtonLink } from "@/components/Button";
 import { DocumentIcon, CheckCircleIcon, CartIcon } from "@/components/icons";
@@ -35,10 +34,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={`Welcome, ${profile.full_name.split(" ")[0]}`} description="Here's what needs your attention today." />
+      <div className="relative overflow-hidden rounded-xl bg-brand-950 px-6 py-7 sm:px-8">
+        <div className="bg-blueprint-grid pointer-events-none absolute inset-0 opacity-20" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-800/40 via-transparent to-transparent" aria-hidden="true" />
+        <h1 className="relative text-2xl font-semibold tracking-tight text-white">
+          Welcome, {profile.full_name.split(" ")[0]}
+        </h1>
+        <p className="relative mt-1 text-sm text-brand-200">Here&apos;s what needs your attention today.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="My requests" value={myRequests ?? 0} href="/requests" icon={<DocumentIcon />} tint="blue" />
+        <StatCard label="My requests" value={myRequests ?? 0} href="/requests" icon={<DocumentIcon />} tint="brand" />
         {APPROVER_ROLES.includes(profile.role) && (
           <StatCard label="Pending my approval" value={pendingApprovals} href="/approvals" icon={<CheckCircleIcon />} tint="amber" />
         )}

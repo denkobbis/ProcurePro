@@ -63,9 +63,9 @@ export default async function ApprovalsPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {list.map((a) => (
-                <tr key={a.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={a.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-4 py-3 font-medium text-zinc-900">
-                    <a href={`/requests/${a.request_id}`} className="text-blue-700 hover:underline">
+                    <a href={`/requests/${a.request_id}`} className="text-brand-700 hover:underline">
                       {a.request_number}
                     </a>
                   </td>

@@ -124,7 +124,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {items.map((li) => (
-                <tr key={li.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={li.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-4 py-3 text-zinc-900">{li.description}</td>
                   <td className="px-4 py-3 text-zinc-500">
                     {li.mpn || li.oem_brand ? `${li.mpn ?? ""}${li.mpn && li.oem_brand ? " · " : ""}${li.oem_brand ?? ""}` : "—"}
@@ -172,9 +172,9 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
           <h2 className="mb-3 text-sm font-semibold text-zinc-900">Shipping</h2>
           <form action={markPoInTransit} className="grid grid-cols-1 gap-3 sm:grid-cols-4">
             <input type="hidden" name="po_id" value={po.id} />
-            <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
-            <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
-            <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+            <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+            <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             <Button type="submit" size="sm">Mark in transit</Button>
           </form>
         </div>
@@ -185,7 +185,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
           <h2 className="mb-3 text-sm font-semibold text-zinc-900">Customs</h2>
           <form action={markPoCustomsCleared} className="flex flex-wrap gap-3">
             <input type="hidden" name="po_id" value={po.id} />
-            <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             <Button type="submit" size="sm">Mark cleared customs</Button>
           </form>
         </div>
@@ -213,7 +213,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                       step="0.01"
                       max={li.qty - li.received_qty}
                       required
-                      className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                     />
                   </div>
                   <label className="flex items-center gap-1 text-sm text-zinc-700">

@@ -75,10 +75,11 @@ export default function Sidebar({ profile }: { profile: Profile }) {
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center gap-2 px-2 pb-5">
-          <LogoMarkIcon className="h-7 w-7 text-blue-600" />
+        <div className="flex items-center gap-2 px-2 pb-4">
+          <LogoMarkIcon className="h-7 w-7 text-brand-600" />
           <span className="text-lg font-semibold tracking-tight text-zinc-900">ProcurePro</span>
         </div>
+        <div className="mx-2 mb-4 border-t border-zinc-100" />
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
           {groups.map((group, i) => (
             <div key={i}>
@@ -91,13 +92,13 @@ export default function Sidebar({ profile }: { profile: Profile }) {
                   const active = !isExternal && (pathname === link.href || pathname.startsWith(link.href + "/"));
                   const Icon = link.icon;
                   const linkClassName = `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                    active ? "bg-blue-50 text-blue-700" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                    active ? "bg-brand-50 text-brand-700" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                   }`;
-                  const iconClassName = `h-[18px] w-[18px] shrink-0 ${active ? "text-blue-600" : "text-zinc-400"}`;
+                  const iconClassName = `h-[18px] w-[18px] shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`;
 
                   if (isExternal) {
                     return (
-                      <li key={link.href}>
+                      <li key={link.href} className="relative">
                         <a href={link.href} target="_blank" rel="noopener noreferrer" className={linkClassName}>
                           <Icon className={iconClassName} />
                           {link.label}
@@ -107,7 +108,10 @@ export default function Sidebar({ profile }: { profile: Profile }) {
                   }
 
                   return (
-                    <li key={link.href}>
+                    <li key={link.href} className="relative">
+                      {active && (
+                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brand-600" aria-hidden="true" />
+                      )}
                       <Link href={link.href} onClick={() => setOpen(false)} className={linkClassName}>
                         <Icon className={iconClassName} />
                         {link.label}

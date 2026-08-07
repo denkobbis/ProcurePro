@@ -58,7 +58,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {quoteList.map((q) => (
-                  <tr key={q.id} className="transition-colors hover:bg-blue-50/40">
+                  <tr key={q.id} className="transition-colors hover:bg-brand-50/40">
                     <td className="px-6 py-3 font-medium text-zinc-900">
                       {vendorMap.get(q.vendor_id) ?? "—"}
                       {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
@@ -89,7 +89,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
           <h2 className="mb-3 text-sm font-semibold text-zinc-900">Add a quote</h2>
           <form action={addRfqQuote} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="rfq_id" value={rfq.id} />
-            <select name="vendor_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:col-span-2">
+            <select name="vendor_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2">
               <option value="">Vendor...</option>
               {(vendors ?? []).map((v: Vendor) => (
                 <option key={v.id} value={v.id}>
@@ -97,16 +97,16 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                 </option>
               ))}
             </select>
-            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
-            <select name="currency" defaultValue="NGN" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+            <select name="currency" defaultValue="NGN" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
             </select>
-            <input name="lead_time_days" type="number" min="0" placeholder="Lead time (days)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
-            <input name="notes" placeholder="Notes (optional)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input name="lead_time_days" type="number" min="0" placeholder="Lead time (days)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+            <input name="notes" placeholder="Notes (optional)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             <Button type="submit" className="sm:col-span-2">Add quote</Button>
           </form>
         </div>

@@ -36,13 +36,13 @@ export default async function VendorsPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {rows.map((v: Vendor) => (
-                <tr key={v.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={v.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-4 py-3">
-                    <Link href={`/vendors/${v.id}`} className="font-medium text-blue-700 hover:underline">
+                    <Link href={`/vendors/${v.id}`} className="font-medium text-brand-700 hover:underline">
                       {v.name}
                     </Link>
                     {v.ncdmb_compliant && (
-                      <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">NCDMB</span>
+                      <span className="ml-2 rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">NCDMB</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-zinc-700">{v.category ?? "—"}</td>

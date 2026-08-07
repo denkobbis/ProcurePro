@@ -56,18 +56,18 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
           <h2 className="mb-3 text-sm font-semibold text-zinc-900">Lease out</h2>
           <form action={leaseOutEquipment} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="asset_id" value={asset.id} />
-            <input name="client_name" required placeholder="Client (e.g. Shell, ExxonMobil)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:col-span-2" />
+            <input name="client_name" required placeholder="Client (e.g. Shell, ExxonMobil)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2" />
             <div>
               <label className="block text-xs text-zinc-500">Start date</label>
-              <input name="start_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="start_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
             <div>
               <label className="block text-xs text-zinc-500">Expected return date</label>
-              <input name="expected_return_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="expected_return_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
             <div className="sm:col-span-2">
               <label className="block text-xs text-zinc-500">Day rate for this lease (₦)</label>
-              <input name="day_rate_ngn" type="number" min="0" step="0.01" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="day_rate_ngn" type="number" min="0" step="0.01" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
             <Button type="submit" className="sm:col-span-2">Lease out</Button>
           </form>
@@ -100,7 +100,7 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
             <input type="hidden" name="lease_id" value={activeLease.id} />
             <div className="flex-1">
               <label className="block text-xs text-zinc-500">Return condition</label>
-              <input name="return_condition" placeholder="e.g. Minor wear, fully operational" className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="return_condition" placeholder="e.g. Minor wear, fully operational" className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
             <label className="flex items-center gap-1 text-sm text-zinc-700">
               <input type="checkbox" name="inspection_pass" defaultChecked className="rounded border-zinc-300" />
@@ -130,7 +130,7 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {(leases ?? []).map((l: EquipmentLease) => (
-                  <tr key={l.id} className="transition-colors hover:bg-blue-50/40">
+                  <tr key={l.id} className="transition-colors hover:bg-brand-50/40">
                     <td className="px-6 py-3 font-medium text-zinc-900">{l.client_name}</td>
                     <td className="px-4 py-3 text-zinc-700">{l.start_date}</td>
                     <td className="px-4 py-3 text-zinc-700">{l.expected_return_date}</td>

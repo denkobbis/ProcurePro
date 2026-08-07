@@ -37,7 +37,7 @@ export default async function NewPurchaseOrderPage({
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Vendor</label>
-          <select name="vendor_id" required defaultValue={request.vendor_id ?? ""} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+          <select name="vendor_id" required defaultValue={request.vendor_id ?? ""} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
             <option value="">Select a vendor...</option>
             {(vendors ?? []).map((v: Vendor) => (
               <option key={v.id} value={v.id}>
@@ -52,7 +52,7 @@ export default async function NewPurchaseOrderPage({
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Delivery terms</label>
-          <textarea name="delivery_terms" rows={2} placeholder="e.g. Deliver to Port Harcourt yard within 10 days" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+          <textarea name="delivery_terms" rows={2} placeholder="e.g. Deliver to Port Harcourt yard within 10 days" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
         </div>
 
         <div>

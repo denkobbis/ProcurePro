@@ -21,7 +21,7 @@ export default async function NewRequestPage() {
             name="description"
             required
             rows={3}
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             placeholder="e.g. 5x Toyota Hilux replacement tyres, 265/65R17"
           />
         </div>
@@ -32,13 +32,13 @@ export default async function NewRequestPage() {
             <input
               name="category"
               required
-              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               placeholder="e.g. Equipment & Tools"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-700">Urgency</label>
-            <select name="urgency" defaultValue="normal" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+            <select name="urgency" defaultValue="normal" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
               <option value="low">Low</option>
               <option value="normal">Normal</option>
               <option value="high">High</option>
@@ -56,7 +56,7 @@ export default async function NewRequestPage() {
               min="0.01"
               step="0.01"
               required
-              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
           </div>
           <div>
@@ -67,7 +67,7 @@ export default async function NewRequestPage() {
               min="0"
               step="0.01"
               required
-              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
           </div>
         </div>
@@ -75,17 +75,17 @@ export default async function NewRequestPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-zinc-700">Manufacturer part number (optional)</label>
-            <input name="mpn" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="e.g. HT-4500-XL" />
+            <input name="mpn" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" placeholder="e.g. HT-4500-XL" />
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-700">OEM brand (optional)</label>
-            <input name="oem_brand" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="e.g. Hytorc, Emerson, Ludecke" />
+            <input name="oem_brand" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" placeholder="e.g. Hytorc, Emerson, Ludecke" />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Preferred vendor (optional)</label>
-          <select name="vendor_id" defaultValue="" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+          <select name="vendor_id" defaultValue="" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
             <option value="">No preference</option>
             {(vendors ?? []).map((v: Vendor) => (
               <option key={v.id} value={v.id}>
@@ -100,7 +100,7 @@ export default async function NewRequestPage() {
           <textarea
             name="justification"
             rows={2}
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             placeholder="Why is this purchase needed?"
           />
         </div>

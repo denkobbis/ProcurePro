@@ -43,7 +43,7 @@ export default async function AwardRfqQuotePage({
 
         <div>
           <label className="block text-sm font-medium text-zinc-700">Delivery terms</label>
-          <textarea name="delivery_terms" rows={2} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+          <textarea name="delivery_terms" rows={2} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
         </div>
 
         <div className="space-y-3 rounded-md border border-zinc-100 p-3">
@@ -52,17 +52,17 @@ export default async function AwardRfqQuotePage({
           {quote.currency !== "NGN" && (
             <div>
               <label className="block text-xs text-zinc-500">FX rate to ₦ (1 {quote.currency} = ? NGN)</label>
-              <input name="fx_rate_to_ngn" type="number" step="0.000001" min="0" defaultValue={1} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="fx_rate_to_ngn" type="number" step="0.000001" min="0" defaultValue={1} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
           )}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs text-zinc-500">Freight cost (₦)</label>
-              <input name="freight_cost_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="freight_cost_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
             <div>
               <label className="block text-xs text-zinc-500">Customs duty (₦)</label>
-              <input name="customs_duty_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+              <input name="customs_duty_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             </div>
           </div>
         </div>

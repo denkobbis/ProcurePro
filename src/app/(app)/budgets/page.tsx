@@ -57,7 +57,7 @@ export default async function BudgetsPage() {
 
                 <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                   <div
-                    className={`h-full transition-all ${over ? "bg-red-600" : pct > 80 ? "bg-amber-500" : "bg-blue-600"}`}
+                    className={`h-full transition-all ${over ? "bg-red-600" : pct > 80 ? "bg-amber-500" : "bg-brand-600"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

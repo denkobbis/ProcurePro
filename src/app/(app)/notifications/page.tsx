@@ -25,7 +25,7 @@ export default async function NotificationsPage() {
         actions={
           rows.some((n) => !n.is_read) ? (
             <form action={markAllNotificationsRead}>
-              <button className="text-sm font-medium text-zinc-500 hover:text-blue-700">Mark all as read</button>
+              <button className="text-sm font-medium text-zinc-500 hover:text-brand-700">Mark all as read</button>
             </form>
           ) : undefined
         }
@@ -37,10 +37,10 @@ export default async function NotificationsPage() {
         ) : (
           <div className="divide-y divide-zinc-100">
             {rows.map((n: AppNotification) => (
-              <div key={n.id} className={`flex items-center justify-between gap-4 p-4 transition-colors hover:bg-blue-50/40 ${n.is_read ? "" : "bg-blue-50/60"}`}>
+              <div key={n.id} className={`flex items-center justify-between gap-4 p-4 transition-colors hover:bg-brand-50/40 ${n.is_read ? "" : "bg-brand-50/60"}`}>
                 <a href={n.link ?? "#"} className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    {!n.is_read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />}
+                    {!n.is_read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-600" />}
                     <div className="truncate text-sm font-medium text-zinc-900">{n.title}</div>
                   </div>
                   {n.body && <div className="mt-0.5 text-sm text-zinc-500">{n.body}</div>}
@@ -49,7 +49,7 @@ export default async function NotificationsPage() {
                 {!n.is_read && (
                   <form action={markNotificationRead}>
                     <input type="hidden" name="id" value={n.id} />
-                    <button className="shrink-0 text-xs font-medium text-zinc-500 hover:text-blue-700">Mark read</button>
+                    <button className="shrink-0 text-xs font-medium text-zinc-500 hover:text-brand-700">Mark read</button>
                   </form>
                 )}
               </div>

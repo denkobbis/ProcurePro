@@ -116,7 +116,7 @@ export default async function UsersPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {(users ?? []).map((u: Profile) => (
-                <tr key={u.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={u.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-5 py-3 font-medium text-zinc-900">{u.full_name}</td>
                   <td className="px-4 py-3 text-zinc-700">{u.email}</td>
                   <td className="px-4 py-3 capitalize text-zinc-700">{u.role.replace(/_/g, " ")}</td>
@@ -137,7 +137,7 @@ export default async function UsersPage() {
                       ) : (
                         <form action={grantRigSourceAccess}>
                           <input type="hidden" name="user_id" value={u.id} />
-                          <button className="text-xs font-medium text-blue-600 hover:underline">Grant access</button>
+                          <button className="text-xs font-medium text-brand-600 hover:underline">Grant access</button>
                         </form>
                       )}
                     </td>

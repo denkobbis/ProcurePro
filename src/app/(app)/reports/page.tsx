@@ -16,7 +16,7 @@ import {
 
 function ExportLink({ type }: { type: string }) {
   return (
-    <a href={`/reports/export/${type}`} className="text-xs font-medium text-zinc-500 hover:text-blue-700 hover:underline">
+    <a href={`/reports/export/${type}`} className="text-xs font-medium text-zinc-500 hover:text-brand-700 hover:underline">
       Export CSV
     </a>
   );
@@ -99,7 +99,7 @@ export default async function ReportsPage() {
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {pendingApprovals.map((a, i) => (
-                  <tr key={i} className="transition-colors hover:bg-blue-50/40">
+                  <tr key={i} className="transition-colors hover:bg-brand-50/40">
                     <td className="px-5 py-3 font-medium text-zinc-900">{a.request_number}</td>
                     <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{a.description}</td>
                     <td className="px-4 py-3 text-zinc-700">{a.step_order}</td>
@@ -132,7 +132,7 @@ export default async function ReportsPage() {
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {expiringCerts.map((c, i) => (
-                  <tr key={i} className="transition-colors hover:bg-blue-50/40">
+                  <tr key={i} className="transition-colors hover:bg-brand-50/40">
                     <td className="px-5 py-3 font-medium text-zinc-900">{c.vendor_name}</td>
                     <td className="px-4 py-3 text-zinc-700">{c.label}</td>
                     <td className="px-4 py-3 text-zinc-700">{c.expiry_date}</td>

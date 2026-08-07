@@ -45,9 +45,9 @@ export default async function RfqsPage() {
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {rows.map((rfq) => (
-                <tr key={rfq.id} className="transition-colors hover:bg-blue-50/40">
+                <tr key={rfq.id} className="transition-colors hover:bg-brand-50/40">
                   <td className="px-4 py-3">
-                    <Link href={`/rfqs/${rfq.id}`} className="font-medium text-blue-700 hover:underline">
+                    <Link href={`/rfqs/${rfq.id}`} className="font-medium text-brand-700 hover:underline">
                       {rfq.requests?.request_number ?? "—"}
                     </Link>
                   </td>
