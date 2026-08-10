@@ -2,12 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { getCurrentProfile, ADMIN_ROLES } from "@/lib/auth";
+import { getCurrentProfile, ADMIN_ROLES, requireActiveOrg } from "@/lib/auth";
 import type { UserRole } from "@/lib/database.types";
 
 export async function createDepartment(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const name = String(formData.get("name") ?? "").trim();
   if (!name) throw new Error("Department name is required");
@@ -22,6 +23,7 @@ export async function createDepartment(formData: FormData) {
 export async function createUser(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const email = String(formData.get("email") ?? "").trim();
   const fullName = String(formData.get("full_name") ?? "").trim();
@@ -37,7 +39,12 @@ export async function createUser(formData: FormData) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: fullName, role, department_id: departmentId },
+    user_metadata: {
+      full_name: fullName,
+      role,
+      department_id: departmentId,
+      organization_id: profile.organization_id,
+    },
   });
   if (error) throw new Error(error.message);
 
@@ -47,6 +54,7 @@ export async function createUser(formData: FormData) {
 export async function deactivateUser(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const userId = String(formData.get("user_id") ?? "");
   const supabase = await createClient();
@@ -61,6 +69,7 @@ export async function deactivateUser(formData: FormData) {
 export async function grantRigSourceAccess(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const userId = String(formData.get("user_id") ?? "");
   const supabase = await createClient();

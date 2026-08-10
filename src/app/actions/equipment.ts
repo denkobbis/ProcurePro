@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
 
 export async function createEquipmentAsset(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const assetTag = String(formData.get("asset_tag") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
@@ -32,6 +33,7 @@ export async function createEquipmentAsset(formData: FormData) {
 export async function leaseOutEquipment(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const assetId = String(formData.get("asset_id") ?? "");
   const clientName = String(formData.get("client_name") ?? "").trim();
@@ -60,6 +62,7 @@ export async function leaseOutEquipment(formData: FormData) {
 export async function markEquipmentReturned(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const assetId = String(formData.get("asset_id") ?? "");
   const leaseId = String(formData.get("lease_id") ?? "");

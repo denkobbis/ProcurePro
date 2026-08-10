@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
 
 export async function createRfq(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const requestId = String(formData.get("request_id") ?? "");
 
@@ -23,6 +24,7 @@ export async function createRfq(formData: FormData) {
 export async function addRfqQuote(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const rfqId = String(formData.get("rfq_id") ?? "");
   const vendorId = String(formData.get("vendor_id") ?? "");
@@ -51,6 +53,7 @@ export async function addRfqQuote(formData: FormData) {
 export async function awardRfqQuote(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const quoteId = String(formData.get("quote_id") ?? "");
   const rfqId = String(formData.get("rfq_id") ?? "");

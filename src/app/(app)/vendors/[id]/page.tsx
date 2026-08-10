@@ -5,6 +5,8 @@ import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, u
 import NcdmbFields from "@/components/NcdmbFields";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/Button";
+import VendorPayoutForm from "@/components/VendorPayoutForm";
+import { listBanks } from "@/lib/paystack";
 import type { VendorDocument } from "@/lib/database.types";
 
 function expiryBadge(expiryDate?: string | null) {
@@ -29,6 +31,14 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   for (const d of documents) {
     const { data } = await supabase.storage.from("attachments").createSignedUrl(d.file_path, 3600);
     if (data) documentUrls.set(d.file_path, data.signedUrl);
+  }
+
+  let banks: { name: string; code: string }[] = [];
+  let banksError: string | null = null;
+  try {
+    banks = await listBanks();
+  } catch (err) {
+    banksError = err instanceof Error ? err.message : "Could not load bank list";
   }
 
   return (
@@ -90,6 +100,25 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           />
           <Button type="submit" size="sm">Save notes</Button>
         </form>
+      </div>
+
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Payout details</h2>
+        {vendor.account_number ? (
+          <p className="mb-3 text-sm text-zinc-700">
+            {vendor.bank_name} — {vendor.account_number} ({vendor.account_name})
+            {vendor.paystack_recipient_code && <span className="ml-2 text-xs text-green-700">Paystack verified</span>}
+          </p>
+        ) : (
+          <p className="mb-3 text-sm text-zinc-400">No payout details on file — a payment can&apos;t be initiated until these are set.</p>
+        )}
+        {banksError ? (
+          <p className="text-sm text-amber-700">
+            Payouts aren&apos;t configured yet ({banksError === "PAYSTACK_SECRET_KEY is not configured" ? "PAYSTACK_SECRET_KEY is not set" : banksError}).
+          </p>
+        ) : (
+          <VendorPayoutForm vendorId={vendor.id} banks={banks} />
+        )}
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">

@@ -2,10 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile, requireActiveOrg } from "@/lib/auth";
 import { notifyApproversForStep, notifyRequesterOfDecision } from "@/lib/notify";
 
 export async function actOnApproval(formData: FormData) {
+  const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
+
   const approvalId = String(formData.get("approval_id") ?? "");
   const action = String(formData.get("action") ?? "");
   const comment = String(formData.get("comment") ?? "").trim() || null;
@@ -44,6 +47,8 @@ export async function actOnApproval(formData: FormData) {
 
 export async function createDelegation(formData: FormData) {
   const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
+
   const delegateEmail = String(formData.get("delegate_email") ?? "").trim();
   const startDate = String(formData.get("start_date") ?? "");
   const endDate = String(formData.get("end_date") ?? "");
@@ -69,6 +74,9 @@ export async function createDelegation(formData: FormData) {
 
 export async function removeDelegation(formData: FormData) {
   // Authorization (own delegation, or admin) is enforced by the delegations_write RLS policy.
+  const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
+
   const delegationId = String(formData.get("delegation_id") ?? "");
   const supabase = await createClient();
 

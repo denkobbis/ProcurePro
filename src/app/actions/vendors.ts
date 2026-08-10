@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
 
 export async function createVendor(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim() || null;
@@ -52,6 +53,7 @@ export async function createVendor(formData: FormData) {
 export async function updateVendorApproval(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const vendorId = String(formData.get("vendor_id") ?? "");
   const isApproved = formData.get("is_approved") === "on";
@@ -66,6 +68,7 @@ export async function updateVendorApproval(formData: FormData) {
 export async function updateVendorCompliance(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const vendorId = String(formData.get("vendor_id") ?? "");
   const defaultCurrency = String(formData.get("default_currency") ?? "NGN");
@@ -94,6 +97,7 @@ export async function updateVendorCompliance(formData: FormData) {
 export async function updatePerformanceNotes(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const vendorId = String(formData.get("vendor_id") ?? "");
   const notes = String(formData.get("performance_notes") ?? "");
@@ -108,6 +112,7 @@ export async function updatePerformanceNotes(formData: FormData) {
 export async function uploadVendorDocument(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const vendorId = String(formData.get("vendor_id") ?? "");
   const file = formData.get("document") as File | null;

@@ -14,6 +14,7 @@ import {
   ScaleIcon,
   WalletIcon,
   ChartBarIcon,
+  CreditCardIcon,
   UsersIcon,
   ExternalLinkIcon,
   LogoMarkIcon,
@@ -48,6 +49,7 @@ const GROUPS = [
     links: [
       { href: "/budgets", label: "Budgets", icon: WalletIcon, roles: null },
       { href: "/reports", label: "Reports", icon: ChartBarIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
+      { href: "/billing", label: "Billing", icon: CreditCardIcon, roles: null },
     ],
   },
   {

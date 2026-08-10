@@ -32,10 +32,30 @@ export type CurrencyCode = "NGN" | "USD" | "EUR" | "GBP";
 export type EquipmentStatus = "available" | "on_lease" | "maintenance" | "retired";
 export type LeaseStatus = "active" | "returned" | "overdue";
 export type RfqStatus = "open" | "awarded" | "cancelled";
+export type PaymentProvider = "paystack" | "flutterwave";
+export type PaymentAttemptStatus = "pending" | "success" | "failed" | "reversed";
+export type PoPaymentStatus = "unpaid" | "processing" | "paid" | "failed" | "partially_paid";
+export type OrgSubscriptionStatus = "trialing" | "active" | "past_due" | "canceled";
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string | null;
+  po_number_seq: number;
+  request_number_seq: number;
+  created_at: string;
+  subscription_status: OrgSubscriptionStatus;
+  trial_ends_at: string;
+  paystack_customer_code: string | null;
+  paystack_subscription_code: string | null;
+  paystack_email_token: string | null;
+  current_period_end: string | null;
+}
 
 export interface Department {
   id: string;
   name: string;
+  organization_id: string;
   created_at: string;
 }
 
@@ -45,6 +65,7 @@ export interface Profile {
   email: string;
   role: UserRole;
   department_id: string | null;
+  organization_id: string;
   is_active: boolean;
   created_at: string;
   rigsource_invited_at: string | null;
@@ -75,12 +96,19 @@ export interface Vendor {
   ncdmb_certificate_expiry: string | null;
   local_content_percentage: number | null;
   created_by: string | null;
+  organization_id: string;
   created_at: string;
+  bank_name: string | null;
+  account_number: string | null;
+  account_name: string | null;
+  paystack_recipient_code: string | null;
+  flutterwave_bank_code: string | null;
 }
 
 export interface Budget {
   id: string;
   department_id: string;
+  organization_id: string;
   category: string;
   period: BudgetPeriod;
   period_start: string;
@@ -94,6 +122,7 @@ export interface Budget {
 export interface ApprovalRule {
   id: string;
   department_id: string | null;
+  organization_id: string;
   min_amount: number;
   max_amount: number | null;
   approver_role: UserRole;
@@ -106,6 +135,7 @@ export interface PurchaseRequest {
   request_number: string;
   requester_id: string;
   department_id: string;
+  organization_id: string;
   category: string;
   description: string;
   qty: number;
@@ -154,6 +184,7 @@ export interface Delegation {
   id: string;
   approver_id: string;
   delegate_id: string;
+  organization_id: string;
   start_date: string;
   end_date: string;
   created_at: string;
@@ -165,6 +196,7 @@ export interface PurchaseOrder {
   request_id: string | null;
   vendor_id: string;
   department_id: string;
+  organization_id: string;
   status: PoStatus;
   total_amount: number;
   delivery_terms: string | null;
@@ -183,6 +215,7 @@ export interface PurchaseOrder {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  payment_status: PoPaymentStatus;
 }
 
 export interface PoLineItem {
@@ -203,6 +236,7 @@ export interface EquipmentAsset {
   asset_tag: string;
   name: string;
   category: string;
+  organization_id: string;
   status: EquipmentStatus;
   day_rate_ngn: number;
   notes: string | null;
@@ -253,6 +287,7 @@ export interface AuditLogEntry {
   action: string;
   actor_id: string | null;
   details: Record<string, unknown> | null;
+  organization_id: string;
   created_at: string;
 }
 
@@ -264,6 +299,25 @@ export interface AppNotification {
   body: string | null;
   link: string | null;
   is_read: boolean;
+  organization_id: string;
+  created_at: string;
+}
+
+export interface Payment {
+  id: string;
+  organization_id: string;
+  purchase_order_id: string;
+  provider: PaymentProvider;
+  amount: number;
+  currency: CurrencyCode;
+  status: PaymentAttemptStatus;
+  provider_reference: string | null;
+  provider_recipient_code: string | null;
+  failure_reason: string | null;
+  initiated_by: string | null;
+  initiated_at: string;
+  completed_at: string | null;
+  raw_webhook_payload: Record<string, unknown> | null;
   created_at: string;
 }
 

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile, requireActiveOrg } from "@/lib/auth";
 import { checkBudget } from "@/lib/budget";
 import { notifyApproversForStep } from "@/lib/notify";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -35,6 +35,7 @@ async function submitWithBudgetCheck(
 
 export async function createRequest(formData: FormData) {
   const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
   const supabase = await createClient();
 
   const description = String(formData.get("description") ?? "").trim();
@@ -108,6 +109,9 @@ async function uploadAttachmentFile(requestId: string, file: File, uploadedBy: s
 }
 
 export async function submitRequest(formData: FormData) {
+  const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
+
   const requestId = String(formData.get("request_id") ?? "");
   const supabase = await createClient();
 
@@ -132,6 +136,7 @@ export async function submitRequest(formData: FormData) {
 
 export async function addRequestComment(formData: FormData) {
   const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
   const requestId = String(formData.get("request_id") ?? "");
   const comment = String(formData.get("comment") ?? "").trim();
   if (!comment) return;
@@ -148,6 +153,7 @@ export async function addRequestComment(formData: FormData) {
 
 export async function addRequestAttachment(formData: FormData) {
   const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
   const requestId = String(formData.get("request_id") ?? "");
   const file = formData.get("attachment") as File | null;
   if (!file || file.size === 0) return;

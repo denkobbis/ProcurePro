@@ -25,12 +25,32 @@ const supabase = createClient(url, serviceKey, {
 const SEED_PASSWORD = "Passw0rd!123";
 
 async function main() {
+  console.log("Seeding organization...");
+  const { data: existingOrg } = await supabase
+    .from("organizations")
+    .select("id")
+    .eq("name", "ProcurePro Demo")
+    .maybeSingle();
+  let orgId = existingOrg?.id;
+  if (!orgId) {
+    const { data: org, error: orgErr } = await supabase
+      .from("organizations")
+      .insert({ name: "ProcurePro Demo" })
+      .select("id")
+      .single();
+    if (orgErr) throw orgErr;
+    orgId = org.id;
+  }
+
   console.log("Seeding departments...");
   const { data: departments, error: deptErr } = await supabase
     .from("departments")
     .upsert(
-      [{ name: "Operations" }, { name: "Finance" }],
-      { onConflict: "name" }
+      [
+        { name: "Operations", organization_id: orgId },
+        { name: "Finance", organization_id: orgId },
+      ],
+      { onConflict: "organization_id,name" }
     )
     .select();
   if (deptErr) throw deptErr;
@@ -77,6 +97,7 @@ async function main() {
         full_name: u.full_name,
         role: u.role,
         department_id: u.department_id,
+        organization_id: orgId,
       },
     });
     if (error) throw error;
@@ -94,6 +115,7 @@ async function main() {
         contact_phone: "+234 801 234 5678",
         payment_terms: "Net 30",
         is_approved: true,
+        organization_id: orgId,
       },
       {
         name: "Naija Office Essentials",
@@ -102,17 +124,19 @@ async function main() {
         contact_phone: "+234 802 345 6789",
         payment_terms: "Net 15",
         is_approved: true,
+        organization_id: orgId,
       },
     ],
-    { onConflict: "name" }
+    { onConflict: "organization_id,name" }
   );
   if (vendorErr) throw vendorErr;
 
   console.log("Seeding approval rules...");
-  await supabase.from("approval_rules").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  await supabase.from("approval_rules").delete().eq("organization_id", orgId);
   const { error: ruleErr } = await supabase.from("approval_rules").insert([
     {
       department_id: operations.id,
+      organization_id: orgId,
       min_amount: 0,
       max_amount: 500000,
       approver_role: "approver",
@@ -120,6 +144,7 @@ async function main() {
     },
     {
       department_id: null,
+      organization_id: orgId,
       min_amount: 500000,
       max_amount: null,
       approver_role: "finance_admin",
@@ -136,6 +161,7 @@ async function main() {
     [
       {
         department_id: operations.id,
+        organization_id: orgId,
         category: "Office Supplies",
         period: "monthly",
         period_start: periodStart,
@@ -144,6 +170,7 @@ async function main() {
       },
       {
         department_id: operations.id,
+        organization_id: orgId,
         category: "Equipment & Tools",
         period: "monthly",
         period_start: periodStart,

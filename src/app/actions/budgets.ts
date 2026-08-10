@@ -2,11 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile, ADMIN_ROLES } from "@/lib/auth";
+import { getCurrentProfile, ADMIN_ROLES, requireActiveOrg } from "@/lib/auth";
 
 export async function createBudget(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!ADMIN_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const departmentId = String(formData.get("department_id") ?? "");
   const category = String(formData.get("category") ?? "").trim();

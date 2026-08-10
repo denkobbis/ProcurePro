@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
 import { notifyPoSent, notifyItemsReceived } from "@/lib/notify";
 
 function parseLineItems(formData: FormData) {
@@ -36,6 +36,7 @@ function parseCurrencyFields(formData: FormData) {
 export async function convertToPo(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const requestId = String(formData.get("request_id") ?? "");
   const vendorId = String(formData.get("vendor_id") ?? "");
@@ -68,6 +69,7 @@ export async function convertToPo(formData: FormData) {
 export async function updatePo(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");
   const vendorId = String(formData.get("vendor_id") ?? "");
@@ -99,6 +101,7 @@ export async function updatePo(formData: FormData) {
 export async function markPoSent(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");
   const supabase = await createClient();
@@ -113,6 +116,7 @@ export async function markPoSent(formData: FormData) {
 export async function markPoInTransit(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");
   const carrier = String(formData.get("carrier") ?? "").trim() || null;
@@ -134,6 +138,7 @@ export async function markPoInTransit(formData: FormData) {
 export async function markPoCustomsCleared(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");
   const customsReference = String(formData.get("customs_reference") ?? "").trim() || null;
@@ -151,6 +156,7 @@ export async function markPoCustomsCleared(formData: FormData) {
 export async function closePo(formData: FormData) {
   const profile = await getCurrentProfile();
   if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Not authorized");
+  await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");
   const supabase = await createClient();
@@ -161,6 +167,9 @@ export async function closePo(formData: FormData) {
 }
 
 export async function receivePoLine(formData: FormData) {
+  const profile = await getCurrentProfile();
+  await requireActiveOrg(profile);
+
   const poId = String(formData.get("po_id") ?? "");
   const lineItemId = String(formData.get("line_item_id") ?? "");
   const receivedQty = Number(formData.get("received_qty") ?? 0);

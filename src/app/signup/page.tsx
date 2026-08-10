@@ -1,4 +1,4 @@
-import { signIn } from "@/app/actions/auth";
+import { signUp } from "@/app/actions/auth";
 import { LogoMarkIcon, DocumentIcon, WalletIcon, BuildingIcon } from "@/components/icons";
 
 const FEATURES = [
@@ -19,12 +19,12 @@ const FEATURES = [
   },
 ];
 
-export default async function LoginPage({
+export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { error, message } = await searchParams;
+  const { error } = await searchParams;
 
   return (
     <div className="grid flex-1 grid-cols-1 lg:grid-cols-2">
@@ -42,11 +42,10 @@ export default async function LoginPage({
 
         <div className="relative max-w-md">
           <h2 className="text-3xl font-semibold leading-[1.15] tracking-tight text-white">
-            Procurement, engineered.
+            Set up your company.
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-brand-200">
-            One system for requisitions, approvals, purchase orders, and vendor compliance —
-            built for oil &amp; gas and equipment-leasing operations.
+            You&apos;ll be the first admin — invite the rest of your team once you&apos;re in.
           </p>
 
           <ul className="mt-9 space-y-5">
@@ -72,26 +71,48 @@ export default async function LoginPage({
           <div className="mb-8 flex flex-col items-center text-center lg:hidden">
             <LogoMarkIcon className="h-11 w-11 text-brand-600" />
             <h1 className="mt-3 text-xl font-semibold tracking-tight text-zinc-900">ProcurePro</h1>
-            <p className="mt-1 text-sm text-zinc-500">Sign in to manage purchase requests, approvals, and POs.</p>
+            <p className="mt-1 text-sm text-zinc-500">Create your company&apos;s account.</p>
           </div>
 
           <div className="hidden lg:block">
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Welcome back</h1>
-            <p className="mt-1.5 text-sm text-zinc-500">Sign in to your ProcurePro account.</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Create your account</h1>
+            <p className="mt-1.5 text-sm text-zinc-500">Start a new ProcurePro workspace for your company.</p>
           </div>
 
-          {message && (
-            <div className="mt-6 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
-              {message}
-            </div>
-          )}
           {error && (
             <div className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}
             </div>
           )}
 
-          <form action={signIn} className="mt-7 space-y-4">
+          <form action={signUp} className="mt-7 space-y-4">
+            <div>
+              <label htmlFor="organization_name" className="block text-sm font-medium text-zinc-700">
+                Company name
+              </label>
+              <input
+                id="organization_name"
+                name="organization_name"
+                type="text"
+                required
+                autoFocus
+                className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                placeholder="Acme Resources Ltd"
+              />
+            </div>
+            <div>
+              <label htmlFor="full_name" className="block text-sm font-medium text-zinc-700">
+                Your name
+              </label>
+              <input
+                id="full_name"
+                name="full_name"
+                type="text"
+                required
+                className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                placeholder="Jane Doe"
+              />
+            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-zinc-700">
                 Email
@@ -101,7 +122,6 @@ export default async function LoginPage({
                 name="email"
                 type="email"
                 required
-                autoFocus
                 className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 placeholder="you@company.com"
               />
@@ -115,24 +135,24 @@ export default async function LoginPage({
                 name="password"
                 type="password"
                 required
+                minLength={8}
                 className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                placeholder="••••••••"
+                placeholder="At least 8 characters"
               />
             </div>
             <button
               type="submit"
               className="w-full rounded-md bg-brand-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
             >
-              Sign in
+              Create company account
             </button>
           </form>
 
           <p className="mt-6 text-center text-xs text-zinc-400">
-            New company?{" "}
-            <a href="/signup" className="font-medium text-brand-600 hover:text-brand-700">
-              Create an account
+            Already have an account?{" "}
+            <a href="/login" className="font-medium text-brand-600 hover:text-brand-700">
+              Sign in
             </a>
-            . Joining an existing team? Ask your Super Admin to invite you in Users &amp; Departments.
           </p>
         </div>
       </div>

@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
-import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, requireRole, PROCUREMENT_ROLES, ADMIN_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira, formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import PrintButton from "@/components/PrintButton";
 import { Button, ButtonLink } from "@/components/Button";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
-import type { PoLineItem } from "@/lib/database.types";
+import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments";
+import type { PoLineItem, Payment } from "@/lib/database.types";
 
 export default async function PurchaseOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,11 +18,18 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
   const { data: po } = await supabase.from("purchase_orders").select("*").eq("id", id).single();
   if (!po) notFound();
 
-  const [{ data: lineItems }, { data: vendor }, { data: department }] = await Promise.all([
+  const [{ data: lineItems }, { data: vendor }, { data: department }, { data: payments }] = await Promise.all([
     supabase.from("po_line_items").select("*").eq("po_id", id).order("created_at"),
     supabase.from("vendors").select("*").eq("id", po.vendor_id).single(),
     supabase.from("departments").select("*").eq("id", po.department_id).single(),
+    supabase.from("payments").select("*").eq("purchase_order_id", id).order("created_at", { ascending: false }),
   ]);
+  const paymentAttempts = (payments ?? []) as Payment[];
+  const amountPaid = paymentAttempts.filter((p) => p.status === "success").reduce((sum, p) => sum + Number(p.amount), 0);
+  const amountRemaining = po.total_amount_ngn - amountPaid;
+  const canPay = ADMIN_ROLES.includes(profile.role);
+  const canInitiatePayment = canPay && po.payment_status !== "paid" && po.payment_status !== "processing" && amountRemaining > 0;
+  const vendorHasPayout = Boolean(vendor?.account_number);
 
   const items = (lineItems ?? []) as PoLineItem[];
   const landedCostNgn = po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
@@ -35,6 +43,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={po.status} />
+          <StatusBadge status={po.payment_status} />
           <PrintButton />
         </div>
       </div>
@@ -227,6 +236,74 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
               <p className="text-sm text-zinc-400">All line items fully received.</p>
             )}
           </div>
+        </div>
+      )}
+
+      {(canPay || paymentAttempts.length > 0) && (
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm print:hidden">
+          <h2 className="mb-1 text-sm font-semibold text-zinc-900">Payment to vendor</h2>
+          {amountPaid > 0 && (
+            <p className="mb-3 text-sm text-zinc-600">
+              {formatNaira(amountPaid)} paid of {formatNaira(po.total_amount_ngn)} — {formatNaira(amountRemaining)} remaining
+            </p>
+          )}
+
+          {canPay && canInitiatePayment && (
+            vendorHasPayout ? (
+              <form action={initiatePayment} className="mb-4 space-y-2">
+                <input type="hidden" name="po_id" value={po.id} />
+                <div>
+                  <label className="block text-xs text-zinc-500">Amount (defaults to the full remaining balance)</label>
+                  <input
+                    name="amount"
+                    type="number"
+                    min="0.01"
+                    max={amountRemaining}
+                    step="0.01"
+                    placeholder={String(amountRemaining)}
+                    className="mt-1 w-48 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="submit" name="provider" value="paystack" size="sm">Pay via Paystack</Button>
+                  <Button type="submit" name="provider" value="flutterwave" variant="secondary" size="sm">Pay via Flutterwave</Button>
+                </div>
+              </form>
+            ) : (
+              <p className="mb-4 text-sm text-amber-700">
+                This vendor has no payout details on file yet — add them on the{" "}
+                <a href={`/vendors/${po.vendor_id}`} className="underline">vendor page</a> before paying.
+              </p>
+            )
+          )}
+
+          {paymentAttempts.length === 0 ? (
+            <p className="text-sm text-zinc-400">No payment attempts yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {paymentAttempts.map((p) => (
+                <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-md border border-zinc-100 p-3 text-sm">
+                  <StatusBadge status={p.status} />
+                  <span className="text-zinc-700 capitalize">{p.provider}</span>
+                  <span className="text-zinc-900 font-medium">{formatNaira(p.amount)}</span>
+                  <span className="text-zinc-400">{new Date(p.initiated_at).toLocaleString()}</span>
+                  {p.provider_reference && <span className="text-zinc-400">Ref: {p.provider_reference}</span>}
+                  {p.failure_reason && <span className="text-red-600">{p.failure_reason}</span>}
+                  {canPay && p.provider === "paystack" && p.status === "pending" && (
+                    <form action={finalizePaystackPayment} className="flex items-center gap-2">
+                      <input type="hidden" name="payment_id" value={p.id} />
+                      <input
+                        name="otp"
+                        placeholder="OTP (if requested)"
+                        className="w-32 rounded-md border border-zinc-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      />
+                      <Button type="submit" variant="secondary" size="sm">Finalize</Button>
+                    </form>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
