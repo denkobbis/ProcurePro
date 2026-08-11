@@ -1,12 +1,15 @@
-import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createVendor } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/Button";
+import { getIndustryModules } from "@/lib/industries";
 
 export default async function NewVendorPage() {
   const profile = await getCurrentProfile();
   requireRole(profile, PROCUREMENT_ROLES);
+  const org = await getCurrentOrganization(profile);
+  const modules = getIndustryModules(org.industry);
 
   return (
     <div className="max-w-xl space-y-4">
@@ -41,7 +44,7 @@ export default async function NewVendorPage() {
 
         <div>
           <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; compliance</label>
-          <NcdmbFields />
+          <NcdmbFields showNcdmb={modules.ncdmb} />
         </div>
 
         <Button type="submit">Save vendor</Button>

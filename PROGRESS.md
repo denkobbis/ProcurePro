@@ -97,6 +97,21 @@ After the two features above, the user asked for every remaining known gap that 
 
 **Verified**: full project-wide typecheck and lint clean after every change in this pass. Vendor payout page and PO detail page (with the new amount input) both re-confirmed rendering correctly in the real running app afterward.
 
+## Industry toggle (built 2026-08-11)
+
+Brainstormed with the user: the app as built is really oil & gas / heavy-industry-flavored procurement software (NCDMB compliance, currency, equipment leasing), but the underlying workflow (requests → approvals → RFQ → PO → receiving, budgets, vendors) is generic enough for other B2B-procurement verticals. Rather than building separate apps, added a per-organization "line of work" field that toggles which industry-specific UI shows — v1 scope only (a feature flag/config layer), not full terminology relabeling or route-level blocking, both deliberately deferred.
+
+**Schema** (migrations `0025`–`0026`): new `organization_industry` enum (`oil_gas`, `construction`, `trading`, `general`); `organizations.industry` column, `not null default 'general'`, Denbis backfilled to `oil_gas`. `handle_new_user()` trigger updated to read `industry` from signup metadata (falls back to `general`).
+
+**How it works**:
+- `src/lib/industries.ts` — single source of truth: `INDUSTRIES` maps each industry to a `modules` boolean map (currently `equipment`, `ncdmb`); `INDUSTRY_OPTIONS` for dropdowns; `getIndustryModules()` helper. Oil & gas and the `general` fallback get both modules; construction and trading get neither (chosen as the safest default — no vertical gets features it didn't ask for).
+- Picked at signup (`/signup` dropdown, defaults to General) or changed later by an admin on `/billing` → Organization → "Line of work" (`updateOrganizationSettings` in `actions/organization.ts`, replacing the old rename-only action).
+- Consumed in three places: `Sidebar.tsx` filters out the Equipment nav link when `!modules.equipment`; `vendors/new` and `vendors/[id]` pass `showNcdmb={modules.ncdmb}` into `NcdmbFields` (hides the compliance fields, currency picker always shows); `purchase-orders/[id]` gates the "Local content (NCDMB)" display block the same way.
+
+**Verified**: full typecheck + lint clean (lint was also cleaned up on one pre-existing, unrelated `Date.now()`-during-render error in `billing/page.tsx` line 22, hit while running a full lint pass — fixed by hoisting to `new Date()` once, since it was blocking a clean verification run). Live end-to-end in the real running app: confirmed Denbis (`oil_gas`) still sees Equipment + full NCDMB fields; used the real `/billing` form to flip Denbis to `trading`, confirmed the Equipment sidebar link disappeared and the vendor-add page collapsed to currency-only, then flipped back to `oil_gas` and re-confirmed everything restored. (Note: the Claude Browser tool's click-by-element-reference intermittently failed to register on that specific Save button for reasons unrelated to the app — worked every time once dispatched via a real DOM click event — not an app bug.)
+
+**Deliberately deferred** (discussed with the user, not built): vendor/PO terminology relabeling per industry (e.g. "Vendor" vs "Supplier"), and route-level blocking of `/equipment` for industries that don't use it (currently just hidden from nav, not access-denied if visited directly).
+
 ## Status
 
 | Area | Status |
@@ -107,6 +122,7 @@ After the two features above, the user asked for every remaining known gap that 
 | Payment processing (Paystack/Flutterwave vendor disbursement, partial payments) | Built, bank verification confirmed live; no completed transfer yet |
 | Subscription billing (plan, trial, lockout, cancel, org rename) | Built, lockout + rename verified live; no completed checkout yet |
 | Security/abuse hardening (role lockdown, signup rate limit, error UX) | Done, verified live |
+| Industry toggle (org line-of-work, conditional Equipment/NCDMB UI) | Done, verified live |
 
 ## Known open items
 

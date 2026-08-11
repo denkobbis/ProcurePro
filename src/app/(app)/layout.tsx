@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <MobileNavProvider>
       <div className="flex min-h-screen w-full">
         <div className="print:hidden">
-          <Sidebar profile={profile} />
+          <Sidebar profile={profile} industry={org.industry} />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="print:hidden">

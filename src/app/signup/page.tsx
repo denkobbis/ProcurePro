@@ -1,5 +1,6 @@
 import { signUp } from "@/app/actions/auth";
 import { LogoMarkIcon, DocumentIcon, WalletIcon, BuildingIcon } from "@/components/icons";
+import { INDUSTRY_OPTIONS } from "@/lib/industries";
 
 const FEATURES = [
   {
@@ -99,6 +100,24 @@ export default async function SignupPage({
                 className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 placeholder="Acme Resources Ltd"
               />
+            </div>
+            <div>
+              <label htmlFor="industry" className="block text-sm font-medium text-zinc-700">
+                Line of work
+              </label>
+              <select
+                id="industry"
+                name="industry"
+                defaultValue="general"
+                className="mt-1.5 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              >
+                {INDUSTRY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-zinc-400">Shapes which features you see — change anytime in Billing settings.</p>
             </div>
             <div>
               <label htmlFor="full_name" className="block text-sm font-medium text-zinc-700">

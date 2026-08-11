@@ -30,6 +30,7 @@ async function checkSignupRateLimit(supabase: Awaited<ReturnType<typeof createCl
 // a new tenant. See supabase/migrations/0012_multi_tenancy.sql's handle_new_user().
 export async function signUp(formData: FormData) {
   const organizationName = String(formData.get("organization_name") ?? "").trim();
+  const industry = String(formData.get("industry") ?? "general").trim();
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -51,6 +52,7 @@ export async function signUp(formData: FormData) {
       data: {
         full_name: fullName,
         create_organization_name: organizationName,
+        industry,
       },
     },
   });

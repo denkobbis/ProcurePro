@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCurrentProfile, requireRole, PROCUREMENT_ROLES, ADMIN_ROLES } from "@/lib/auth";
+import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROLES, ADMIN_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira, formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
@@ -7,12 +7,15 @@ import PrintButton from "@/components/PrintButton";
 import { Button, ButtonLink } from "@/components/Button";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
 import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments";
+import { getIndustryModules } from "@/lib/industries";
 import type { PoLineItem, Payment } from "@/lib/database.types";
 
 export default async function PurchaseOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const profile = await getCurrentProfile();
   requireRole(profile, PROCUREMENT_ROLES);
+  const org = await getCurrentOrganization(profile);
+  const modules = getIndustryModules(org.industry);
 
   const supabase = await createClient();
   const { data: po } = await supabase.from("purchase_orders").select("*").eq("id", id).single();
@@ -79,7 +82,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
               <dd className="text-zinc-900">{po.delivery_terms}</dd>
             </div>
           )}
-          {po.local_content_percentage !== null && (
+          {modules.ncdmb && po.local_content_percentage !== null && (
             <div>
               <dt className="text-zinc-500">Local content (NCDMB)</dt>
               <dd className="text-zinc-900">{po.local_content_percentage}%{po.ncdmb_certificate_number ? ` — Cert #${po.ncdmb_certificate_number}` : ""}</dd>

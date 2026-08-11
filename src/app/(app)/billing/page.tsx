@@ -1,10 +1,11 @@
 import { getCurrentProfile, getCurrentOrganization, isOrgLocked, ADMIN_ROLES } from "@/lib/auth";
 import { startSubscription, cancelSubscription } from "@/app/actions/billing";
-import { updateOrganizationName } from "@/app/actions/organization";
+import { updateOrganizationSettings } from "@/app/actions/organization";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/Button";
 import StatusBadge from "@/components/StatusBadge";
 import { formatNaira } from "@/lib/money";
+import { INDUSTRY_OPTIONS } from "@/lib/industries";
 
 export default async function BillingPage({
   searchParams,
@@ -18,7 +19,8 @@ export default async function BillingPage({
   const locked = isOrgLocked(org);
 
   const trialEnds = new Date(org.trial_ends_at);
-  const daysLeftInTrial = Math.ceil((trialEnds.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+  const now = new Date();
+  const daysLeftInTrial = Math.ceil((trialEnds.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
 
   return (
     <div className="max-w-xl space-y-6">
@@ -91,8 +93,8 @@ export default async function BillingPage({
       {canManage && (
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 className="mb-2 text-sm font-semibold text-zinc-900">Organization</h2>
-          <form action={updateOrganizationName} className="flex flex-wrap items-end gap-2">
-            <div className="flex-1">
+          <form action={updateOrganizationSettings} className="space-y-3">
+            <div>
               <label className="block text-xs text-zinc-500">Name</label>
               <input
                 name="name"
@@ -100,6 +102,21 @@ export default async function BillingPage({
                 required
                 className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               />
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-500">Line of work</label>
+              <select
+                name="industry"
+                defaultValue={org.industry}
+                className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              >
+                {INDUSTRY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-zinc-400">Controls which features (e.g. Equipment, NCDMB compliance) show up in the sidebar.</p>
             </div>
             <Button type="submit" variant="secondary" size="sm">Save</Button>
           </form>

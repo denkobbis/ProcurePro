@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { Profile } from "@/lib/database.types";
+import type { Profile, OrganizationIndustry } from "@/lib/database.types";
+import { getIndustryModules } from "@/lib/industries";
 import { useMobileNav } from "./MobileNavContext";
 import {
   DashboardIcon,
@@ -39,7 +40,7 @@ const GROUPS = [
     links: [
       { href: "/purchase-orders", label: "Purchase Orders", icon: CartIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
       { href: "/vendors", label: "Vendors", icon: BuildingIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
-      { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
+      { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "equipment" },
       { href: RIGSOURCE_URL, label: "AI Sourcing", icon: ExternalLinkIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], external: true },
       { href: "/rfqs", label: "RFQs", icon: ScaleIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
     ],
@@ -58,13 +59,18 @@ const GROUPS = [
   },
 ] as const;
 
-export default function Sidebar({ profile }: { profile: Profile }) {
+export default function Sidebar({ profile, industry }: { profile: Profile; industry: OrganizationIndustry }) {
   const pathname = usePathname();
   const { open, setOpen } = useMobileNav();
+  const modules = getIndustryModules(industry);
 
   const groups = GROUPS.map((group) => ({
     ...group,
-    links: group.links.filter((l) => !l.roles || (l.roles as readonly string[]).includes(profile.role)),
+    links: group.links.filter((l) => {
+      if (l.roles && !(l.roles as readonly string[]).includes(profile.role)) return false;
+      if ("module" in l && l.module === "equipment" && !modules.equipment) return false;
+      return true;
+    }),
   })).filter((group) => group.links.length > 0);
 
   return (

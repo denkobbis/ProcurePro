@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
@@ -7,6 +7,7 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/Button";
 import VendorPayoutForm from "@/components/VendorPayoutForm";
 import { listBanks } from "@/lib/paystack";
+import { getIndustryModules } from "@/lib/industries";
 import type { VendorDocument } from "@/lib/database.types";
 
 function expiryBadge(expiryDate?: string | null) {
@@ -21,6 +22,8 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const profile = await getCurrentProfile();
   requireRole(profile, PROCUREMENT_ROLES);
+  const org = await getCurrentOrganization(profile);
+  const modules = getIndustryModules(org.industry);
 
   const supabase = await createClient();
   const { data: vendor } = await supabase.from("vendors").select("*").eq("id", id).single();
@@ -70,7 +73,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Currency &amp; Nigerian Content compliance</h2>
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">{modules.ncdmb ? "Currency & Nigerian Content compliance" : "Currency"}</h2>
         <form action={updateVendorCompliance} className="space-y-3">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <NcdmbFields
@@ -79,8 +82,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             defaultCertificateNumber={vendor.ncdmb_certificate_number ?? ""}
             defaultCertificateExpiry={vendor.ncdmb_certificate_expiry ?? ""}
             defaultLocalContentPercentage={vendor.local_content_percentage ?? ""}
+            showNcdmb={modules.ncdmb}
           />
-          {expiryBadge(vendor.ncdmb_certificate_expiry) && (
+          {modules.ncdmb && expiryBadge(vendor.ncdmb_certificate_expiry) && (
             <p className="text-sm text-zinc-600">NCDMB certificate {expiryBadge(vendor.ncdmb_certificate_expiry)}</p>
           )}
           <Button type="submit" size="sm">Save</Button>

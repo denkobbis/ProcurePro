@@ -36,6 +36,7 @@ export type PaymentProvider = "paystack" | "flutterwave";
 export type PaymentAttemptStatus = "pending" | "success" | "failed" | "reversed";
 export type PoPaymentStatus = "unpaid" | "processing" | "paid" | "failed" | "partially_paid";
 export type OrgSubscriptionStatus = "trialing" | "active" | "past_due" | "canceled";
+export type OrganizationIndustry = "oil_gas" | "construction" | "trading" | "general";
 
 export interface Organization {
   id: string;
@@ -50,6 +51,7 @@ export interface Organization {
   paystack_subscription_code: string | null;
   paystack_email_token: string | null;
   current_period_end: string | null;
+  industry: OrganizationIndustry;
 }
 
 export interface Department {
