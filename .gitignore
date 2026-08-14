@@ -47,3 +47,6 @@ next-env.d.ts
 
 # plaintext credentials notes — never commit
 ProcurePro Logins.txt
+
+# scratch verification/export scripts and captures
+/screenshot/

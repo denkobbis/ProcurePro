@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://procurepro-woad.vercel.app"),
   title: "ProcurePro",
   description: "Procurement management — requests, approvals, POs, and budgets in one place.",
 };
