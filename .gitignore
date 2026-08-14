@@ -50,3 +50,6 @@ ProcurePro Logins.txt
 
 # scratch verification/export scripts and captures
 /screenshot/
+
+# raw demo footage — large binary intermediates, not a repo deliverable
+/marketing/footage/
