@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.join(__dirname, "ads");
+const outDir = path.join(__dirname, "..", "assets", "ads");
 const brandDir = path.join(__dirname, "..", "public", "brand");
 const landingDir = path.join(__dirname, "..", "public", "landing");
 

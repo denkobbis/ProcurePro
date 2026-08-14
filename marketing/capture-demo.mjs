@@ -1,9 +1,11 @@
 import { chromium } from "playwright";
+import { renameSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "footage");
+const finalDir = path.join(__dirname, "..", "assets", "videos");
 
 const BASE_URL = process.env.DEMO_BASE_URL || "http://localhost:3000";
 const EMAIL = "admin@procurepro.test";
@@ -27,8 +29,12 @@ async function recordShot(browser, name, holdMs, fn, { skipLogin = false } = {})
   await fn(page);
   await page.waitForTimeout(holdMs);
   await context.close();
-  const video = await page.video().path().catch(() => null);
-  console.log(`shot "${name}" ->`, video);
+  const rawPath = await page.video().path().catch(() => null);
+  if (rawPath) {
+    const finalPath = path.join(finalDir, `${name}.webm`);
+    renameSync(rawPath, finalPath);
+    console.log(`shot "${name}" ->`, finalPath);
+  }
 }
 
 async function main() {
