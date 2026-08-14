@@ -3,7 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createRequest } from "@/app/actions/requests";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/Button";
+import RequestAutoFill from "@/components/RequestAutoFill";
 import type { Vendor } from "@/lib/database.types";
+
+const FORM_ID = "new-request-form";
 
 export default async function NewRequestPage() {
   const profile = await getCurrentProfile();
@@ -14,7 +17,9 @@ export default async function NewRequestPage() {
     <div className="max-w-2xl space-y-4">
       <PageHeader title="New purchase request" />
 
-      <form action={createRequest} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <RequestAutoFill formId={FORM_ID} />
+
+      <form id={FORM_ID} action={createRequest} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div>
           <label className="block text-sm font-medium text-zinc-700">Item / service description</label>
           <textarea
