@@ -5,7 +5,8 @@ import { actOnApproval, createDelegation, removeDelegation } from "@/app/actions
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/Button";
-import { CheckCircleIcon } from "@/components/icons";
+import { CheckCircleIcon, SparkleIcon } from "@/components/icons";
+import { getBottleneckFlags } from "@/lib/approval-bottleneck";
 import type { Profile } from "@/lib/database.types";
 
 interface ActionableApproval {
@@ -18,6 +19,7 @@ interface ActionableApproval {
   requester_id: string;
   qty: number;
   est_unit_cost: number;
+  created_at: string;
 }
 
 export default async function ApprovalsPage() {
@@ -31,6 +33,7 @@ export default async function ApprovalsPage() {
     .order("created_at");
 
   const list = (approvals ?? []) as ActionableApproval[];
+  const bottleneckFlags = await getBottleneckFlags(supabase, list);
   const requesterIds = [...new Set(list.map((a) => a.requester_id))];
   const { data: requesters } = requesterIds.length
     ? await supabase.from("profiles").select("id, full_name").in("id", requesterIds)
@@ -68,6 +71,15 @@ export default async function ApprovalsPage() {
                     <a href={`/requests/${a.request_id}`} className="text-brand-700 hover:underline">
                       {a.request_number}
                     </a>
+                    {bottleneckFlags.get(a.id)?.isSlow && (
+                      <span
+                        title={`Waiting ${bottleneckFlags.get(a.id)!.waitingDays}d — usually decided in ${bottleneckFlags.get(a.id)!.historicalAvgDays ?? "a few"}d`}
+                        className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700"
+                      >
+                        <SparkleIcon className="h-3 w-3" />
+                        Slower than usual
+                      </span>
+                    )}
                   </td>
                   <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{a.description}</td>
                   <td className="px-4 py-3 text-zinc-700">{nameMap.get(a.requester_id) ?? "—"}</td>

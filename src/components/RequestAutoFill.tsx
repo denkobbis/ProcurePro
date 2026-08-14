@@ -7,9 +7,11 @@ import type { ExtractedRequestFields } from "@/lib/extract";
 
 export default function RequestAutoFill({ formId }: { formId: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mode, setMode] = useState<"file" | "text">("file");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
+  const [text, setText] = useState("");
 
   function applyFields(fields: ExtractedRequestFields) {
     const form = document.getElementById(formId) as HTMLFormElement | null;
@@ -28,13 +30,10 @@ export default function RequestAutoFill({ formId }: { formId: string }) {
     set("justification", fields.justification);
   }
 
-  async function handleFile(file: File) {
+  async function runExtraction(body: FormData) {
     setStatus("loading");
     setError("");
-    setFileName(file.name);
     try {
-      const body = new FormData();
-      body.set("file", file);
       const res = await fetch("/api/extract-request", { method: "POST", body });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Extraction failed.");
@@ -46,40 +45,97 @@ export default function RequestAutoFill({ formId }: { formId: string }) {
     }
   }
 
+  function handleFile(file: File) {
+    setFileName(file.name);
+    const body = new FormData();
+    body.set("file", file);
+    runExtraction(body);
+  }
+
+  function handleTextSubmit() {
+    const body = new FormData();
+    body.set("text", text);
+    runExtraction(body);
+  }
+
   return (
     <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50/50 p-4">
       <div className="flex items-start gap-3">
         <SparkleIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-zinc-900">Fill this in from a file</p>
-          <p className="mt-0.5 text-xs text-zinc-500">
-            Upload a vendor quote, invoice, or spec sheet (PDF or image) and the fields below will be filled in for
-            you to review — nothing is saved until you submit.
-          </p>
-          <div className="mt-3 flex items-center gap-3">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={status === "loading"}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <UploadIcon className="h-4 w-4" />
-              {status === "loading" ? "Reading file…" : "Upload file"}
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/pdf,image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFile(file);
-                e.target.value = "";
-              }}
-            />
-            {fileName && status !== "idle" && <span className="text-xs text-zinc-500">{fileName}</span>}
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-zinc-900">Fill this in for me</p>
+            <div className="flex gap-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setMode("file")}
+                className={`rounded px-2 py-0.5 font-medium ${mode === "file" ? "bg-brand-600 text-white" : "text-brand-700 hover:bg-brand-100"}`}
+              >
+                Upload file
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("text")}
+                className={`rounded px-2 py-0.5 font-medium ${mode === "text" ? "bg-brand-600 text-white" : "text-brand-700 hover:bg-brand-100"}`}
+              >
+                Paste text
+              </button>
+            </div>
           </div>
+
+          {mode === "file" ? (
+            <>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Upload a vendor quote, invoice, or spec sheet (PDF or image) and the fields below will be filled in
+                for you to review — nothing is saved until you submit.
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={status === "loading"}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <UploadIcon className="h-4 w-4" />
+                  {status === "loading" ? "Reading file…" : "Upload file"}
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf,image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                {fileName && status !== "idle" && <span className="text-xs text-zinc-500">{fileName}</span>}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Paste an email, a WhatsApp message, or just describe what you need in plain words — e.g. &ldquo;need 50
+                gate valves like the last order from Delta Engineering&rdquo;.
+              </p>
+              <div className="mt-3 space-y-2">
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  placeholder="Describe what you need..."
+                />
+                <Button type="button" variant="secondary" size="sm" disabled={status === "loading" || !text.trim()} onClick={handleTextSubmit}>
+                  <SparkleIcon className="h-4 w-4" />
+                  {status === "loading" ? "Thinking…" : "Fill in fields"}
+                </Button>
+              </div>
+            </>
+          )}
+
           {status === "done" && <p className="mt-2 text-xs font-medium text-green-700">Filled in below — check it over before saving.</p>}
           {status === "error" && <p className="mt-2 text-xs font-medium text-red-600">{error}</p>}
         </div>

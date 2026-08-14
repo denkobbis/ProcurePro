@@ -4,6 +4,7 @@ import { formatNaira } from "@/lib/money";
 import BarList from "@/components/BarList";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
+import SpendCopilot from "@/components/SpendCopilot";
 import { InboxIcon, ChartBarIcon } from "@/components/icons";
 import {
   getSpendByDepartment,
@@ -44,6 +45,8 @@ export default async function ReportsPage() {
         title="Reports"
         description={`Total spend to date: ${formatNaira(totalSpend)} (across all fully-created purchase orders)`}
       />
+
+      <SpendCopilot />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">

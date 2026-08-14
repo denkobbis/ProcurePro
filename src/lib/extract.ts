@@ -32,15 +32,9 @@ const EXTRACT_TOOL = {
   },
 };
 
-export async function extractRequestFields(fileBuffer: Buffer, mimeType: string): Promise<ExtractedRequestFields> {
+async function callExtractTool(content: unknown[]): Promise<ExtractedRequestFields> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set — AI extraction is not configured.");
-
-  const isPdf = mimeType === "application/pdf";
-  const isImage = mimeType.startsWith("image/");
-  if (!isPdf && !isImage) throw new Error("Unsupported file type — upload a PDF or an image (JPG/PNG).");
-
-  const base64 = fileBuffer.toString("base64");
 
   const res = await fetch(ANTHROPIC_API_URL, {
     method: "POST",
@@ -54,21 +48,7 @@ export async function extractRequestFields(fileBuffer: Buffer, mimeType: string)
       max_tokens: 1024,
       tools: [EXTRACT_TOOL],
       tool_choice: { type: "tool", name: "extract_request_fields" },
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: isPdf ? "document" : "image",
-              source: { type: "base64", media_type: mimeType, data: base64 },
-            },
-            {
-              type: "text",
-              text: "Extract the purchase request fields from this document using the extract_request_fields tool.",
-            },
-          ],
-        },
-      ],
+      messages: [{ role: "user", content }],
     }),
   });
 
@@ -79,7 +59,39 @@ export async function extractRequestFields(fileBuffer: Buffer, mimeType: string)
 
   const data = await res.json();
   const toolUse = data.content?.find((block: { type: string }) => block.type === "tool_use");
-  if (!toolUse) throw new Error("Extraction did not return structured data — try a clearer scan or a different file.");
+  if (!toolUse) throw new Error("Extraction did not return structured data — try being more specific.");
 
   return toolUse.input as ExtractedRequestFields;
+}
+
+export async function extractRequestFields(fileBuffer: Buffer, mimeType: string): Promise<ExtractedRequestFields> {
+  const isPdf = mimeType === "application/pdf";
+  const isImage = mimeType.startsWith("image/");
+  if (!isPdf && !isImage) throw new Error("Unsupported file type — upload a PDF or an image (JPG/PNG).");
+
+  const base64 = fileBuffer.toString("base64");
+
+  return callExtractTool([
+    {
+      type: isPdf ? "document" : "image",
+      source: { type: "base64", media_type: mimeType, data: base64 },
+    },
+    {
+      type: "text",
+      text: "Extract the purchase request fields from this document using the extract_request_fields tool.",
+    },
+  ]);
+}
+
+export async function extractRequestFieldsFromText(text: string): Promise<ExtractedRequestFields> {
+  const trimmed = text.trim();
+  if (!trimmed) throw new Error("Type a description first.");
+  if (trimmed.length > 4000) throw new Error("That's a lot of text — trim it to a paragraph or two.");
+
+  return callExtractTool([
+    {
+      type: "text",
+      text: `Extract the purchase request fields from this text using the extract_request_fields tool. The text may be an informal note, a forwarded email, or a WhatsApp-style message — infer sensible field values, and if quantity/cost aren't stated, leave them as 0 rather than guessing:\n\n"""\n${trimmed}\n"""`,
+    },
+  ]);
 }

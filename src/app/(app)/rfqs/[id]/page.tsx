@@ -8,6 +8,8 @@ import { Button } from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { ScaleIcon } from "@/components/icons";
 import { addRfqQuote } from "@/app/actions/rfq";
+import { rankQuotes } from "@/lib/quote-compare";
+import { SparkleIcon } from "@/components/icons";
 import type { RfqQuote, Vendor } from "@/lib/database.types";
 
 const CURRENCIES = ["NGN", "USD", "EUR", "GBP"] as const;
@@ -29,6 +31,8 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
 
   const vendorMap = new Map((vendors ?? []).map((v: Vendor) => [v.id, v.name]));
   const quoteList = (quotes ?? []) as RfqQuote[];
+  const ranked = rankQuotes(quoteList, request?.qty ?? 1);
+  const rankedByQuoteId = new Map(ranked.map((r) => [r.quote.id, r]));
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -42,6 +46,12 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
 
       <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
         <h2 className="border-b border-zinc-200 px-6 py-3 text-sm font-semibold text-zinc-900">Quotes</h2>
+        {quoteList.length >= 2 && (
+          <div className="flex items-start gap-2 border-b border-brand-100 bg-brand-50/50 px-6 py-3 text-xs text-zinc-600">
+            <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
+            <span>Auto-ranked by total price (qty × unit price) and lead time — Cheapest, Fastest, and Recommended badges below.</span>
+          </div>
+        )}
         <div className="overflow-x-auto">
           {quoteList.length === 0 ? (
             <EmptyState icon={<ScaleIcon />} title="No quotes yet" />
@@ -51,33 +61,45 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                 <tr>
                   <th className="px-6 py-3">Vendor</th>
                   <th className="px-4 py-3">Unit price</th>
+                  <th className="px-4 py-3">Total</th>
                   <th className="px-4 py-3">Lead time</th>
                   <th className="px-4 py-3">Notes</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {quoteList.map((q) => (
-                  <tr key={q.id} className="transition-colors hover:bg-brand-50/40">
-                    <td className="px-6 py-3 font-medium text-zinc-900">
-                      {vendorMap.get(q.vendor_id) ?? "—"}
-                      {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
-                    <td className="px-4 py-3 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
-                    <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{q.notes ?? "—"}</td>
-                    <td className="px-4 py-3">
-                      {rfq.status === "open" && (
-                        <Link
-                          href={`/rfqs/${rfq.id}/award?quote_id=${q.id}`}
-                          className="rounded-md bg-green-700 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-green-800"
-                        >
-                          Award
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {quoteList.map((q) => {
+                  const r = rankedByQuoteId.get(q.id);
+                  return (
+                    <tr key={q.id} className="transition-colors hover:bg-brand-50/40">
+                      <td className="px-6 py-3 font-medium text-zinc-900">
+                        {vendorMap.get(q.vendor_id) ?? "—"}
+                        {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
+                        {quoteList.length >= 2 && (
+                          <span className="mt-1 flex flex-wrap gap-1">
+                            {r?.isRecommended && <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[11px] font-medium text-brand-700">Recommended</span>}
+                            {r?.isCheapest && <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">Cheapest</span>}
+                            {r?.isFastest && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">Fastest</span>}
+                          </span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{r ? formatMoney(r.total, q.currency) : "—"}</td>
+                      <td className="px-4 py-3 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
+                      <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{q.notes ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        {rfq.status === "open" && (
+                          <Link
+                            href={`/rfqs/${rfq.id}/award?quote_id=${q.id}`}
+                            className="rounded-md bg-green-700 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-green-800"
+                          >
+                            Award
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

@@ -8,7 +8,13 @@ import { Button } from "@/components/Button";
 import VendorPayoutForm from "@/components/VendorPayoutForm";
 import { listBanks } from "@/lib/paystack";
 import { getIndustryModules } from "@/lib/industries";
+import { getVendorScorecard } from "@/lib/vendor-score";
+import { SparkleIcon } from "@/components/icons";
 import type { VendorDocument } from "@/lib/database.types";
+
+function pct(n: number | null) {
+  return n == null ? "—" : `${Math.round(n * 100)}%`;
+}
 
 function expiryBadge(expiryDate?: string | null) {
   if (!expiryDate) return null;
@@ -36,6 +42,8 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
     if (data) documentUrls.set(d.file_path, data.signedUrl);
   }
 
+  const scorecard = await getVendorScorecard(supabase, vendor.id);
+
   let banks: { name: string; code: string }[] = [];
   let banksError: string | null = null;
   try {
@@ -47,6 +55,35 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="max-w-2xl space-y-6">
       <PageHeader title={vendor.name} description={vendor.category ?? "No category set"} />
+
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-zinc-900">
+          <SparkleIcon className="h-4 w-4 text-brand-600" />
+          Reliability scorecard
+        </h2>
+        {scorecard.quoteCount === 0 && scorecard.poCount === 0 ? (
+          <p className="text-sm text-zinc-400">No quote or order history yet — the scorecard fills in as this vendor is used.</p>
+        ) : (
+          <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+            <div>
+              <dt className="text-zinc-500">Avg. quote response</dt>
+              <dd className="text-zinc-900">{scorecard.avgResponseDays == null ? "—" : `${scorecard.avgResponseDays}d`}</dd>
+            </div>
+            <div>
+              <dt className="text-zinc-500">Quotes given</dt>
+              <dd className="text-zinc-900">{scorecard.quoteCount}</dd>
+            </div>
+            <div>
+              <dt className="text-zinc-500">Orders fully received</dt>
+              <dd className="text-zinc-900">{pct(scorecard.fullyReceivedRate)}</dd>
+            </div>
+            <div>
+              <dt className="text-zinc-500">Fulfillment rate</dt>
+              <dd className="text-zinc-900">{pct(scorecard.fulfillmentRate)}</dd>
+            </div>
+          </dl>
+        )}
+      </div>
 
       <div className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
