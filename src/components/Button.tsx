@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "danger" | "success" | "ghost";
-type Size = "sm" | "md";
+type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500",
@@ -15,6 +15,7 @@ const variantClasses: Record<Variant, string> = {
 const sizeClasses: Record<Size, string> = {
   sm: "px-2.5 py-1 text-xs",
   md: "px-4 py-2 text-sm",
+  lg: "px-6 py-3 text-base",
 };
 
 const shared = "inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40";

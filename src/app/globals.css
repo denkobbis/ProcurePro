@@ -41,3 +41,20 @@ body {
   background-color: var(--color-brand-200);
   color: var(--color-brand-900);
 }
+
+/* The landing page's one authored motion moment: the hero reveals on load,
+   staggered slightly per element. Nowhere else on the page animates. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-reveal {
+  animation: reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

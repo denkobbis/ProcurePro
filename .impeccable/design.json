@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-14T00:00:00.000Z",
+  "title": "Design System: ProcurePro",
+  "extensions": {
+    "colorMeta": {
+      "brand-600": {
+        "role": "primary",
+        "displayName": "Blueprint Navy",
+        "canonical": "#2c4f9e",
+        "tonalRamp": ["#0e1830", "#172750", "#1c3163", "#223d7c", "#2c4f9e", "#3b69be", "#5c8bd3", "#8cb0e4", "#b8cff0", "#dce7f8", "#eff4fc"]
+      },
+      "brand-950": {
+        "role": "primary",
+        "displayName": "Blueprint Navy Deep",
+        "canonical": "#0e1830",
+        "tonalRamp": ["#0e1830", "#172750", "#1c3163", "#223d7c", "#2c4f9e", "#3b69be", "#5c8bd3", "#8cb0e4"]
+      },
+      "zinc-canvas": {
+        "role": "neutral",
+        "displayName": "Canvas White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#18181b", "#3f3f46", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Landing hero H1 only, set white on navy-950." },
+      "title": { "displayName": "Title", "purpose": "Section headers across landing and app." },
+      "body": { "displayName": "Body", "purpose": "Descriptive paragraph copy, capped ~55-65ch." },
+      "label": { "displayName": "Label", "purpose": "Nav links, buttons, stat labels, table headers." }
+    },
+    "shadows": [
+      { "name": "card-resting", "value": "0 1px 2px rgba(0,0,0,0.05)", "purpose": "Default resting shadow for StatCard and content cards." },
+      { "name": "card-hover", "value": "0 4px 6px rgba(0,0,0,0.08)", "purpose": "Hover-lift shadow on interactive stat cards, paired with -translate-y-0.5." },
+      { "name": "screenshot-frame-light", "value": "0 10px 15px rgba(228,228,231,0.6)", "purpose": "Tinted frame shadow for feature screenshots on white sections." },
+      { "name": "screenshot-frame-navy", "value": "0 25px 50px rgba(0,0,0,0.4)", "purpose": "Deep frame shadow for the hero dashboard screenshot on navy." }
+    ],
+    "motion": [
+      { "name": "reveal-up", "value": "translateY(14px)->translateY(0), opacity 0->1, 0.7s cubic-bezier(0.16,1,0.3,1)", "purpose": "The single authored motion moment: staggered hero entrance on the landing page. Used nowhere else." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid navy CTA button, medium size.",
+      "html": "<button class=\"ds-btn-primary\">Start free trial</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #2c4f9e; color: #ffffff; font-weight: 500; font-size: 0.875rem; padding: 8px 16px; border: none; border-radius: 6px; transition: background-color 0.15s; } .ds-btn-primary:hover { background: #223d7c; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b69be; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White outlined button for secondary actions.",
+      "html": "<button class=\"ds-btn-secondary\">View budgets</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #ffffff; color: #3f3f46; font-weight: 500; font-size: 0.875rem; padding: 8px 16px; border: 1px solid #d4d4d8; border-radius: 6px; transition: background-color 0.15s; } .ds-btn-secondary:hover { background: #fafafa; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b69be; }"
+    },
+    {
+      "name": "Stat Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Icon-tinted KPI card with hover-lift; the system's signature reused primitive.",
+      "html": "<a href=\"#\" class=\"ds-stat-card\"><span class=\"ds-stat-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" width=\"20\" height=\"20\"><path d=\"M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z\"/><path d=\"M14 3.5V8h4\"/></svg></span><span><span class=\"ds-stat-value\">12</span><span class=\"ds-stat-label\">My requests</span></span></a>",
+      "css": ".ds-stat-card { display: flex; align-items: center; gap: 16px; border-radius: 8px; border: 1px solid #e4e4e7; background: #ffffff; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; } .ds-stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.08); } .ds-stat-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 8px; background: #eff4fc; color: #2c4f9e; flex-shrink: 0; } .ds-stat-value { display: block; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; color: #18181b; } .ds-stat-label { display: block; font-size: 0.875rem; color: #71717a; }"
+    },
+    {
+      "name": "Industry Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill chip used for industry tags on the navy hero.",
+      "html": "<span class=\"ds-chip\">Oil &amp; Gas</span>",
+      "css": ".ds-chip { display: inline-block; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #8cb0e4; font-size: 0.75rem; font-weight: 500; padding: 4px 12px; }"
+    },
+    {
+      "name": "Marketing Nav",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Sticky translucent top navigation with logo, text links, and primary CTA.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav-brand\"><span class=\"ds-nav-logo\">P</span>ProcurePro</div><div class=\"ds-nav-links\"><a href=\"#\">Features</a><a href=\"#\">Pricing</a><button class=\"ds-btn-primary\">Start free trial</button></div></nav>",
+      "css": ".ds-nav { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); border-bottom: 1px solid #e4e4e7; padding: 12px 24px; } .ds-nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.125rem; font-weight: 600; color: #18181b; } .ds-nav-logo { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #2c4f9e; color: #fff; font-size: 0.875rem; } .ds-nav-links { display: flex; align-items: center; gap: 20px; } .ds-nav-links a { font-size: 0.875rem; font-weight: 500; color: #52525b; text-decoration: none; } .ds-nav-links a:hover { color: #18181b; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Engineering Blueprint",
+    "overview": "ProcurePro reads as an instrument panel for people who move steel, freight, and money, not a consumer SaaS toy. The system pairs one deep, steady navy (deliberately more industrial than a flat SaaS blue-600, per its own inline comment in globals.css) with a mostly neutral, white-and-zinc application body, so the brand color reads as authority and stays legible at table density. Structural grammar -- stat strips with trend context, chip filters, alternating feature/screenshot rhythm, dark navy bookend panels -- is borrowed honestly from a Behance B2B SaaS dashboard reference, but the reference's own teal identity was explicitly rejected in favor of the existing navy brand (a pinned, user-and-brief-directed choice, not a concept-seed roll). The build is Restrained-to-Committed: the authenticated app stays flat, white, and zinc-neutral so operational data stays scannable; navy is spent deliberately on a small number of declaration surfaces -- the landing hero, the pricing section, and the dashboard's welcome banner -- where the brand needs to announce itself. Icons are a single hand-drawn stroke set, and typography is single-family throughout (Geist Sans). One motion moment is authored and confirmed: the landing hero staggers in on load.",
+    "keyCharacteristics": [
+      "Deep navy (brand-950/900) as a rare, declarative surface color; white/zinc as the working default",
+      "Single-family typography (Geist Sans) — hierarchy by weight/size, not font pairing",
+      "Hand-drawn stroke icons (1.75px stroke, round caps/joins), never a third-party icon library",
+      "Flat white cards with a hairline border and a soft resting shadow — no heavy elevation",
+      "Tabular numbers on ordered/indexed lists (tabular-nums) for the engineering-instrument feel",
+      "One authored motion moment (hero reveal), not a recurring animation language"
+    ],
+    "rules": [
+      { "name": "The Bookend Rule", "body": "Deep navy (brand-950) is reserved for a small, fixed set of declaration surfaces — landing hero, pricing section, dashboard welcome banner. Every other application surface stays on the white/zinc neutral field.", "section": "colors" },
+      { "name": "The Single-Accent Rule", "body": "Only the brand-navy ramp functions as a UI accent color. Semantic states borrow directly from Tailwind's stock red/amber/green scales rather than adding bespoke accent hues.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Every text role — hero headline through table cell — is Geist Sans. No second font is introduced for display moments; weight and size carry all hierarchy.", "section": "typography" },
+      { "name": "The Lift-on-Hover Rule", "body": "Only genuinely clickable surfaces get the hover-lift + shadow-deepen treatment. Static content never adopts it.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reserve brand-950 navy for the fixed bookend surfaces (hero, pricing, dashboard banner) — see The Bookend Rule.",
+      "Do use the hand-drawn stroke icon set (1.75 stroke-width, round caps, no fill) for every icon; never mix in a third-party icon library or a filled/glyph style.",
+      "Do use tabular-nums on any numbered/indexed list (workflow steps, ranked lists) to keep digits aligned — an established, reused pattern, not a one-off.",
+      "Do cap body copy at max-w-md/max-w-lg (~55-65ch) wherever it appears next to a heading.",
+      "Do apply the shared focus-visible ring treatment (ring-2 ring-brand-500 ring-offset-2, rounded-sm) to every interactive text element and button."
+    ],
+    "donts": [
+      "Don't introduce a second display typeface. Geist Sans carries every role; hierarchy is weight/size only.",
+      "Don't add shadow or elevation as a stacking signal — it exists only to mark liftable/interactive surfaces (see The Lift-on-Hover Rule).",
+      "Don't extend the navy background beyond its three bookend surfaces; a fourth 'just this once' navy section breaks The Bookend Rule and dilutes navy's declarative weight.",
+      "Don't animate outside the single authored hero reveal moment; the system's stillness is deliberate, not an oversight.",
+      "Don't fabricate stat-strip or social-proof numbers to fill the grammar borrowed from the reference dashboard — every stat card and figure in this build ties to a real, checkable product fact, per PRODUCT.md's no-fabricated-proof commitment."
+    ]
+  }
+}
