@@ -21,9 +21,9 @@ export default async function VendorsPage() {
         title="Vendors"
         actions={
           <div className="flex items-center gap-3">
-            <a href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            <Link href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
               Export CSV
-            </a>
+            </Link>
             <ButtonLink href="/vendors/new">Add vendor</ButtonLink>
           </div>
         }

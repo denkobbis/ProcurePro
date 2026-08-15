@@ -33,9 +33,9 @@ export default async function RequestsPage() {
         title="Purchase requests"
         actions={
           <div className="flex items-center gap-3">
-            <a href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            <Link href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
               Export CSV
-            </a>
+            </Link>
             <ButtonLink href="/requests/new">New request</ButtonLink>
           </div>
         }

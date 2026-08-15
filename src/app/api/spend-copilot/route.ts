@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentProfile, requireActiveOrg, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { allowAiCall } from "@/lib/ai-usage";
 import { answerSpendQuestion } from "@/lib/spend-copilot";
 
 export async function POST(req: NextRequest) {
@@ -19,6 +20,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const supabase = await createClient();
+    const allowed = await allowAiCall(supabase, profile.organization_id, "copilot");
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Your organization has hit its daily spend-copilot limit (100). Try again tomorrow." },
+        { status: 429 }
+      );
+    }
     const answer = await answerSpendQuestion(supabase, question);
     return NextResponse.json({ answer });
   } catch (err) {

@@ -30,9 +30,9 @@ export default async function PurchaseOrdersPage() {
       <PageHeader
         title="Purchase Orders"
         actions={
-          <a href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+          <Link href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
             Export CSV
-          </a>
+          </Link>
         }
       />
 
