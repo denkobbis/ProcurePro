@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/Button";
+import ThemeToggle from "@/components/ThemeToggle";
 import {
   LogoMarkIcon,
   DocumentIcon,
@@ -13,13 +14,14 @@ import {
   ChartBarIcon,
   ShieldCheckIcon,
   ArrowRightIcon,
+  SparkleIcon,
 } from "@/components/icons";
 
-const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-sm";
+const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-brand-950 rounded-sm";
 
 const STATS = [
   { value: "6", label: "stages, one system — request to receiving" },
-  { value: "2", label: "payout rails built in — Paystack & Flutterwave" },
+  { value: "9", label: "AI-assisted checks running quietly in the background" },
   { value: "₦25k", label: "flat per month, 14-day trial, no card required" },
 ];
 
@@ -61,11 +63,27 @@ const FEATURES = [
     image: "/landing/landing_dashboard.png",
   },
   {
+    icon: SparkleIcon,
+    title: "Upload a quote, skip the retyping",
+    description:
+      "Upload a vendor quote, invoice, or spec sheet and Claude fills in the request for you — description, quantity, cost, part number. You review and submit; nothing saves itself.",
+    image: "/landing/landing_ai_extract.png",
+    panel: true,
+  },
+  {
     icon: WalletIcon,
     title: "Budgets that stop overspend before it happens",
     description:
       "Department and category budgets enforce themselves. Set a hard block and the system refuses submission once a budget's exhausted — no more finding out after the fact.",
     image: "/landing/landing_budgets.png",
+  },
+  {
+    icon: SparkleIcon,
+    title: "The alerts a busy team would otherwise miss",
+    description:
+      "Approvals sitting longer than usual, FX moves that changed a landed cost, certificates about to expire, vendors sharing a bank account — surfaced the moment you sign in, computed from your own data, not guessed.",
+    image: "/landing/landing_smart_flags.png",
+    panel: true,
   },
   {
     icon: ChartBarIcon,
@@ -101,26 +119,27 @@ const PRICING_INCLUDES = [
 
 export default function LandingPage() {
   return (
-    <div className="flex-1">
-      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
+    <div className="flex-1 bg-white dark:bg-[#0a0e1a]">
+      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0a0e1a]/90">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-2 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <LogoMarkIcon className="h-7 w-7 text-brand-600" />
-            <span className="text-lg font-semibold tracking-tight text-zinc-900">ProcurePro</span>
+            <LogoMarkIcon className="h-7 w-7 text-brand-600 dark:text-brand-400" />
+            <span className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">ProcurePro</span>
           </div>
           <div className="flex items-center gap-5 sm:gap-6">
-            <a href="#features" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
+            <a href="#features" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
               Features
             </a>
-            <a href="#pricing" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
+            <a href="#pricing" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
               Pricing
             </a>
-            <Link href="/login" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
+            <Link href="/login" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
               Sign in
             </Link>
             <ButtonLink href="/signup" size="sm">
               Start free trial
             </ButtonLink>
+            <ThemeToggle className="text-zinc-500 dark:text-zinc-400" />
           </div>
         </div>
       </nav>
@@ -170,12 +189,12 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
-            <div className="aspect-[2880/1000] overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/40">
+            <div className="aspect-[2880/1250] overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/40">
               <Image
                 src="/landing/landing_dashboard.png"
-                alt="ProcurePro dashboard showing requests, approvals, and open purchase orders"
+                alt="ProcurePro dashboard showing requests, approvals, open purchase orders, and Smart flags"
                 width={2880}
-                height={1800}
+                height={1250}
                 priority
                 className="h-full w-full object-cover object-top"
               />
@@ -185,34 +204,34 @@ export default function LandingPage() {
       </section>
 
       {/* Stat strip */}
-      <section className="border-b border-zinc-100 bg-white px-4 py-10 sm:px-6">
+      <section className="border-b border-zinc-100 bg-white px-4 py-10 sm:px-6 dark:border-white/10 dark:bg-[#0a0e1a]">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-3">
           {STATS.map((stat) => (
             <div key={stat.label} className="flex items-baseline gap-3">
-              <span className="text-3xl font-semibold tracking-tight text-brand-700">{stat.value}</span>
-              <span className="text-sm leading-snug text-zinc-500">{stat.label}</span>
+              <span className="text-3xl font-semibold tracking-tight text-brand-700 dark:text-brand-400">{stat.value}</span>
+              <span className="text-sm leading-snug text-zinc-500 dark:text-zinc-400">{stat.label}</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* Problem */}
-      <section className="bg-white px-4 py-20 sm:px-6">
+      <section className="bg-white px-4 py-20 sm:px-6 dark:bg-[#0a0e1a]">
         <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900">
+          <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
             The way most teams still run procurement
           </h2>
-          <div className="mt-12 divide-y divide-zinc-100 border-t border-zinc-100">
+          <div className="mt-12 divide-y divide-zinc-100 border-t border-zinc-100 dark:divide-white/10 dark:border-white/10">
             {PROBLEMS.map((p, i) => (
               <div key={p.title} className="flex flex-col gap-4 py-8 sm:flex-row sm:items-start sm:gap-8">
                 <div className="flex items-baseline gap-4 sm:w-64 sm:shrink-0">
-                  <span className="text-sm tabular-nums text-zinc-300">{String(i + 1).padStart(2, "0")}</span>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                  <span className="text-sm tabular-nums text-zinc-300 dark:text-zinc-700">{String(i + 1).padStart(2, "0")}</span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
                     <p.icon className="h-4 w-4" />
                   </div>
-                  <h3 className="text-base font-semibold text-zinc-900">{p.title}</h3>
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-white">{p.title}</h3>
                 </div>
-                <p className="max-w-lg text-sm leading-relaxed text-zinc-500 sm:pt-1">{p.description}</p>
+                <p className="max-w-lg text-sm leading-relaxed text-zinc-500 sm:pt-1 dark:text-zinc-400">{p.description}</p>
               </div>
             ))}
           </div>
@@ -220,21 +239,21 @@ export default function LandingPage() {
       </section>
 
       {/* Workflow */}
-      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 sm:px-6">
+      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 sm:px-6 dark:border-white/10 dark:bg-white/[0.02]">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">One system, the whole purchase lifecycle</h2>
-          <p className="mt-3 max-w-xl text-base text-zinc-500">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">One system, the whole purchase lifecycle</h2>
+          <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
             From the first request to the goods arriving at your yard, every step is tracked, approved,
             and auditable.
           </p>
           <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
             {WORKFLOW.map((step, i) => (
               <div key={step.label} className="relative">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200 bg-white text-brand-600 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200 bg-white text-brand-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-brand-400">
                   <step.icon className="h-5 w-5" />
                 </div>
-                <div className="mt-3 text-sm font-medium text-zinc-900">
-                  <span className="tabular-nums text-zinc-400">{String(i + 1).padStart(2, "0")}</span>{" "}
+                <div className="mt-3 text-sm font-medium text-zinc-900 dark:text-white">
+                  <span className="tabular-nums text-zinc-400 dark:text-zinc-600">{String(i + 1).padStart(2, "0")}</span>{" "}
                   {step.label}
                 </div>
               </div>
@@ -244,27 +263,37 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-white px-4 py-20 sm:px-6">
+      <section id="features" className="bg-white px-4 py-20 sm:px-6 dark:bg-[#0a0e1a]">
         <div className="mx-auto max-w-6xl space-y-24">
           {FEATURES.map((feature, i) => (
             <div key={feature.title} className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
                   <feature.icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-2xl font-semibold tracking-tight text-zinc-900">{feature.title}</h3>
-                <p className="mt-3 max-w-md text-base leading-relaxed text-zinc-500">{feature.description}</p>
+                <h3 className="mt-4 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">{feature.title}</h3>
+                <p className="mt-3 max-w-md text-base leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
               </div>
               <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                <div className="aspect-[2880/1150] overflow-hidden rounded-xl border border-zinc-200 shadow-lg shadow-zinc-200/60">
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    width={2880}
-                    height={1800}
-                    className="h-full w-full object-cover object-top"
-                  />
-                </div>
+                {feature.panel ? (
+                  // Cropped UI-panel screenshots (much wider/shorter than a
+                  // full-page capture) — shown whole via object-contain in a
+                  // shorter frame instead of force-cropped into the full-page
+                  // screenshots' wide aspect ratio, which badly over-zoomed them.
+                  <div className="flex aspect-[2880/900] items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 p-8 shadow-lg shadow-zinc-200/60 dark:border-white/10 dark:bg-white/[0.03] dark:shadow-black/40">
+                    <Image src={feature.image} alt={feature.title} width={1400} height={400} className="h-auto max-h-full w-full object-contain" />
+                  </div>
+                ) : (
+                  <div className="aspect-[2880/1150] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg shadow-zinc-200/60 dark:border-white/10 dark:shadow-black/40">
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      width={2880}
+                      height={1800}
+                      className="h-full w-full object-cover object-top"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -331,18 +360,18 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 bg-white px-4 py-10 sm:px-6">
+      <footer className="border-t border-zinc-200 bg-white px-4 py-10 sm:px-6 dark:border-white/10 dark:bg-[#0a0e1a]">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <LogoMarkIcon className="h-6 w-6 text-brand-600" />
-            <span className="text-sm font-semibold text-zinc-900">ProcurePro</span>
-            <span className="text-sm text-zinc-400">— Procurement control for heavy industry.</span>
+            <LogoMarkIcon className="h-6 w-6 text-brand-600 dark:text-brand-400" />
+            <span className="text-sm font-semibold text-zinc-900 dark:text-white">ProcurePro</span>
+            <span className="text-sm text-zinc-400 dark:text-zinc-600">— Procurement control for heavy industry.</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-zinc-500">
-            <Link href="/login" className={`hover:text-zinc-900 ${focusRing}`}>
+          <div className="flex items-center gap-6 text-sm text-zinc-500 dark:text-zinc-400">
+            <Link href="/login" className={`hover:text-zinc-900 dark:hover:text-white ${focusRing}`}>
               Sign in
             </Link>
-            <Link href="/signup" className={`hover:text-zinc-900 ${focusRing}`}>
+            <Link href="/signup" className={`hover:text-zinc-900 dark:hover:text-white ${focusRing}`}>
               Start free trial
             </Link>
             <span>&copy; {new Date().getFullYear()} ProcurePro</span>

@@ -1,9 +1,20 @@
 @import "tailwindcss";
 
+/* Class-based dark mode (toggle-controlled, not just prefers-color-scheme) —
+   scoped to the landing page for now via ThemeToggle; the authenticated app
+   doesn't opt into this. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
   color-scheme: light;
+}
+
+:root.dark {
+  --background: #0a0e1a;
+  --foreground: #e4e7ec;
+  color-scheme: dark;
 }
 
 @theme inline {

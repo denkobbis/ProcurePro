@@ -7,7 +7,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "..", "assets", "ads");
 const brandDir = path.join(__dirname, "..", "assets", "logos");
 const landingDir = path.join(__dirname, "..", "public", "landing");
-const fixturesDir = path.join(__dirname, "..", "scripts", "test-fixtures");
 
 function b64(filePath) {
   const ext = path.extname(filePath).slice(1);
@@ -17,7 +16,8 @@ function b64(filePath) {
 
 const lockupWhite = b64(path.join(brandDir, "procurepro-lockup-white.svg"));
 const dashboard = b64(path.join(landingDir, "landing_dashboard.png"));
-const aiWidgetShot = b64(path.join(fixturesDir, "ai-widget-screenshot.png"));
+const aiWidgetShot = b64(path.join(landingDir, "landing_ai_extract.png"));
+const smartFlagsShot = b64(path.join(landingDir, "landing_smart_flags.png"));
 
 const NAVY_BG = "linear-gradient(135deg, #1a2c5c 0%, #0e1830 75%)";
 
@@ -88,9 +88,30 @@ function aiExtractionHtml() {
         </div>
       </div>
       <div style="flex:1;position:relative;">
-        <div style="position:absolute;inset:40px 40px 40px 0;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);">
-          <img src="${aiWidgetShot}" style="width:100%;height:100%;object-fit:cover;object-position:left top;" />
+        <div style="position:absolute;inset:40px 40px 40px 0;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);background:#f8f9fb;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;">
+          <img src="${aiWidgetShot}" style="width:100%;height:auto;object-fit:contain;" />
         </div>
+      </div>
+    </div>
+  </body></html>`;
+}
+
+function smartFlagsHtml() {
+  return `
+  <html><body style="margin:0;">
+    <div style="width:1200px;height:1200px;background:${NAVY_BG};display:flex;flex-direction:column;font-family:Arial,Helvetica,sans-serif;overflow:hidden;padding:64px;box-sizing:border-box;">
+      <img src="${lockupWhite}" style="height:38px;width:auto;" />
+      <div style="margin-top:44px;color:#fff;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.5px;max-width:900px;">
+        The alerts a busy team would otherwise miss.
+      </div>
+      <div style="margin-top:16px;color:#aab8dd;font-size:20px;line-height:1.5;max-width:820px;">
+        Slow approvals, FX moves, expiring certificates, vendors sharing a bank account — flagged the moment you sign in, computed from your own data.
+      </div>
+      <div style="flex:1;margin-top:40px;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);background:#fffbeb;display:flex;align-items:center;justify-content:center;padding:32px;box-sizing:border-box;">
+        <img src="${smartFlagsShot}" style="width:100%;height:auto;object-fit:contain;" />
+      </div>
+      <div style="margin-top:36px;display:inline-flex;align-self:flex-start;align-items:center;gap:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:12px 24px;color:#fff;font-size:19px;font-weight:600;">
+        Every flag is advisory — nothing is ever blocked automatically
       </div>
     </div>
   </body></html>`;
@@ -158,6 +179,12 @@ async function main() {
   await page.waitForTimeout(150);
   await (await page.$("div")).screenshot({ path: path.join(outDir, "linkedin-feature-list-1200x1200.png") });
   console.log("exported linkedin-feature-list-1200x1200.png");
+
+  await page.setViewportSize({ width: 1200, height: 1200 });
+  await page.setContent(smartFlagsHtml());
+  await page.waitForTimeout(150);
+  await (await page.$("div")).screenshot({ path: path.join(outDir, "linkedin-smart-flags-1200x1200.png") });
+  console.log("exported linkedin-smart-flags-1200x1200.png");
 
   await browser.close();
 }
