@@ -39,11 +39,13 @@ export default async function DashboardPage() {
 
   let pendingApprovals = 0;
   if (APPROVER_ROLES.includes(profile.role)) {
-    const { count } = await supabase
-      .from("approvals")
-      .select("id", { count: "exact", head: true })
-      .eq("approver_role", profile.role)
-      .eq("status", "pending");
+    // v_actionable_approvals is RLS-scoped the same way the /approvals page
+    // itself is — a plain approver/finance_admin only ever sees rows matching
+    // their own role anyway, but admin roles can act on ANY role's pending
+    // step (see approvals_select policy), and eq("approver_role", profile.role)
+    // undercounted them down to 0 since no approval row's approver_role is
+    // ever literally "super_admin".
+    const { count } = await supabase.from("v_actionable_approvals").select("id", { count: "exact", head: true });
     pendingApprovals = count ?? 0;
   }
 
@@ -52,7 +54,7 @@ export default async function DashboardPage() {
     const { count } = await supabase
       .from("purchase_orders")
       .select("id", { count: "exact", head: true })
-      .in("status", ["draft", "sent_to_vendor", "partially_received"]);
+      .in("status", ["draft", "sent_to_vendor", "in_transit", "customs_clearance", "partially_received"]);
     openPOs = count ?? 0;
   }
 
