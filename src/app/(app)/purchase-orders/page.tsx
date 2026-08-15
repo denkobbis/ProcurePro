@@ -24,7 +24,14 @@ export default async function PurchaseOrdersPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Purchase Orders" />
+      <PageHeader
+        title="Purchase Orders"
+        actions={
+          <a href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            Export CSV
+          </a>
+        }
+      />
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
         {rows.length === 0 ? (

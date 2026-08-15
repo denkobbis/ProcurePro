@@ -29,7 +29,17 @@ export default async function RequestsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Purchase requests" actions={<ButtonLink href="/requests/new">New request</ButtonLink>} />
+      <PageHeader
+        title="Purchase requests"
+        actions={
+          <div className="flex items-center gap-3">
+            <a href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+              Export CSV
+            </a>
+            <ButtonLink href="/requests/new">New request</ButtonLink>
+          </div>
+        }
+      />
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
         {rows.length === 0 ? (

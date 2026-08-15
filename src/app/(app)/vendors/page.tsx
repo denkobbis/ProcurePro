@@ -17,7 +17,17 @@ export default async function VendorsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Vendors" actions={<ButtonLink href="/vendors/new">Add vendor</ButtonLink>} />
+      <PageHeader
+        title="Vendors"
+        actions={
+          <div className="flex items-center gap-3">
+            <a href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+              Export CSV
+            </a>
+            <ButtonLink href="/vendors/new">Add vendor</ButtonLink>
+          </div>
+        }
+      />
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
         {rows.length === 0 ? (

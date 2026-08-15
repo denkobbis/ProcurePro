@@ -59,7 +59,7 @@ const GROUPS = [
   },
 ] as const;
 
-export default function Sidebar({ profile, industry }: { profile: Profile; industry: OrganizationIndustry }) {
+export default function Sidebar({ profile, industry, orgName }: { profile: Profile; industry: OrganizationIndustry; orgName: string }) {
   const pathname = usePathname();
   const { open, setOpen } = useMobileNav();
   const modules = getIndustryModules(industry);
@@ -84,8 +84,11 @@ export default function Sidebar({ profile, industry }: { profile: Profile; indus
         }`}
       >
         <div className="flex items-center gap-2 px-2 pb-4">
-          <LogoMarkIcon className="h-7 w-7 text-brand-600" />
-          <span className="text-lg font-semibold tracking-tight text-zinc-900">ProcurePro</span>
+          <LogoMarkIcon className="h-7 w-7 shrink-0 text-brand-600" />
+          <div className="min-w-0">
+            <div className="text-lg font-semibold leading-tight tracking-tight text-zinc-900">ProcurePro</div>
+            <div className="truncate text-xs text-zinc-500" title={orgName}>{orgName}</div>
+          </div>
         </div>
         <div className="mx-2 mb-4 border-t border-zinc-100" />
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
