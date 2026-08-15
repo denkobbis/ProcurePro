@@ -5,8 +5,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "..", "assets", "ads");
-const brandDir = path.join(__dirname, "..", "public", "brand");
+const brandDir = path.join(__dirname, "..", "assets", "logos");
 const landingDir = path.join(__dirname, "..", "public", "landing");
+const fixturesDir = path.join(__dirname, "..", "scripts", "test-fixtures");
 
 function b64(filePath) {
   const ext = path.extname(filePath).slice(1);
@@ -16,6 +17,7 @@ function b64(filePath) {
 
 const lockupWhite = b64(path.join(brandDir, "procurepro-lockup-white.svg"));
 const dashboard = b64(path.join(landingDir, "landing_dashboard.png"));
+const aiWidgetShot = b64(path.join(fixturesDir, "ai-widget-screenshot.png"));
 
 const NAVY_BG = "linear-gradient(135deg, #1a2c5c 0%, #0e1830 75%)";
 
@@ -67,6 +69,68 @@ function squareHtml() {
   </body></html>`;
 }
 
+function aiExtractionHtml() {
+  return `
+  <html><body style="margin:0;">
+    <div style="width:1200px;height:627px;background:${NAVY_BG};display:flex;align-items:stretch;font-family:Arial,Helvetica,sans-serif;overflow:hidden;">
+      <div style="flex:0 0 560px;padding:56px 40px 56px 56px;display:flex;flex-direction:column;justify-content:space-between;">
+        <img src="${lockupWhite}" style="height:34px;width:auto;" />
+        <div>
+          <div style="color:#fff;font-size:42px;font-weight:700;line-height:1.15;letter-spacing:-0.5px;">
+            Stop retyping quotes into forms.
+          </div>
+          <div style="margin-top:20px;color:#aab8dd;font-size:19px;line-height:1.5;max-width:460px;">
+            Upload a vendor quote or invoice and Claude fills in the request for you — you review and submit, nothing saves itself.
+          </div>
+        </div>
+        <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:10px 20px;color:#fff;font-size:16px;font-weight:600;">
+          New: AI-assisted request entry
+        </div>
+      </div>
+      <div style="flex:1;position:relative;">
+        <div style="position:absolute;inset:40px 40px 40px 0;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);">
+          <img src="${aiWidgetShot}" style="width:100%;height:100%;object-fit:cover;object-position:left top;" />
+        </div>
+      </div>
+    </div>
+  </body></html>`;
+}
+
+function featureListHtml() {
+  const features = [
+    ["Bid comparison", "Vendor quotes auto-ranked by cheapest, fastest, and best value"],
+    ["Spend copilot", "Ask plain-English questions about vendor spend and budgets"],
+    ["Freeform intake", "Paste an email or WhatsApp message, get a structured request"],
+    ["Vendor scorecards", "Quote response time and fulfillment rate, tracked automatically"],
+    ["Bottleneck alerts", "Flags approvals sitting longer than this org's own average"],
+  ];
+  const rows = features
+    .map(
+      ([title, desc]) => `
+      <div style="display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,0.12);">
+        <div style="width:8px;height:8px;border-radius:999px;background:#5b82d6;margin-top:10px;flex-shrink:0;"></div>
+        <div>
+          <div style="color:#fff;font-size:24px;font-weight:700;">${title}</div>
+          <div style="color:#aab8dd;font-size:17px;margin-top:4px;">${desc}</div>
+        </div>
+      </div>`
+    )
+    .join("");
+  return `
+  <html><body style="margin:0;">
+    <div style="width:1200px;height:1200px;background:${NAVY_BG};display:flex;flex-direction:column;font-family:Arial,Helvetica,sans-serif;overflow:hidden;padding:64px;box-sizing:border-box;">
+      <img src="${lockupWhite}" style="height:38px;width:auto;" />
+      <div style="margin-top:44px;color:#fff;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.5px;max-width:900px;">
+        5 new ways ProcurePro does the busywork for you.
+      </div>
+      <div style="margin-top:8px;">${rows}</div>
+      <div style="margin-top:32px;display:inline-flex;align-self:flex-start;align-items:center;gap:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:12px 24px;color:#fff;font-size:19px;font-weight:600;">
+        Every suggestion is reviewed by you before it's saved
+      </div>
+    </div>
+  </body></html>`;
+}
+
 async function main() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
@@ -82,6 +146,18 @@ async function main() {
   await page.waitForTimeout(150);
   await (await page.$("div")).screenshot({ path: path.join(outDir, "linkedin-square-1200x1200.png") });
   console.log("exported linkedin-square-1200x1200.png");
+
+  await page.setViewportSize({ width: 1200, height: 627 });
+  await page.setContent(aiExtractionHtml());
+  await page.waitForTimeout(150);
+  await (await page.$("div")).screenshot({ path: path.join(outDir, "linkedin-ai-extraction-1200x627.png") });
+  console.log("exported linkedin-ai-extraction-1200x627.png");
+
+  await page.setViewportSize({ width: 1200, height: 1200 });
+  await page.setContent(featureListHtml());
+  await page.waitForTimeout(150);
+  await (await page.$("div")).screenshot({ path: path.join(outDir, "linkedin-feature-list-1200x1200.png") });
+  console.log("exported linkedin-feature-list-1200x1200.png");
 
   await browser.close();
 }
