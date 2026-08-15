@@ -9,6 +9,7 @@ import EmptyState from "@/components/EmptyState";
 import { ScaleIcon } from "@/components/icons";
 import { addRfqQuote } from "@/app/actions/rfq";
 import { rankQuotes } from "@/lib/quote-compare";
+import BackLink from "@/components/BackLink";
 import { SparkleIcon } from "@/components/icons";
 import type { RfqQuote, Vendor } from "@/lib/database.types";
 
@@ -36,6 +37,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="max-w-3xl space-y-6">
+      <BackLink href="/rfqs" label="Back to RFQs" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">RFQ for {request?.request_number}</h1>

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 import { awardRfqQuote } from "@/app/actions/rfq";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 
 export default async function AwardRfqQuotePage({
@@ -32,6 +33,7 @@ export default async function AwardRfqQuotePage({
 
   return (
     <div className="max-w-xl space-y-4">
+      <BackLink href={`/rfqs/${rfq.id}`} label="Back to RFQ" />
       <PageHeader
         title="Award quote & create PO"
         description={`${vendor?.name} — ${formatMoney(quote.unit_price, quote.currency)} × ${request?.qty} for ${request?.description}`}

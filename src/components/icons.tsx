@@ -186,6 +186,14 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+export function ArrowLeftIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M19.5 12h-15M11 5.5 4.5 12 11 18.5" />
+    </svg>
+  );
+}
+
 export function ShieldCheckIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

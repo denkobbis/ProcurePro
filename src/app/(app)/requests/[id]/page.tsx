@@ -6,6 +6,7 @@ import { formatNaira } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import { Button, ButtonLink } from "@/components/Button";
 import { submitRequest, addRequestComment, addRequestAttachment } from "@/app/actions/requests";
+import BackLink from "@/components/BackLink";
 import type { Approval, RequestComment, RequestAttachment, Profile, Vendor } from "@/lib/database.types";
 
 export default async function RequestDetailPage({
@@ -52,6 +53,7 @@ export default async function RequestDetailPage({
 
   return (
     <div className="max-w-3xl space-y-6">
+      <BackLink href="/requests" label="Back to Purchase Requests" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{request.request_number}</h1>

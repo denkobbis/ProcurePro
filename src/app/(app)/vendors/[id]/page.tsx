@@ -4,11 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import VendorPayoutForm from "@/components/VendorPayoutForm";
 import { listBanks } from "@/lib/paystack";
 import { getIndustryModules } from "@/lib/industries";
 import { getVendorScorecard } from "@/lib/vendor-score";
+import { findVendorsSharingAccount } from "@/lib/vendor-fraud";
 import { SparkleIcon } from "@/components/icons";
 import type { VendorDocument } from "@/lib/database.types";
 
@@ -43,6 +45,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   }
 
   const scorecard = await getVendorScorecard(supabase, vendor.id);
+  const sharedAccountVendors = vendor.account_number
+    ? await findVendorsSharingAccount(supabase, vendor.account_number, vendor.id)
+    : [];
 
   let banks: { name: string; code: string }[] = [];
   let banksError: string | null = null;
@@ -54,6 +59,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="max-w-2xl space-y-6">
+      <BackLink href="/vendors" label="Back to Vendors" />
       <PageHeader title={vendor.name} description={vendor.category ?? "No category set"} />
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
@@ -145,6 +151,16 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <h2 className="mb-2 text-sm font-semibold text-zinc-900">Payout details</h2>
+        {sharedAccountVendors.length > 0 && (
+          <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <span>
+              This account number is also on file for {sharedAccountVendors.map((v) => v.name).join(", ")} — a known
+              payment-diversion pattern (same account, different company name). Worth confirming this is intentional
+              before paying either vendor.
+            </span>
+          </div>
+        )}
         {vendor.account_number ? (
           <p className="mb-3 text-sm text-zinc-700">
             {vendor.bank_name} — {vendor.account_number} ({vendor.account_name})

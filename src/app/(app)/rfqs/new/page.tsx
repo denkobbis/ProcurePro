@@ -3,6 +3,7 @@ import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createRfq } from "@/app/actions/rfq";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 
 export default async function NewRfqPage({
@@ -22,6 +23,7 @@ export default async function NewRfqPage({
 
   return (
     <div className="max-w-xl space-y-4">
+      <BackLink href={`/requests/${request.id}`} label="Back to Request" />
       <PageHeader title="Request quotes from vendors" />
       <div className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <p className="text-sm text-zinc-700">

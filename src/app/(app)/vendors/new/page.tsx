@@ -2,6 +2,7 @@ import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROL
 import { createVendor } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import { getIndustryModules } from "@/lib/industries";
 
@@ -13,6 +14,7 @@ export default async function NewVendorPage() {
 
   return (
     <div className="max-w-xl space-y-4">
+      <BackLink href="/vendors" label="Back to Vendors" />
       <PageHeader title="Add vendor" />
       <form action={createVendor} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div>

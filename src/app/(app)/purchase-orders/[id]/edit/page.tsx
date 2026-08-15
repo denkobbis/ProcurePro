@@ -5,6 +5,7 @@ import { updatePo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
 import CurrencyFields from "@/components/CurrencyFields";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import type { PoLineItem, Vendor } from "@/lib/database.types";
 
@@ -25,6 +26,7 @@ export default async function EditPurchaseOrderPage({ params }: { params: Promis
 
   return (
     <div className="max-w-2xl space-y-4">
+      <BackLink href={`/purchase-orders/${po.id}`} label={`Back to ${po.po_number}`} />
       <PageHeader
         title={`Edit ${po.po_number}`}
         description="Only draft purchase orders can be edited — changes are recorded in the audit log."

@@ -1,6 +1,7 @@
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createEquipmentAsset } from "@/app/actions/equipment";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 
 export default async function NewEquipmentAssetPage() {
@@ -9,6 +10,7 @@ export default async function NewEquipmentAssetPage() {
 
   return (
     <div className="max-w-xl space-y-4">
+      <BackLink href="/equipment" label="Back to Equipment" />
       <PageHeader title="Add equipment asset" />
       <form action={createEquipmentAsset} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

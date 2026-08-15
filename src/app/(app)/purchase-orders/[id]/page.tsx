@@ -8,6 +8,9 @@ import { Button, ButtonLink } from "@/components/Button";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
 import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments";
 import { getIndustryModules } from "@/lib/industries";
+import { checkPoAnomalies, DUPLICATE_WINDOW_DAYS } from "@/lib/po-anomaly";
+import { SparkleIcon } from "@/components/icons";
+import BackLink from "@/components/BackLink";
 import type { PoLineItem, Payment } from "@/lib/database.types";
 
 export default async function PurchaseOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,9 +39,12 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
 
   const items = (lineItems ?? []) as PoLineItem[];
   const landedCostNgn = po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
+  const anomalies = canPay && canInitiatePayment ? await checkPoAnomalies(supabase, po) : { possibleDuplicates: [], priceJump: null };
+  const hasAnomalyFlags = anomalies.possibleDuplicates.length > 0 || anomalies.priceJump !== null;
 
   return (
     <div className="max-w-3xl space-y-6">
+      <BackLink href="/purchase-orders" label="Back to Purchase Orders" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{po.po_number}</h1>
@@ -249,6 +255,29 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             <p className="mb-3 text-sm text-zinc-600">
               {formatNaira(amountPaid)} paid of {formatNaira(po.total_amount_ngn)} — {formatNaira(amountRemaining)} remaining
             </p>
+          )}
+
+          {canPay && canInitiatePayment && hasAnomalyFlags && (
+            <div className="mb-4 space-y-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              {anomalies.possibleDuplicates.length > 0 && (
+                <div className="flex items-start gap-2">
+                  <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <span>
+                    Possible duplicate: {anomalies.possibleDuplicates.map((d) => d.po_number).join(", ")} — same vendor, same
+                    amount, opened within {DUPLICATE_WINDOW_DAYS} days. Worth checking this isn&apos;t a repeat payment.
+                  </span>
+                </div>
+              )}
+              {anomalies.priceJump && (
+                <div className="flex items-start gap-2">
+                  <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <span>
+                    This PO is {anomalies.priceJump.percentAbove}% above this vendor&apos;s usual amount
+                    ({formatNaira(anomalies.priceJump.historicalAvgNgn)} average) — worth a second look before paying.
+                  </span>
+                </div>
+              )}
+            </div>
           )}
 
           {canPay && canInitiatePayment && (

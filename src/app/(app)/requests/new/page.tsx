@@ -2,6 +2,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createRequest } from "@/app/actions/requests";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import RequestAutoFill from "@/components/RequestAutoFill";
 import type { Vendor } from "@/lib/database.types";
@@ -15,6 +16,7 @@ export default async function NewRequestPage() {
 
   return (
     <div className="max-w-2xl space-y-4">
+      <BackLink href="/requests" label="Back to Purchase Requests" />
       <PageHeader title="New purchase request" />
 
       <RequestAutoFill formId={FORM_ID} />

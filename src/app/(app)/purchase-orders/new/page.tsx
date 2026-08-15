@@ -5,7 +5,10 @@ import { convertToPo } from "@/app/actions/po";
 import LineItemsEditor from "@/components/LineItemsEditor";
 import CurrencyFields from "@/components/CurrencyFields";
 import PageHeader from "@/components/PageHeader";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
+import { estimateLandedCost } from "@/lib/landed-cost-estimate";
+import { SparkleIcon } from "@/components/icons";
 import type { Vendor } from "@/lib/database.types";
 
 export default async function NewPurchaseOrderPage({
@@ -24,9 +27,11 @@ export default async function NewPurchaseOrderPage({
   if (!request || request.status !== "approved") notFound();
 
   const { data: vendors } = await supabase.from("vendors").select("*").eq("is_approved", true).order("name");
+  const landedCostEstimate = await estimateLandedCost(supabase, request.category);
 
   return (
     <div className="max-w-2xl space-y-4">
+      <BackLink href={`/requests/${request.id}`} label="Back to Request" />
       <PageHeader
         title="Create Purchase Order"
         description={`From request ${request.request_number}: ${request.description}`}
@@ -57,7 +62,17 @@ export default async function NewPurchaseOrderPage({
 
         <div>
           <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; landed cost</label>
-          <CurrencyFields />
+          {landedCostEstimate && (
+            <p className="mb-2 flex items-start gap-1.5 text-xs text-zinc-500">
+              <SparkleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-500" />
+              Freight and customs duty pre-filled from the average of {landedCostEstimate.basedOnCount} past
+              &ldquo;{request.category}&rdquo; POs — edit to match this vendor&apos;s actual quote.
+            </p>
+          )}
+          <CurrencyFields
+            defaultFreightCost={landedCostEstimate?.freightCostNgn ?? 0}
+            defaultCustomsDuty={landedCostEstimate?.customsDutyNgn ?? 0}
+          />
         </div>
 
         <div>

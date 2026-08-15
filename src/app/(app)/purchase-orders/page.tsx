@@ -5,7 +5,9 @@ import { formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
-import { CartIcon } from "@/components/icons";
+import { CartIcon, SparkleIcon } from "@/components/icons";
+import { formatNaira } from "@/lib/money";
+import { checkFxExposure } from "@/lib/fx-exposure";
 import type { PurchaseOrder, Vendor } from "@/lib/database.types";
 
 export default async function PurchaseOrdersPage() {
@@ -21,6 +23,7 @@ export default async function PurchaseOrdersPage() {
     : { data: [] as Pick<Vendor, "id" | "name">[] };
   const vendorMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
   const rows = pos ?? [];
+  const fxFlags = await checkFxExposure(rows);
 
   return (
     <div className="space-y-4">
@@ -32,6 +35,24 @@ export default async function PurchaseOrdersPage() {
           </a>
         }
       />
+
+      {fxFlags.length > 0 && (
+        <div className="space-y-1.5 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="flex items-center gap-1.5 font-medium">
+            <SparkleIcon className="h-4 w-4 shrink-0 text-amber-600" />
+            NGN has moved since these open POs were raised
+          </div>
+          <ul className="space-y-0.5 pl-5 text-xs">
+            {fxFlags.map((f) => (
+              <li key={f.poId} className="list-disc">
+                <Link href={`/purchase-orders/${f.poId}`} className="underline">{f.poNumber}</Link>: {f.currency} is{" "}
+                {f.percentChange > 0 ? "up" : "down"} {Math.abs(f.percentChange)}% vs. this PO&apos;s rate — landed cost is now
+                roughly {f.ngnImpact >= 0 ? "" : "-"}{formatNaira(Math.abs(f.ngnImpact))} {f.ngnImpact >= 0 ? "more" : "less"} in NGN.
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
         {rows.length === 0 ? (

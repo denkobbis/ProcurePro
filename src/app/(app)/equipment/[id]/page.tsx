@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { TruckIcon } from "@/components/icons";
 import { leaseOutEquipment, markEquipmentReturned } from "@/app/actions/equipment";
+import BackLink from "@/components/BackLink";
 import type { EquipmentLease } from "@/lib/database.types";
 
 export default async function EquipmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -28,6 +29,7 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
 
   return (
     <div className="max-w-2xl space-y-6">
+      <BackLink href="/equipment" label="Back to Equipment" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{asset.name}</h1>
