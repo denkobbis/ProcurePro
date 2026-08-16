@@ -15,9 +15,9 @@ function b64(filePath) {
 }
 
 const lockupWhite = b64(path.join(brandDir, "procurepro-lockup-white.svg"));
-const dashboard = b64(path.join(landingDir, "landing_dashboard.png"));
-const aiWidgetShot = b64(path.join(landingDir, "landing_ai_extract.png"));
-const smartFlagsShot = b64(path.join(landingDir, "landing_smart_flags.png"));
+const dashboard = b64(path.join(landingDir, "v2_hero_today.png"));
+const aiWidgetShot = b64(path.join(landingDir, "v2_ai_extract.png"));
+const smartFlagsShot = b64(path.join(landingDir, "v2_needs_you_today.png"));
 
 const NAVY_BG = "linear-gradient(135deg, #1a2c5c 0%, #0e1830 75%)";
 

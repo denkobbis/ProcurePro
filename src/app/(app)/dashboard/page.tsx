@@ -35,8 +35,7 @@ export default async function DashboardPage() {
             href={step.href}
             className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm transition-colors hover:border-brand-300"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Step {step.step}</span>
+            <div className="flex items-center justify-end">
               <span className="text-[13px] font-medium tabular-nums text-zinc-400">{step.valueLabel}</span>
             </div>
             <div className="mt-2 text-[44px] font-semibold leading-none tabular-nums text-zinc-900">{step.count}</div>

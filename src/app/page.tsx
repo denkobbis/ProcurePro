@@ -8,10 +8,8 @@ import {
   CheckCircleIcon,
   ScaleIcon,
   CartIcon,
-  TruckIcon,
   InboxIcon,
   WalletIcon,
-  ChartBarIcon,
   ShieldCheckIcon,
   ArrowRightIcon,
   SparkleIcon,
@@ -22,6 +20,7 @@ const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible
 const STATS = [
   { value: "6", label: "stages, one system — request to receiving" },
   { value: "9", label: "AI-assisted checks running quietly in the background" },
+  { value: "2", label: "payout rails built in — Paystack & Flutterwave" },
   { value: "₦25k", label: "flat per month, 14-day trial, no card required" },
 ];
 
@@ -45,66 +44,67 @@ const PROBLEMS = [
   },
 ];
 
-const WORKFLOW = [
-  { icon: DocumentIcon, label: "Request" },
-  { icon: CheckCircleIcon, label: "Approval" },
-  { icon: ScaleIcon, label: "RFQ" },
-  { icon: CartIcon, label: "Purchase order" },
-  { icon: TruckIcon, label: "Shipping & customs" },
-  { icon: InboxIcon, label: "Receiving" },
+const LOOP = [
+  { icon: DocumentIcon, label: "Drafted & submitted" },
+  { icon: CheckCircleIcon, label: "Awaiting approval" },
+  { icon: CartIcon, label: "Open purchase orders" },
+  { icon: InboxIcon, label: "Awaiting receipt" },
 ];
 
 const FEATURES = [
   {
-    icon: ChartBarIcon,
-    title: "One dashboard, the whole team's queue",
+    icon: DocumentIcon,
+    title: "Every request tracked, staged, and searchable",
     description:
-      "Every request, approval, and open purchase order in one place — no more chasing status updates across email threads.",
-    image: "/landing/landing_dashboard.png",
+      "Submission through receiving, at a glance — stage bars instead of a status pill, and age that turns amber the moment something's slower than this org's own average.",
+    image: "/landing/v2_requests_list.png",
+    width: 2624,
+    height: 920,
   },
   {
     icon: SparkleIcon,
     title: "Upload a quote, skip the retyping",
     description:
       "Upload a vendor quote, invoice, or spec sheet and Claude fills in the request for you — description, quantity, cost, part number. You review and submit; nothing saves itself.",
-    image: "/landing/landing_ai_extract.png",
-    panel: true,
-  },
-  {
-    icon: WalletIcon,
-    title: "Budgets that stop overspend before it happens",
-    description:
-      "Department and category budgets enforce themselves. Set a hard block and the system refuses submission once a budget's exhausted — no more finding out after the fact.",
-    image: "/landing/landing_budgets.png",
+    image: "/landing/v2_ai_extract.png",
+    width: 1630,
+    height: 252,
   },
   {
     icon: SparkleIcon,
     title: "The alerts a busy team would otherwise miss",
     description:
-      "Approvals sitting longer than usual, FX moves that changed a landed cost, certificates about to expire, vendors sharing a bank account — surfaced the moment you sign in, computed from your own data, not guessed.",
-    image: "/landing/landing_smart_flags.png",
-    panel: true,
+      "Slow approvals, FX moves, expiring certificates, vendors sharing a bank account — ranked by cost of waiting and surfaced the moment you sign in, computed from your own data.",
+    image: "/landing/v2_needs_you_today.png",
+    width: 1600,
+    height: 720,
   },
   {
-    icon: ChartBarIcon,
-    title: "Spend visibility finance actually trusts",
+    icon: WalletIcon,
+    title: "Landed cost you can trust, not just a PO number",
     description:
-      "Spend by department, category, and vendor, plus a live trend — normalized across currencies so a landed-cost import and a local NGN purchase report the same way.",
-    image: "/landing/landing_reports.png",
+      "Multi-currency purchase orders track FX rate, freight, and customs duty automatically, with a warning the moment the Naira moves against an open order.",
+    image: "/landing/v2_landed_cost.png",
+    width: 694,
+    height: 394,
+  },
+  {
+    icon: ScaleIcon,
+    title: "Quotes ranked for you, not just collected",
+    description:
+      "Vendor quotes on an RFQ are auto-ranked by total price and lead time — Cheapest, Fastest, and Recommended, so picking a winner isn't a spreadsheet exercise.",
+    image: "/landing/v2_quote_compare.png",
+    width: 1792,
+    height: 710,
   },
   {
     icon: ShieldCheckIcon,
     title: "Vendor compliance, built in — not bolted on",
     description:
-      "NCDMB local content percentage, certificate numbers, and expiry dates live on the vendor record itself, with alerts before a certificate lapses.",
-    image: "/landing/landing_vendors.png",
-  },
-  {
-    icon: CartIcon,
-    title: "Purchase orders with landed cost, not just a PO number",
-    description:
-      "Multi-currency purchase orders track FX rate, freight, and customs duty automatically — so the number finance sees is what the order actually costs to land.",
-    image: "/landing/landing_po_list.png",
+      "NCDMB local content and certificate expiry live on the vendor record itself, and a shared bank account across two vendors gets flagged before it becomes a payment mistake.",
+    image: "/landing/v2_vendors.png",
+    width: 2624,
+    height: 840,
   },
 ];
 
@@ -149,7 +149,7 @@ export default function LandingPage() {
         <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:py-28">
           <div>
-            <h1 className="animate-reveal text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl">
+            <h1 className="animate-reveal text-[40px] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[62px]">
               Procurement control, without the SAP-sized budget.
             </h1>
             <p
@@ -189,14 +189,14 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
-            <div className="aspect-[2880/1250] overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/40">
+            <div className="aspect-[2624/1498] overflow-hidden rounded-xl border border-white/10 bg-zinc-50 shadow-2xl shadow-black/40">
               <Image
-                src="/landing/landing_dashboard.png"
-                alt="ProcurePro dashboard showing requests, approvals, open purchase orders, and Smart flags"
-                width={2880}
-                height={1250}
+                src="/landing/v2_hero_today.png"
+                alt="ProcurePro's Today dashboard: the loop from drafted request to receiving, and a ranked queue of what needs a decision"
+                width={2624}
+                height={1498}
                 priority
-                className="h-full w-full object-cover object-top"
+                className="h-full w-full object-contain object-top"
               />
             </div>
           </div>
@@ -205,11 +205,11 @@ export default function LandingPage() {
 
       {/* Stat strip */}
       <section className="border-b border-zinc-100 bg-white px-4 py-10 sm:px-6 dark:border-white/10 dark:bg-[#0a0e1a]">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat) => (
-            <div key={stat.label} className="flex items-baseline gap-3">
-              <span className="text-3xl font-semibold tracking-tight text-brand-700 dark:text-brand-400">{stat.value}</span>
-              <span className="text-sm leading-snug text-zinc-500 dark:text-zinc-400">{stat.label}</span>
+            <div key={stat.label} className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <span className="text-xl font-semibold tracking-tight text-brand-700 dark:text-brand-400">{stat.value}</span>{" "}
+              {stat.label}
             </div>
           ))}
         </div>
@@ -222,10 +222,9 @@ export default function LandingPage() {
             The way most teams still run procurement
           </h2>
           <div className="mt-12 divide-y divide-zinc-100 border-t border-zinc-100 dark:divide-white/10 dark:border-white/10">
-            {PROBLEMS.map((p, i) => (
+            {PROBLEMS.map((p) => (
               <div key={p.title} className="flex flex-col gap-4 py-8 sm:flex-row sm:items-start sm:gap-8">
                 <div className="flex items-baseline gap-4 sm:w-64 sm:shrink-0">
-                  <span className="text-sm tabular-nums text-zinc-300 dark:text-zinc-700">{String(i + 1).padStart(2, "0")}</span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
                     <p.icon className="h-4 w-4" />
                   </div>
@@ -238,24 +237,21 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Workflow */}
+      {/* The loop, end to end */}
       <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 sm:px-6 dark:border-white/10 dark:bg-white/[0.02]">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">One system, the whole purchase lifecycle</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">The loop, end to end</h2>
           <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
-            From the first request to the goods arriving at your yard, every step is tracked, approved,
-            and auditable.
+            The same four stages your team sees on their own &ldquo;Today&rdquo; screen every morning — nothing
+            sits in an inbox waiting to be noticed.
           </p>
-          <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
-            {WORKFLOW.map((step, i) => (
+          <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
+            {LOOP.map((step) => (
               <div key={step.label} className="relative">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200 bg-white text-brand-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-brand-400">
                   <step.icon className="h-5 w-5" />
                 </div>
-                <div className="mt-3 text-sm font-medium text-zinc-900 dark:text-white">
-                  <span className="tabular-nums text-zinc-400 dark:text-zinc-600">{String(i + 1).padStart(2, "0")}</span>{" "}
-                  {step.label}
-                </div>
+                <div className="mt-3 text-sm font-medium text-zinc-900 dark:text-white">{step.label}</div>
               </div>
             ))}
           </div>
@@ -264,39 +260,39 @@ export default function LandingPage() {
 
       {/* Features */}
       <section id="features" className="bg-white px-4 py-20 sm:px-6 dark:bg-[#0a0e1a]">
-        <div className="mx-auto max-w-6xl space-y-24">
-          {FEATURES.map((feature, i) => (
-            <div key={feature.title} className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-              <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
-                  <feature.icon className="h-5 w-5" />
+        <div className="mx-auto max-w-6xl">
+          <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+            Real screens, not a sales deck
+          </h2>
+          <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
+            Every image below is the actual product, cropped in close enough to read.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.title}
+                className="flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.02]"
+              >
+                <div className="flex aspect-[16/10] items-center justify-center border-b border-zinc-100 bg-zinc-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                  <Image
+                    src={feature.image}
+                    alt={feature.title}
+                    width={feature.width}
+                    height={feature.height}
+                    className="h-auto max-h-full w-full object-contain"
+                  />
                 </div>
-                <h3 className="mt-4 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">{feature.title}</h3>
-                <p className="mt-3 max-w-md text-base leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
-              </div>
-              <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                {feature.panel ? (
-                  // Cropped UI-panel screenshots (much wider/shorter than a
-                  // full-page capture) — shown whole via object-contain in a
-                  // shorter frame instead of force-cropped into the full-page
-                  // screenshots' wide aspect ratio, which badly over-zoomed them.
-                  <div className="flex aspect-[2880/900] items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 p-8 shadow-lg shadow-zinc-200/60 dark:border-white/10 dark:bg-white/[0.03] dark:shadow-black/40">
-                    <Image src={feature.image} alt={feature.title} width={1400} height={400} className="h-auto max-h-full w-full object-contain" />
+                <div className="p-6">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                    <feature.icon className="h-4 w-4" />
                   </div>
-                ) : (
-                  <div className="aspect-[2880/1150] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg shadow-zinc-200/60 dark:border-white/10 dark:shadow-black/40">
-                    <Image
-                      src={feature.image}
-                      alt={feature.title}
-                      width={2880}
-                      height={1800}
-                      className="h-full w-full object-cover object-top"
-                    />
-                  </div>
-                )}
+                  <h3 className="mt-3 text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
