@@ -1,10 +1,9 @@
 import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createVendor } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
-import PageHeader from "@/components/PageHeader";
-import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import { getIndustryModules } from "@/lib/industries";
+import { FormShell, FormPanel, AsidePanel, FormField, fieldInputClass } from "@/components/FormLayout";
 
 export default async function NewVendorPage() {
   const profile = await getCurrentProfile();
@@ -13,44 +12,59 @@ export default async function NewVendorPage() {
   const modules = getIndustryModules(org.industry);
 
   return (
-    <div className="max-w-xl space-y-4">
-      <BackLink href="/vendors" label="Back to Vendors" />
-      <PageHeader title="Add vendor" />
-      <form action={createVendor} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Vendor name</label>
-          <input name="name" required className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Category</label>
-          <input name="category" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium text-zinc-700">Contact email</label>
-            <input name="contact_email" type="email" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-zinc-700">Contact phone</label>
-            <input name="contact_phone" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Payment terms</label>
-          <input name="payment_terms" placeholder="e.g. Net 30" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <label className="flex items-center gap-2 text-sm text-zinc-700">
-          <input type="checkbox" name="is_approved" className="rounded border-zinc-300" />
-          Mark as approved (can be used on purchase orders immediately)
-        </label>
+    <FormShell
+      backHref="/vendors"
+      backLabel="Back to vendors"
+      title="Add vendor"
+      description="Bank details and payout setup happen on the vendor's own page once they're saved."
+      form={
+        <form action={createVendor}>
+          <FormPanel title="Vendor details">
+            <FormField label="Vendor name" span={12}>
+              <input name="name" required className={fieldInputClass} />
+            </FormField>
+            <FormField label="Category" span={12}>
+              <input name="category" className={fieldInputClass} />
+            </FormField>
+            <FormField label="Contact email" span={6}>
+              <input name="contact_email" type="email" className={fieldInputClass} />
+            </FormField>
+            <FormField label="Contact phone" span={6}>
+              <input name="contact_phone" className={fieldInputClass} />
+            </FormField>
+            <FormField label="Payment terms" span={12} hint="e.g. Net 30">
+              <input name="payment_terms" className={fieldInputClass} />
+            </FormField>
+            <FormField label="Approval" span={12}>
+              <label className="flex items-center gap-2 text-sm text-zinc-700">
+                <input type="checkbox" name="is_approved" className="rounded border-zinc-300" />
+                Mark as approved (can be used on purchase orders immediately)
+              </label>
+            </FormField>
+          </FormPanel>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-700">Currency &amp; compliance</label>
-          <NcdmbFields showNcdmb={modules.ncdmb} />
-        </div>
+          <div className="mt-[18px]">
+            <FormPanel title="Currency & compliance">
+              <FormField label="Details" span={12}>
+                <NcdmbFields showNcdmb={modules.ncdmb} />
+              </FormField>
+            </FormPanel>
+          </div>
 
-        <Button type="submit">Save vendor</Button>
-      </form>
-    </div>
+          <div className="mt-[18px]">
+            <Button type="submit">Save vendor</Button>
+          </div>
+        </form>
+      }
+      aside={
+        <AsidePanel title="What happens next">
+          <ul className="space-y-2 text-sm text-zinc-600">
+            <li>Bank details and payout setup are added from the vendor&apos;s own page after saving.</li>
+            <li>Unapproved vendors can still receive RFQs, but can&apos;t be selected on a purchase order until approved.</li>
+            {modules.ncdmb && <li>NCDMB certificate expiry is tracked automatically and flagged before it lapses.</li>}
+          </ul>
+        </AsidePanel>
+      }
+    />
   );
 }

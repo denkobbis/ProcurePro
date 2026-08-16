@@ -2,12 +2,29 @@ import Link from "next/link";
 import { getCurrentProfile, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
-import StatusBadge from "@/components/StatusBadge";
-import PageHeader from "@/components/PageHeader";
+import { getBottleneckFlags } from "@/lib/approval-bottleneck";
 import { ButtonLink } from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { DocumentIcon } from "@/components/icons";
-import type { PurchaseRequest, Profile } from "@/lib/database.types";
+import RequestsTable, { type RequestRow } from "./RequestsTable";
+import type { PurchaseRequest, Profile, Department, PurchaseOrder } from "@/lib/database.types";
+
+function daysSince(iso: string): number {
+  return Math.round((Date.now() - new Date(iso).getTime()) / (24 * 60 * 60 * 1000));
+}
+
+function stageFilledFor(status: string, po: PurchaseOrder | undefined): number {
+  if (status === "draft") return 0;
+  if (status === "submitted" || status === "under_review") return 1;
+  if (status === "rejected") return 1;
+  if (status === "approved") return 2;
+  if (status === "converted_to_po") {
+    if (!po) return 2;
+    if (["fully_received", "closed"].includes(po.status)) return 4;
+    return 3;
+  }
+  return 0;
+}
 
 export default async function RequestsPage() {
   const profile = await getCurrentProfile();
@@ -19,69 +36,74 @@ export default async function RequestsPage() {
     query = query.or(`requester_id.eq.${profile.id},department_id.eq.${profile.department_id}`);
   }
   const { data: requests } = await query;
+  const rows = (requests ?? []) as PurchaseRequest[];
 
-  const requesterIds = [...new Set((requests ?? []).map((r: PurchaseRequest) => r.requester_id))];
-  const { data: requesters } = requesterIds.length
-    ? await supabase.from("profiles").select("id, full_name").in("id", requesterIds)
-    : { data: [] as Pick<Profile, "id" | "full_name">[] };
+  const requesterIds = [...new Set(rows.map((r) => r.requester_id))];
+  const departmentIds = [...new Set(rows.map((r) => r.department_id))];
+  const requestIds = rows.map((r) => r.id);
+
+  const [{ data: requesters }, { data: departments }, { data: pos }] = await Promise.all([
+    requesterIds.length ? supabase.from("profiles").select("id, full_name").in("id", requesterIds) : Promise.resolve({ data: [] as Pick<Profile, "id" | "full_name">[] }),
+    departmentIds.length ? supabase.from("departments").select("id, name").in("id", departmentIds) : Promise.resolve({ data: [] as Pick<Department, "id" | "name">[] }),
+    requestIds.length ? supabase.from("purchase_orders").select("*").in("request_id", requestIds) : Promise.resolve({ data: [] as PurchaseOrder[] }),
+  ]);
+
   const nameMap = new Map((requesters ?? []).map((p) => [p.id, p.full_name]));
-  const rows = requests ?? [];
+  const deptMap = new Map((departments ?? []).map((d) => [d.id, d.name]));
+  const poMap = new Map((pos ?? []).map((po) => [po.request_id, po as PurchaseOrder]));
+
+  const underReviewIds = rows.filter((r) => r.status === "under_review").map((r) => r.id);
+  const { data: pendingApprovals } = underReviewIds.length
+    ? await supabase.from("approvals").select("id, request_id, step_order, approver_role, created_at").eq("status", "pending").in("request_id", underReviewIds)
+    : { data: [] as Array<{ id: string; request_id: string; step_order: number; approver_role: string; created_at: string }> };
+  const bottleneckFlags = await getBottleneckFlags(supabase, pendingApprovals ?? []);
+  const slowRequestIds = new Set(
+    [...bottleneckFlags.entries()]
+      .filter(([, f]) => f.isSlow)
+      .map(([id]) => (pendingApprovals ?? []).find((a) => a.id === id)?.request_id)
+      .filter(Boolean)
+  );
+
+  const tableRows: RequestRow[] = rows.map((r) => ({
+    id: r.id,
+    requestNumber: r.request_number,
+    description: r.description,
+    departmentName: deptMap.get(r.department_id) ?? "—",
+    requesterName: nameMap.get(r.requester_id) ?? "—",
+    status: r.status,
+    stageFilled: stageFilledFor(r.status, poMap.get(r.id)),
+    ageDays: daysSince(r.created_at),
+    ageAmber: slowRequestIds.has(r.id),
+    valueLabel: formatNaira(r.qty * r.est_unit_cost),
+  }));
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="Purchase requests"
-        actions={
-          <div className="flex items-center gap-3">
-            <Link href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
-              Export CSV
-            </Link>
-            <ButtonLink href="/requests/new">New request</ButtonLink>
-          </div>
-        }
-      />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Requests</h1>
+          <p className="mt-2 text-sm text-zinc-500">Every purchase request from submission through receiving.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            Export CSV
+          </Link>
+          <ButtonLink href="/requests/new">New request</ButtonLink>
+        </div>
+      </div>
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
-        {rows.length === 0 ? (
+      {rows.length === 0 ? (
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
           <EmptyState
             icon={<DocumentIcon />}
             title="No requests yet"
             description="Once you or your team submit a purchase request, it'll show up here."
             action={<ButtonLink href="/requests/new" size="sm">New request</ButtonLink>}
           />
-        ) : (
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Request #</th>
-                <th className="px-4 py-3">Description</th>
-                <th className="px-4 py-3">Requester</th>
-                <th className="px-4 py-3">Total est.</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Created</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {rows.map((r: PurchaseRequest) => (
-                <tr key={r.id} className="transition-colors hover:bg-brand-50/40">
-                  <td className="px-4 py-3">
-                    <Link href={`/requests/${r.id}`} className="font-medium text-brand-700 hover:underline">
-                      {r.request_number}
-                    </Link>
-                  </td>
-                  <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{r.description}</td>
-                  <td className="px-4 py-3 text-zinc-700">{nameMap.get(r.requester_id) ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{formatNaira(r.qty * r.est_unit_cost)}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={r.status} />
-                  </td>
-                  <td className="px-4 py-3 text-zinc-500">{new Date(r.created_at).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+        </div>
+      ) : (
+        <RequestsTable rows={tableRows} />
+      )}
     </div>
   );
 }

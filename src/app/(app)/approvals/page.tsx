@@ -1,11 +1,11 @@
+import Link from "next/link";
 import { getCurrentProfile, requireRole, APPROVER_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import { actOnApproval, createDelegation, removeDelegation } from "@/app/actions/approvals";
-import PageHeader from "@/components/PageHeader";
-import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/Button";
-import { CheckCircleIcon, SparkleIcon } from "@/components/icons";
+import EmptyState from "@/components/EmptyState";
+import { CheckCircleIcon } from "@/components/icons";
 import { getBottleneckFlags } from "@/lib/approval-bottleneck";
 import type { Profile } from "@/lib/database.types";
 
@@ -27,10 +27,7 @@ export default async function ApprovalsPage() {
   requireRole(profile, APPROVER_ROLES);
 
   const supabase = await createClient();
-  const { data: approvals } = await supabase
-    .from("v_actionable_approvals")
-    .select("*")
-    .order("created_at");
+  const { data: approvals } = await supabase.from("v_actionable_approvals").select("*").order("created_at");
 
   const list = (approvals ?? []) as ActionableApproval[];
   const bottleneckFlags = await getBottleneckFlags(supabase, list);
@@ -47,73 +44,87 @@ export default async function ApprovalsPage() {
     .order("start_date", { ascending: false });
 
   return (
-    <div className="space-y-8">
-      <PageHeader title="Approvals awaiting you" />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Approvals</h1>
+        <p className="mt-2 text-sm text-zinc-500">
+          {list.length} request{list.length === 1 ? "" : "s"} waiting on a decision from you.
+        </p>
+      </div>
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
         {list.length === 0 ? (
           <EmptyState icon={<CheckCircleIcon />} title="Nothing waiting on you right now" />
         ) : (
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Request #</th>
-                <th className="px-4 py-3">Description</th>
-                <th className="px-4 py-3">Requester</th>
-                <th className="px-4 py-3">Total est.</th>
-                <th className="px-4 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {list.map((a) => (
-                <tr key={a.id} className="transition-colors hover:bg-brand-50/40">
-                  <td className="px-4 py-3 font-medium text-zinc-900">
-                    <a href={`/requests/${a.request_id}`} className="text-brand-700 hover:underline">
-                      {a.request_number}
-                    </a>
-                    {bottleneckFlags.get(a.id)?.isSlow && (
-                      <span
-                        title={`Waiting ${bottleneckFlags.get(a.id)!.waitingDays}d — usually decided in ${bottleneckFlags.get(a.id)!.historicalAvgDays ?? "a few"}d`}
-                        className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700"
-                      >
-                        <SparkleIcon className="h-3 w-3" />
-                        Slower than usual
-                      </span>
-                    )}
-                  </td>
-                  <td className="max-w-xs truncate px-4 py-3 text-zinc-700">{a.description}</td>
-                  <td className="px-4 py-3 text-zinc-700">{nameMap.get(a.requester_id) ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{formatNaira(a.qty * a.est_unit_cost)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      <form action={actOnApproval}>
-                        <input type="hidden" name="approval_id" value={a.id} />
-                        <input type="hidden" name="action" value="approved" />
-                        <button className="rounded-md bg-green-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-green-700">
-                          Approve
-                        </button>
-                      </form>
-                      <form action={actOnApproval}>
-                        <input type="hidden" name="approval_id" value={a.id} />
-                        <input type="hidden" name="action" value="rejected" />
-                        <button className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-700">
-                          Reject
-                        </button>
-                      </form>
-                      <form action={actOnApproval}>
-                        <input type="hidden" name="approval_id" value={a.id} />
-                        <input type="hidden" name="action" value="info_requested" />
-                        <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50">
-                          Request info
-                        </button>
-                      </form>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead>
+                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                  <th className="px-5 py-3">Request</th>
+                  <th className="px-4 py-3">Requester</th>
+                  <th className="px-4 py-3">Waiting</th>
+                  <th className="px-4 py-3 text-right">Value</th>
+                  <th className="px-4 py-3">Decision</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {list.map((a) => {
+                  const flag = bottleneckFlags.get(a.id);
+                  return (
+                    <tr key={a.id} className="transition-colors hover:bg-brand-50/40">
+                      <td className="px-5 py-3">
+                        <Link href={`/requests/${a.request_id}`} className="block font-medium text-zinc-900 hover:text-brand-700">
+                          {a.description}
+                        </Link>
+                        <div className="mt-0.5 text-[13px] text-zinc-400">{a.request_number}</div>
+                      </td>
+                      <td className="px-4 py-3 text-zinc-700">{nameMap.get(a.requester_id) ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-sm tabular-nums ${flag?.isSlow ? "font-medium text-amber-700" : "text-zinc-500"}`}>
+                          {flag ? `${Math.round(flag.waitingDays)}d` : "—"}
+                        </span>
+                        {flag?.historicalAvgDays != null && (
+                          <span className="ml-1 text-[13px] text-zinc-400">usually {flag.historicalAvgDays}d</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right text-[17px] tabular-nums text-zinc-900">
+                        {formatNaira(a.qty * a.est_unit_cost)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1.5">
+                          <form action={actOnApproval}>
+                            <input type="hidden" name="approval_id" value={a.id} />
+                            <input type="hidden" name="action" value="approved" />
+                            <button className="rounded-md bg-brand-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-700">
+                              Approve
+                            </button>
+                          </form>
+                          <form action={actOnApproval}>
+                            <input type="hidden" name="approval_id" value={a.id} />
+                            <input type="hidden" name="action" value="rejected" />
+                            <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50">
+                              Reject
+                            </button>
+                          </form>
+                          <form action={actOnApproval}>
+                            <input type="hidden" name="approval_id" value={a.id} />
+                            <input type="hidden" name="action" value="info_requested" />
+                            <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50">
+                              Ask
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
+        <div className="border-t border-zinc-100 px-5 py-3 text-[13px] text-zinc-400">
+          Only steps currently assigned to your role are shown — decided items move to the request&apos;s own timeline.
+        </div>
       </div>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">

@@ -6,11 +6,10 @@ import { formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
-import { ScaleIcon } from "@/components/icons";
+import { ScaleIcon, SparkleIcon } from "@/components/icons";
 import { addRfqQuote } from "@/app/actions/rfq";
 import { rankQuotes } from "@/lib/quote-compare";
-import BackLink from "@/components/BackLink";
-import { SparkleIcon } from "@/components/icons";
+import { RecordHeader, RecordSection, NotePanel } from "@/components/RecordPanels";
 import type { RfqQuote, Vendor } from "@/lib/database.types";
 
 const CURRENCIES = ["NGN", "USD", "EUR", "GBP"] as const;
@@ -36,37 +35,37 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
   const rankedByQuoteId = new Map(ranked.map((r) => [r.quote.id, r]));
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <BackLink href="/rfqs" label="Back to RFQs" />
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">RFQ for {request?.request_number}</h1>
-          <p className="text-sm text-zinc-500">{request?.description}</p>
-        </div>
-        <StatusBadge status={rfq.status} />
-      </div>
+    <div className="max-w-4xl space-y-4">
+      <RecordHeader
+        backHref="/rfqs"
+        backLabel="Back to RFQs"
+        title={`RFQ for ${request?.request_number}`}
+        subline={request?.description}
+        badges={<StatusBadge status={rfq.status} />}
+      />
 
-      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
-        <h2 className="border-b border-zinc-200 px-6 py-3 text-sm font-semibold text-zinc-900">Quotes</h2>
+      <RecordSection title="Quotes">
         {quoteList.length >= 2 && (
-          <div className="flex items-start gap-2 border-b border-brand-100 bg-brand-50/50 px-6 py-3 text-xs text-zinc-600">
-            <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
-            <span>Auto-ranked by total price (qty × unit price) and lead time — Cheapest, Fastest, and Recommended badges below.</span>
-          </div>
+          <NotePanel>
+            <span className="flex items-start gap-2">
+              <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
+              Auto-ranked by total price (qty × unit price) and lead time — Cheapest, Fastest, and Recommended badges below.
+            </span>
+          </NotePanel>
         )}
-        <div className="overflow-x-auto">
+        <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-200">
           {quoteList.length === 0 ? (
             <EmptyState icon={<ScaleIcon />} title="No quotes yet" />
           ) : (
             <table className="w-full min-w-[640px] text-sm">
-              <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                <tr>
-                  <th className="px-6 py-3">Vendor</th>
-                  <th className="px-4 py-3">Unit price</th>
-                  <th className="px-4 py-3">Total</th>
-                  <th className="px-4 py-3">Lead time</th>
-                  <th className="px-4 py-3">Notes</th>
-                  <th className="px-4 py-3"></th>
+              <thead>
+                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                  <th className="px-5 py-2.5">Vendor</th>
+                  <th className="px-4 py-2.5">Unit price</th>
+                  <th className="px-4 py-2.5">Total</th>
+                  <th className="px-4 py-2.5">Lead time</th>
+                  <th className="px-4 py-2.5">Notes</th>
+                  <th className="px-4 py-2.5"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -74,7 +73,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                   const r = rankedByQuoteId.get(q.id);
                   return (
                     <tr key={q.id} className="transition-colors hover:bg-brand-50/40">
-                      <td className="px-6 py-3 font-medium text-zinc-900">
+                      <td className="px-5 py-2.5 font-medium text-zinc-900">
                         {vendorMap.get(q.vendor_id) ?? "—"}
                         {q.is_winner && <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Winner</span>}
                         {quoteList.length >= 2 && (
@@ -85,11 +84,11 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                           </span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
-                      <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-700">{r ? formatMoney(r.total, q.currency) : "—"}</td>
-                      <td className="px-4 py-3 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
-                      <td className="max-w-xs truncate px-4 py-3 text-zinc-500">{q.notes ?? "—"}</td>
-                      <td className="px-4 py-3">
+                      <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-700">{formatMoney(q.unit_price, q.currency)}</td>
+                      <td className="whitespace-nowrap px-4 py-2.5 text-[17px] tabular-nums font-medium text-zinc-900">{r ? formatMoney(r.total, q.currency) : "—"}</td>
+                      <td className="px-4 py-2.5 text-zinc-700">{q.lead_time_days ? `${q.lead_time_days} days` : "—"}</td>
+                      <td className="max-w-xs truncate px-4 py-2.5 text-zinc-500">{q.notes ?? "—"}</td>
+                      <td className="px-4 py-2.5">
                         {rfq.status === "open" && (
                           <Link
                             href={`/rfqs/${rfq.id}/award?quote_id=${q.id}`}
@@ -106,11 +105,10 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
             </table>
           )}
         </div>
-      </div>
+      </RecordSection>
 
       {rfq.status === "open" && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-900">Add a quote</h2>
+        <RecordSection title="Add a quote">
           <form action={addRfqQuote} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="rfq_id" value={rfq.id} />
             <select name="vendor_id" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2">
@@ -133,7 +131,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
             <input name="notes" placeholder="Notes (optional)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
             <Button type="submit" className="sm:col-span-2">Add quote</Button>
           </form>
-        </div>
+        </RecordSection>
       )}
     </div>
   );

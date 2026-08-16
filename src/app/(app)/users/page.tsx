@@ -1,9 +1,9 @@
 import { getCurrentProfile, requireRole, ADMIN_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { createDepartment, createUser, deactivateUser, grantRigSourceAccess } from "@/app/actions/users";
-import PageHeader from "@/components/PageHeader";
+import { createDepartment, createUser } from "@/app/actions/users";
 import { Button } from "@/components/Button";
 import { CopyButton } from "@/components/CopyButton";
+import UsersTable, { type UserRow } from "./UsersTable";
 import type { Department, Profile } from "@/lib/database.types";
 
 const ROLE_OPTIONS = ["requester", "approver", "procurement_officer", "finance_admin", "super_admin"];
@@ -25,16 +25,32 @@ export default async function UsersPage() {
   const rigsourceEnabled = Boolean(rigsourceUrl && rigsourceInviteCode);
   const rigsourceInviteLink = rigsourceEnabled ? `${rigsourceUrl}/register?invite=${rigsourceInviteCode}` : null;
 
+  const tableRows: UserRow[] = ((users ?? []) as Profile[]).map((u) => ({
+    id: u.id,
+    fullName: u.full_name,
+    email: u.email,
+    role: u.role,
+    departmentName: u.department_id ? deptMap.get(u.department_id) ?? "—" : "—",
+    isActive: u.is_active,
+    isSelf: u.id === profile.id,
+    rigsourceInvitedAt: u.rigsource_invited_at,
+  }));
+
   return (
-    <div className="space-y-8">
-      <PageHeader title="Users & Departments" />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Users &amp; departments</h1>
+        <p className="mt-2 text-sm text-zinc-500">{tableRows.length} teammates across {departments?.length ?? 0} departments.</p>
+      </div>
+
+      <UsersTable rows={tableRows} rigsourceEnabled={rigsourceEnabled} />
 
       {rigsourceEnabled && (
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
           <h2 className="mb-1 text-sm font-semibold text-zinc-900">RigSource access</h2>
           <p className="mb-3 text-xs text-zinc-500">
             Share this link with a user to have them join your team&apos;s RigSource sourcing workspace.
-            The &quot;Grant access&quot; button in the table below just marks who&apos;s been sent it.
+            The &quot;Grant access&quot; button in the table above just marks who&apos;s been sent it.
           </p>
           <div className="flex max-w-xl items-center gap-2">
             <code className="flex-1 truncate rounded-md border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-700">
@@ -55,12 +71,7 @@ export default async function UsersPage() {
           ))}
         </ul>
         <form action={createDepartment} className="flex gap-2">
-          <input
-            name="name"
-            placeholder="New department name"
-            required
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm"
-          />
+          <input name="name" placeholder="New department name" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
           <Button type="submit" size="sm">Add</Button>
         </form>
       </section>
@@ -97,64 +108,6 @@ export default async function UsersPage() {
         <p className="mt-2 text-xs text-zinc-400">
           The user signs in with this email/password immediately; share it with them securely and ask them to change it.
         </p>
-      </section>
-
-      <section className="rounded-lg border border-zinc-200 bg-white shadow-sm">
-        <h2 className="border-b border-zinc-200 px-5 py-3 text-sm font-semibold text-zinc-900">All users</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-              <tr>
-                <th className="px-5 py-3">Name</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Department</th>
-                <th className="px-4 py-3">Status</th>
-                {rigsourceEnabled && <th className="px-4 py-3">RigSource</th>}
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {(users ?? []).map((u: Profile) => (
-                <tr key={u.id} className="transition-colors hover:bg-brand-50/40">
-                  <td className="px-5 py-3 font-medium text-zinc-900">{u.full_name}</td>
-                  <td className="px-4 py-3 text-zinc-700">{u.email}</td>
-                  <td className="px-4 py-3 capitalize text-zinc-700">{u.role.replace(/_/g, " ")}</td>
-                  <td className="px-4 py-3 text-zinc-700">{u.department_id ? deptMap.get(u.department_id) ?? "—" : "—"}</td>
-                  <td className="px-4 py-3">
-                    {u.is_active ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
-                    ) : (
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Deactivated</span>
-                    )}
-                  </td>
-                  {rigsourceEnabled && (
-                    <td className="px-4 py-3">
-                      {u.rigsource_invited_at ? (
-                        <span className="text-xs text-zinc-500">
-                          Invited {new Date(u.rigsource_invited_at).toLocaleDateString()}
-                        </span>
-                      ) : (
-                        <form action={grantRigSourceAccess}>
-                          <input type="hidden" name="user_id" value={u.id} />
-                          <button className="text-xs font-medium text-brand-600 hover:underline">Grant access</button>
-                        </form>
-                      )}
-                    </td>
-                  )}
-                  <td className="px-4 py-3">
-                    {u.is_active && u.id !== profile.id && (
-                      <form action={deactivateUser}>
-                        <input type="hidden" name="user_id" value={u.id} />
-                        <button className="text-xs font-medium text-red-600 hover:underline">Deactivate</button>
-                      </form>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </section>
     </div>
   );

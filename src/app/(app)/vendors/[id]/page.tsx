@@ -3,15 +3,13 @@ import { getCurrentProfile, getCurrentOrganization, requireRole, PROCUREMENT_ROL
 import { createClient } from "@/lib/supabase/server";
 import { updateVendorApproval, updateVendorCompliance, updatePerformanceNotes, uploadVendorDocument } from "@/app/actions/vendors";
 import NcdmbFields from "@/components/NcdmbFields";
-import PageHeader from "@/components/PageHeader";
-import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
 import VendorPayoutForm from "@/components/VendorPayoutForm";
 import { listBanks } from "@/lib/paystack";
 import { getIndustryModules } from "@/lib/industries";
 import { getVendorScorecard } from "@/lib/vendor-score";
 import { findVendorsSharingAccount } from "@/lib/vendor-fraud";
-import { SparkleIcon } from "@/components/icons";
+import { RecordHeader, RecordSection, FactsPanel, NotePanel, StatsRow } from "@/components/RecordPanels";
 import type { VendorDocument } from "@/lib/database.types";
 
 function pct(n: number | null) {
@@ -45,9 +43,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   }
 
   const scorecard = await getVendorScorecard(supabase, vendor.id);
-  const sharedAccountVendors = vendor.account_number
-    ? await findVendorsSharingAccount(supabase, vendor.account_number, vendor.id)
-    : [];
+  const sharedAccountVendors = vendor.account_number ? await findVendorsSharingAccount(supabase, vendor.account_number, vendor.id) : [];
 
   let banks: { name: string; code: string }[] = [];
   let banksError: string | null = null;
@@ -58,65 +54,63 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <BackLink href="/vendors" label="Back to Vendors" />
-      <PageHeader title={vendor.name} description={vendor.category ?? "No category set"} />
+    <div className="max-w-3xl space-y-4">
+      <RecordHeader
+        backHref="/vendors"
+        backLabel="Back to vendors"
+        title={vendor.name}
+        subline={vendor.category ?? "No category set"}
+        badges={
+          <>
+            {vendor.is_approved ? (
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
+            ) : (
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Pending</span>
+            )}
+            {vendor.ncdmb_compliant && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">NCDMB</span>}
+          </>
+        }
+      />
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-zinc-900">
-          <SparkleIcon className="h-4 w-4 text-brand-600" />
-          Reliability scorecard
-        </h2>
+      {sharedAccountVendors.length > 0 && (
+        <NotePanel tone="warn" title="Shared bank account">
+          This account number is also on file for {sharedAccountVendors.map((v) => v.name).join(", ")} — a known payment-diversion pattern
+          (same account, different company name). Worth confirming this is intentional before paying either vendor.
+        </NotePanel>
+      )}
+
+      <RecordSection title="Reliability scorecard">
         {scorecard.quoteCount === 0 && scorecard.poCount === 0 ? (
           <p className="text-sm text-zinc-400">No quote or order history yet — the scorecard fills in as this vendor is used.</p>
         ) : (
-          <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-            <div>
-              <dt className="text-zinc-500">Avg. quote response</dt>
-              <dd className="text-zinc-900">{scorecard.avgResponseDays == null ? "—" : `${scorecard.avgResponseDays}d`}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Quotes given</dt>
-              <dd className="text-zinc-900">{scorecard.quoteCount}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Orders fully received</dt>
-              <dd className="text-zinc-900">{pct(scorecard.fullyReceivedRate)}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Fulfillment rate</dt>
-              <dd className="text-zinc-900">{pct(scorecard.fulfillmentRate)}</dd>
-            </div>
-          </dl>
+          <StatsRow
+            stats={[
+              { label: "Avg. quote response", value: scorecard.avgResponseDays == null ? "—" : `${scorecard.avgResponseDays}d` },
+              { label: "Quotes given", value: String(scorecard.quoteCount) },
+              { label: "Orders fully received", value: pct(scorecard.fullyReceivedRate) },
+              { label: "Fulfillment rate", value: pct(scorecard.fulfillmentRate) },
+            ]}
+          />
         )}
-      </div>
+      </RecordSection>
 
-      <div className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-zinc-500">Contact email</dt>
-            <dd className="text-zinc-900">{vendor.contact_email ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Contact phone</dt>
-            <dd className="text-zinc-900">{vendor.contact_phone ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Payment terms</dt>
-            <dd className="text-zinc-900">{vendor.payment_terms ?? "—"}</dd>
-          </div>
-        </dl>
-
-        <form action={updateVendorApproval} className="flex items-center gap-2">
+      <RecordSection title="Contact & terms">
+        <FactsPanel
+          facts={[
+            { label: "Contact email", value: vendor.contact_email ?? "—" },
+            { label: "Contact phone", value: vendor.contact_phone ?? "—" },
+            { label: "Payment terms", value: vendor.payment_terms ?? "—" },
+          ]}
+        />
+        <form action={updateVendorApproval} className="mt-3 flex items-center gap-2 border-t border-zinc-100 pt-3">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <input type="checkbox" name="is_approved" defaultChecked={vendor.is_approved} className="rounded border-zinc-300" />
           <label className="text-sm text-zinc-700">Approved for use on purchase orders</label>
           <Button type="submit" variant="secondary" size="sm" className="ml-auto">Save</Button>
         </form>
-      </div>
+      </RecordSection>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">{modules.ncdmb ? "Currency & Nigerian Content compliance" : "Currency"}</h2>
+      <RecordSection title={modules.ncdmb ? "Currency & Nigerian Content compliance" : "Currency"}>
         <form action={updateVendorCompliance} className="space-y-3">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <NcdmbFields
@@ -132,10 +126,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           )}
           <Button type="submit" size="sm">Save</Button>
         </form>
-      </div>
+      </RecordSection>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Performance notes</h2>
+      <RecordSection title="Performance notes">
         <form action={updatePerformanceNotes} className="space-y-2">
           <input type="hidden" name="vendor_id" value={vendor.id} />
           <textarea
@@ -147,20 +140,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           />
           <Button type="submit" size="sm">Save notes</Button>
         </form>
-      </div>
+      </RecordSection>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Payout details</h2>
-        {sharedAccountVendors.length > 0 && (
-          <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-            <span>
-              This account number is also on file for {sharedAccountVendors.map((v) => v.name).join(", ")} — a known
-              payment-diversion pattern (same account, different company name). Worth confirming this is intentional
-              before paying either vendor.
-            </span>
-          </div>
-        )}
+      <RecordSection title="Payout details">
         {vendor.account_number ? (
           <p className="mb-3 text-sm text-zinc-700">
             {vendor.bank_name} — {vendor.account_number} ({vendor.account_name})
@@ -176,10 +158,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
         ) : (
           <VendorPayoutForm vendorId={vendor.id} banks={banks} />
         )}
-      </div>
+      </RecordSection>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">Documents</h2>
+      <RecordSection title="Documents">
         <ul className="mb-3 space-y-1 text-sm">
           {documents.map((d) => (
             <li key={d.file_path} className="text-zinc-700">
@@ -187,8 +168,10 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
                 <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline">
                   {d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name}
                 </a>
+              ) : d.document_type ? (
+                `${d.document_type} — ${d.file_name}`
               ) : (
-                d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name
+                d.file_name
               )}
               {expiryBadge(d.expiry_date)}
             </li>
@@ -202,7 +185,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           <input type="file" name="document" className="text-sm" />
           <Button type="submit" variant="secondary" size="sm" className="sm:col-span-4">Upload</Button>
         </form>
-      </div>
+      </RecordSection>
     </div>
   );
 }

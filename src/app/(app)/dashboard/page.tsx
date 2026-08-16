@@ -1,169 +1,170 @@
 import Link from "next/link";
-import { getCurrentProfile, APPROVER_ROLES, PROCUREMENT_ROLES } from "@/lib/auth";
+import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatNaira } from "@/lib/money";
-import StatCard from "@/components/StatCard";
+import { getTodayData } from "@/lib/today";
+import { actOnApproval } from "@/app/actions/approvals";
 import { ButtonLink } from "@/components/Button";
-import { DocumentIcon, CheckCircleIcon, CartIcon, SparkleIcon } from "@/components/icons";
-import { checkFxExposure } from "@/lib/fx-exposure";
-import { getBottleneckFlags } from "@/lib/approval-bottleneck";
-import { getExpiringCertifications } from "@/lib/reports";
-
-interface ActionableApproval {
-  id: string;
-  request_id: string;
-  step_order: number;
-  approver_role: string;
-  request_number: string;
-  description: string;
-  requester_id: string;
-  qty: number;
-  est_unit_cost: number;
-  created_at: string;
-}
-
-interface SmartFlag {
-  key: string;
-  href: string;
-  text: string;
-}
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
   const supabase = await createClient();
+  const data = await getTodayData(supabase, profile);
 
-  const { count: myRequests } = await supabase
-    .from("requests")
-    .select("id", { count: "exact", head: true })
-    .eq("requester_id", profile.id);
-
-  let pendingApprovals = 0;
-  if (APPROVER_ROLES.includes(profile.role)) {
-    // v_actionable_approvals is RLS-scoped the same way the /approvals page
-    // itself is — a plain approver/finance_admin only ever sees rows matching
-    // their own role anyway, but admin roles can act on ANY role's pending
-    // step (see approvals_select policy), and eq("approver_role", profile.role)
-    // undercounted them down to 0 since no approval row's approver_role is
-    // ever literally "super_admin".
-    const { count } = await supabase.from("v_actionable_approvals").select("id", { count: "exact", head: true });
-    pendingApprovals = count ?? 0;
-  }
-
-  let openPOs = 0;
-  if (PROCUREMENT_ROLES.includes(profile.role)) {
-    const { count } = await supabase
-      .from("purchase_orders")
-      .select("id", { count: "exact", head: true })
-      .in("status", ["draft", "sent_to_vendor", "in_transit", "customs_clearance", "partially_received"]);
-    openPOs = count ?? 0;
-  }
-
-  // Advisory "smart flags" — the same read-only, deterministic insights the AI
-  // roadmap ships, surfaced where a sign-in lands first. Nothing here blocks
-  // any action; each flag links to the page where the detail lives.
-  const flags: SmartFlag[] = [];
-
-  if (APPROVER_ROLES.includes(profile.role)) {
-    const { data: approvals } = await supabase.from("v_actionable_approvals").select("*").order("created_at");
-    const list = (approvals ?? []) as ActionableApproval[];
-    const bottleneck = await getBottleneckFlags(supabase, list);
-    for (const [id, f] of bottleneck) {
-      if (!f.isSlow) continue;
-      const a = list.find((x) => x.id === id);
-      if (!a) continue;
-      flags.push({
-        key: `slow-approval-${id}`,
-        href: "/approvals",
-        text: `${a.request_number} has been waiting ${f.waitingDays} days for the ${a.approver_role.replace(/_/g, " ")} step${
-          f.historicalAvgDays != null ? ` — usually decided in ${f.historicalAvgDays} days` : ""
-        }.`,
-      });
-      if (flags.length >= 3) break;
-    }
-  }
-
-  if (PROCUREMENT_ROLES.includes(profile.role)) {
-    const [{ data: pos }, { data: vendors }] = await Promise.all([
-      supabase.from("purchase_orders").select("*").order("created_at", { ascending: false }),
-      supabase.from("vendors").select("id, name, account_number"),
-    ]);
-
-    const fx = await checkFxExposure(pos ?? []);
-    for (const f of fx.slice(0, 3)) {
-      flags.push({
-        key: `fx-${f.poId}`,
-        href: `/purchase-orders/${f.poId}`,
-        text: `${f.poNumber}: ${f.currency} is ${f.percentChange > 0 ? "up" : "down"} ${Math.abs(f.percentChange)}% vs. this PO's rate — landed cost is now roughly ${formatNaira(Math.abs(f.ngnImpact))} ${f.ngnImpact >= 0 ? "more" : "less"} in NGN.`,
-      });
-    }
-
-    const certs = await getExpiringCertifications(supabase, 60);
-    if (certs.length > 0) {
-      flags.push({
-        key: "expiring-certs",
-        href: "/reports",
-        text: `${certs.length} vendor certification${certs.length === 1 ? "" : "s"} expire${certs.length === 1 ? "s" : ""} within 60 days (earliest: ${certs[0].vendor_name}).`,
-      });
-    }
-
-    const accountGroups = new Map<string, string[]>();
-    for (const v of (vendors ?? []) as Array<{ id: string; name: string; account_number: string | null }>) {
-      if (!v.account_number) continue;
-      accountGroups.set(v.account_number, [...(accountGroups.get(v.account_number) ?? []), v.name]);
-    }
-    const shared = [...accountGroups.values()].filter((group) => group.length > 1);
-    if (shared.length > 0) {
-      flags.push({
-        key: "shared-accounts",
-        href: "/vendors",
-        text: `${shared.length} bank account${shared.length === 1 ? "" : "s"} shared by multiple vendors — e.g. ${shared[0].join(" & ")}. Check this isn't a payment-diversion setup.`,
-      });
-    }
-  }
+  const dateLine = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const monthLabel = new Date().toLocaleDateString("en-NG", { month: "long" });
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-xl bg-brand-950 px-6 py-7 sm:px-8">
-        <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <h1 className="relative text-2xl font-semibold tracking-tight text-white">
-          Welcome, {profile.full_name.split(" ")[0]}
-        </h1>
-        <p className="relative mt-1 text-sm text-brand-200">Here&apos;s what needs your attention today.</p>
+    <div className="space-y-[22px]">
+      <div>
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Today</h1>
+        <p className="mt-2 text-sm text-zinc-500">
+          {dateLine}
+          {data.decisionsCount > 0 && (
+            <>
+              {" "}
+              · {data.decisionsCount} thing{data.decisionsCount === 1 ? "" : "s"} need{data.decisionsCount === 1 ? "s" : ""} a decision from you
+            </>
+          )}
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="My requests" value={myRequests ?? 0} href="/requests" icon={<DocumentIcon />} tint="brand" />
-        {APPROVER_ROLES.includes(profile.role) && (
-          <StatCard label="Pending my approval" value={pendingApprovals} href="/approvals" icon={<CheckCircleIcon />} tint="amber" />
-        )}
-        {PROCUREMENT_ROLES.includes(profile.role) && (
-          <StatCard label="Open purchase orders" value={openPOs} href="/purchase-orders" icon={<CartIcon />} tint="green" />
-        )}
+      <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+        {data.loop.map((step) => (
+          <Link
+            key={step.step}
+            href={step.href}
+            className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm transition-colors hover:border-brand-300"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Step {step.step}</span>
+              <span className="text-[13px] font-medium tabular-nums text-zinc-400">{step.valueLabel}</span>
+            </div>
+            <div className="mt-2 text-[44px] font-semibold leading-none tabular-nums text-zinc-900">{step.count}</div>
+            <div className="mt-2 text-[15px] font-medium text-zinc-900">{step.label}</div>
+            <div className={`mt-0.5 text-[13px] ${step.subTone === "warn" ? "text-amber-700" : "text-zinc-500"}`}>{step.sub}</div>
+          </Link>
+        ))}
       </div>
 
-      {flags.length > 0 && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <h2 className="flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-            <SparkleIcon className="h-4 w-4 text-amber-600" />
-            Smart flags
-          </h2>
-          <ul className="mt-2 space-y-1.5 text-sm text-amber-800">
-            {flags.map((flag) => (
-              <li key={flag.key}>
-                <Link href={flag.href} className="hover:underline">
-                  {flag.text}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[1.62fr_1fr]">
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4">
+            <h2 className="text-[15px] font-semibold text-zinc-900">Needs you today</h2>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Ranked by cost of waiting</span>
+          </div>
+
+          {data.needsYou.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-zinc-400">Nothing needs a decision from you right now.</p>
+          ) : (
+            <ul>
+              {data.needsYou.map((row) => (
+                <li key={row.key} className="group flex flex-col border-b border-zinc-100 last:border-b-0 sm:flex-row">
+                  <div className="flex flex-1 min-w-0">
+                    <div className={`w-[3px] shrink-0 ${row.severity === "urgent" ? "bg-amber-500" : "bg-zinc-300"}`} />
+                    <div className="min-w-0 flex-1 px-4 py-3">
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                        <Link href={row.href} className="text-[13px] font-medium tabular-nums text-zinc-400 hover:text-brand-700">
+                          {row.ref}
+                        </Link>
+                        <Link href={row.href} className="text-[15px] font-medium text-zinc-900 hover:text-brand-700">
+                          {row.title}
+                        </Link>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            row.severity === "urgent" ? "bg-amber-50 text-amber-700" : "bg-zinc-100 text-zinc-500"
+                          }`}
+                        >
+                          {row.tag}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-[13px] text-zinc-500 sm:truncate">{row.evidence}</p>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3 px-4 pb-3 pl-[15px] sm:py-3 sm:pl-4">
+                    <span className="text-[17px] font-medium tabular-nums text-zinc-900">{row.amountLabel}</span>
+                    <div className="flex items-center gap-1.5 opacity-100 transition-opacity sm:opacity-55 sm:group-hover:opacity-100">
+                      {row.approvalId && (
+                        <form action={actOnApproval}>
+                          <input type="hidden" name="approval_id" value={row.approvalId} />
+                          <input type="hidden" name="action" value="approved" />
+                          <button
+                            type="submit"
+                            className="rounded-md bg-brand-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-brand-700"
+                          >
+                            Approve
+                          </button>
+                        </form>
+                      )}
+                      <Link href={row.href} className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
+                        Open
+                      </Link>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {data.approvalsWaitingCount > 0 && (
+            <div className="border-t border-zinc-100 px-5 py-3">
+              <Link href="/approvals" className="text-[13px] font-medium text-brand-700 hover:underline">
+                See all {data.approvalsWaitingCount} approval{data.approvalsWaitingCount === 1 ? "" : "s"} waiting on you →
+              </Link>
+            </div>
+          )}
         </div>
-      )}
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900">Quick actions</h2>
-        <div className="flex flex-wrap gap-2">
-          <ButtonLink href="/requests/new">New purchase request</ButtonLink>
-          <ButtonLink href="/budgets" variant="secondary">View budgets</ButtonLink>
+        <div className="flex flex-col gap-[18px]">
+          <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-[15px] font-semibold text-zinc-900">Budget, {monthLabel}</h2>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Committed vs. cap</span>
+            </div>
+            {data.budgetBars.length === 0 ? (
+              <p className="mt-3 text-sm text-zinc-400">No budgets set up for this period yet.</p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {data.budgetBars.map((bar) => (
+                  <li key={bar.name}>
+                    <div className="flex items-baseline justify-between text-[13px]">
+                      <span className="text-zinc-700">{bar.name}</span>
+                      <span className={`tabular-nums font-medium ${bar.over ? "text-amber-700" : "text-zinc-500"}`}>
+                        ₦{(bar.committed / 1e6).toFixed(1)}m / ₦{(bar.cap / 1e6).toFixed(1)}m
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-200">
+                      <div
+                        className={`h-full rounded-full ${bar.over ? "bg-amber-500" : "bg-brand-600"}`}
+                        style={{ width: `${Math.min(100, (bar.committed / Math.max(bar.cap, 1)) * 100)}%` }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <h2 className="text-[15px] font-semibold text-zinc-900">Moved today</h2>
+            {data.moved.length === 0 ? (
+              <p className="mt-3 text-sm text-zinc-400">Nothing has moved in the last 24 hours.</p>
+            ) : (
+              <ul className="mt-3 space-y-2.5">
+                {data.moved.map((row, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-3 text-[13px]">
+                    <span className="min-w-0 truncate text-zinc-700">
+                      <span className="font-medium tabular-nums text-zinc-900">{row.ref}</span> {row.text}
+                    </span>
+                    <span className="shrink-0 text-zinc-400">{row.when}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <ButtonLink href="/requests/new" className="w-full justify-center">
+            New purchase request
+          </ButtonLink>
         </div>
       </div>
     </div>

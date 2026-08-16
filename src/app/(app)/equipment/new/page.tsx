@@ -1,42 +1,50 @@
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createEquipmentAsset } from "@/app/actions/equipment";
-import PageHeader from "@/components/PageHeader";
-import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
+import { FormShell, FormPanel, AsidePanel, FormField, fieldInputClass, fieldTextareaClass } from "@/components/FormLayout";
 
 export default async function NewEquipmentAssetPage() {
   const profile = await getCurrentProfile();
   requireRole(profile, PROCUREMENT_ROLES);
 
   return (
-    <div className="max-w-xl space-y-4">
-      <BackLink href="/equipment" label="Back to Equipment" />
-      <PageHeader title="Add equipment asset" />
-      <form action={createEquipmentAsset} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium text-zinc-700">Asset tag</label>
-            <input name="asset_tag" required placeholder="e.g. CR-001" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+    <FormShell
+      backHref="/equipment"
+      backLabel="Back to equipment"
+      title="Add equipment asset"
+      form={
+        <form action={createEquipmentAsset}>
+          <FormPanel title="Asset details">
+            <FormField label="Asset tag" span={6} hint="e.g. CR-001">
+              <input name="asset_tag" required className={fieldInputClass} />
+            </FormField>
+            <FormField label="Category" span={6} hint="e.g. Crane, Nitrogen Converter">
+              <input name="category" required className={fieldInputClass} />
+            </FormField>
+            <FormField label="Name / description" span={12} hint="e.g. 50-tonne mobile crane">
+              <input name="name" required className={fieldInputClass} />
+            </FormField>
+            <FormField label="Day rate (₦)" span={6}>
+              <input name="day_rate_ngn" type="number" min="0" step="0.01" required className={fieldInputClass} />
+            </FormField>
+            <FormField label="Notes" span={12}>
+              <textarea name="notes" rows={2} className={fieldTextareaClass} />
+            </FormField>
+          </FormPanel>
+
+          <div className="mt-[18px]">
+            <Button type="submit">Save asset</Button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-zinc-700">Category</label>
-            <input name="category" required placeholder="e.g. Crane, Nitrogen Converter" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Name / description</label>
-          <input name="name" required placeholder="e.g. 50-tonne mobile crane" className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Day rate (₦)</label>
-          <input name="day_rate_ngn" type="number" min="0" step="0.01" required className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Notes (optional)</label>
-          <textarea name="notes" rows={2} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-        </div>
-        <Button type="submit">Save asset</Button>
-      </form>
-    </div>
+        </form>
+      }
+      aside={
+        <AsidePanel title="Where this shows up">
+          <p className="text-sm text-zinc-600">
+            The day rate you set here is what leases are billed against once this asset is checked out on a request. Status starts as
+            &ldquo;Available&rdquo; — it moves to &ldquo;On lease&rdquo; automatically when a lease is created.
+          </p>
+        </AsidePanel>
+      }
+    />
   );
 }

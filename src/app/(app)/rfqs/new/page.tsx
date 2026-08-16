@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createRfq } from "@/app/actions/rfq";
-import PageHeader from "@/components/PageHeader";
-import BackLink from "@/components/BackLink";
+import { formatNaira } from "@/lib/money";
 import { Button } from "@/components/Button";
+import { FormShell, FormPanel, AsidePanel } from "@/components/FormLayout";
 
 export default async function NewRfqPage({
   searchParams,
@@ -22,22 +22,42 @@ export default async function NewRfqPage({
   if (!request || request.status !== "approved") notFound();
 
   return (
-    <div className="max-w-xl space-y-4">
-      <BackLink href={`/requests/${request.id}`} label="Back to Request" />
-      <PageHeader title="Request quotes from vendors" />
-      <div className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-zinc-700">
-          <span className="font-medium">{request.request_number}</span>: {request.description}
-        </p>
-        <p className="text-sm text-zinc-500">
-          This creates an RFQ so you can add quotes from multiple vendors and compare before picking a winner. You can still
-          convert straight to a PO instead from the request page if you already know the vendor.
-        </p>
-        <form action={createRfq}>
-          <input type="hidden" name="request_id" value={request.id} />
-          <Button type="submit">Start RFQ</Button>
-        </form>
-      </div>
-    </div>
+    <FormShell
+      backHref={`/requests/${request.id}`}
+      backLabel="Back to request"
+      title="Request quotes from vendors"
+      form={
+        <FormPanel title={request.request_number} note={request.description}>
+          <div className="col-span-12">
+            <p className="text-sm text-zinc-500">
+              This creates an RFQ so you can add quotes from multiple vendors and compare before picking a winner. You can still
+              convert straight to a PO instead from the request page if you already know the vendor.
+            </p>
+            <form action={createRfq} className="mt-4">
+              <input type="hidden" name="request_id" value={request.id} />
+              <Button type="submit">Start RFQ</Button>
+            </form>
+          </div>
+        </FormPanel>
+      }
+      aside={
+        <AsidePanel title="This request">
+          <dl className="space-y-1.5 text-[13px]">
+            <div className="flex justify-between">
+              <dt className="text-zinc-500">Quantity</dt>
+              <dd className="tabular-nums text-zinc-900">{request.qty}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-zinc-500">Est. unit cost</dt>
+              <dd className="tabular-nums text-zinc-900">{formatNaira(request.est_unit_cost)}</dd>
+            </div>
+            <div className="flex justify-between border-t border-zinc-100 pt-1.5 font-medium">
+              <dt className="text-zinc-700">Est. total</dt>
+              <dd className="tabular-nums text-zinc-900">{formatNaira(request.qty * request.est_unit_cost)}</dd>
+            </div>
+          </dl>
+        </AsidePanel>
+      }
+    />
   );
 }

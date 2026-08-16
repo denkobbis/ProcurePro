@@ -54,6 +54,10 @@ export function isOrgLocked(org: Organization): boolean {
   return false;
 }
 
+export function daysUntilTrialEnd(org: Organization): number {
+  return Math.ceil((new Date(org.trial_ends_at).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
 // Call at the top of any mutating server action. Read-only access (viewing
 // pages) stays available when locked — this only blocks writes.
 export async function requireActiveOrg(profile: Profile) {

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/app/actions/auth";
 import type { Profile, OrganizationIndustry } from "@/lib/database.types";
 import { getIndustryModules } from "@/lib/industries";
 import { useMobileNav } from "./MobileNavContext";
@@ -23,104 +24,152 @@ import {
 
 const RIGSOURCE_URL = "https://rigsource.vercel.app";
 
-const GROUPS = [
-  {
-    label: null,
-    links: [{ href: "/dashboard", label: "Dashboard", icon: DashboardIcon, roles: null }],
-  },
-  {
-    label: "Workflow",
-    links: [
-      { href: "/requests", label: "Purchase Requests", icon: DocumentIcon, roles: null },
-      { href: "/approvals", label: "Approvals", icon: CheckCircleIcon, roles: ["approver", "finance_admin", "super_admin"] },
-    ],
-  },
-  {
-    label: "Procurement",
-    links: [
-      { href: "/purchase-orders", label: "Purchase Orders", icon: CartIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
-      { href: "/vendors", label: "Vendors", icon: BuildingIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
-      { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "equipment" },
-      { href: RIGSOURCE_URL, label: "AI Sourcing", icon: ExternalLinkIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], external: true },
-      { href: "/rfqs", label: "RFQs", icon: ScaleIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
-    ],
-  },
-  {
-    label: "Finance",
-    links: [
-      { href: "/budgets", label: "Budgets", icon: WalletIcon, roles: null },
-      { href: "/reports", label: "Reports", icon: ChartBarIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
-      { href: "/billing", label: "Billing", icon: CreditCardIcon, roles: null },
-    ],
-  },
-  {
-    label: "Admin",
-    links: [{ href: "/users", label: "Users & Departments", icon: UsersIcon, roles: ["finance_admin", "super_admin"] }],
-  },
+const ROLE_LABELS: Record<string, string> = {
+  requester: "Requester",
+  approver: "Approver",
+  procurement_officer: "Procurement Officer",
+  finance_admin: "Finance / Admin",
+  super_admin: "Super Admin",
+};
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase();
+}
+
+const PRIMARY = [
+  { href: "/dashboard", label: "Today", icon: DashboardIcon, roles: null, badge: null as null | "requests" | "approvals" | "po" },
+  { href: "/requests", label: "Requests", icon: DocumentIcon, roles: null, badge: "requests" as const },
+  { href: "/approvals", label: "Approvals", icon: CheckCircleIcon, roles: ["approver", "finance_admin", "super_admin"], badge: "approvals" as const },
+  { href: "/purchase-orders", label: "Purchase orders", icon: CartIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], badge: "po" as const },
+  { href: "/vendors", label: "Vendors", icon: BuildingIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], badge: null },
+  { href: "/reports", label: "Reports", icon: ChartBarIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], badge: null },
 ] as const;
 
-export default function Sidebar({ profile, industry, orgName }: { profile: Profile; industry: OrganizationIndustry; orgName: string }) {
+const SECONDARY = [
+  { href: "/budgets", label: "Budgets", icon: WalletIcon, roles: null },
+  { href: "/rfqs", label: "RFQs", icon: ScaleIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
+  { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "equipment" },
+  { href: "/billing", label: "Billing", icon: CreditCardIcon, roles: null },
+  { href: "/users", label: "Users & departments", icon: UsersIcon, roles: ["finance_admin", "super_admin"] },
+  { href: RIGSOURCE_URL, label: "AI sourcing", icon: ExternalLinkIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], external: true },
+] as const;
+
+export interface SidebarCounts {
+  requestsOpen: number;
+  approvalsAwaiting: number;
+  poOpen: number;
+}
+
+function Badge({ count, active }: { count: number; active: boolean }) {
+  if (!count) return null;
+  return (
+    <span
+      className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${
+        active ? "bg-brand-600 text-white" : "bg-zinc-100 text-zinc-600"
+      }`}
+    >
+      {count}
+    </span>
+  );
+}
+
+export default function Sidebar({
+  profile,
+  industry,
+  orgName,
+  counts,
+}: {
+  profile: Profile;
+  industry: OrganizationIndustry;
+  orgName: string;
+  counts: SidebarCounts;
+}) {
   const pathname = usePathname();
   const { open, setOpen } = useMobileNav();
   const modules = getIndustryModules(industry);
 
-  const groups = GROUPS.map((group) => ({
-    ...group,
-    links: group.links.filter((l) => {
-      if (l.roles && !(l.roles as readonly string[]).includes(profile.role)) return false;
-      if ("module" in l && l.module === "equipment" && !modules.equipment) return false;
-      return true;
-    }),
-  })).filter((group) => group.links.length > 0);
+  const badgeValue: Record<NonNullable<(typeof PRIMARY)[number]["badge"]>, number> = {
+    requests: counts.requestsOpen,
+    approvals: counts.approvalsAwaiting,
+    po: counts.poOpen,
+  };
+
+  const primary = PRIMARY.filter((l) => !l.roles || (l.roles as readonly string[]).includes(profile.role));
+  const secondary = SECONDARY.filter((l) => {
+    if (l.roles && !(l.roles as readonly string[]).includes(profile.role)) return false;
+    if ("module" in l && l.module === "equipment" && !modules.equipment) return false;
+    return true;
+  });
 
   return (
     <>
-      {open && (
-        <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />
-      )}
+      {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav
-        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white px-3 py-4 transition-transform duration-200 ease-in-out md:static md:z-auto md:w-60 md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-transform duration-200 ease-in-out md:static md:z-auto md:w-[232px] md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center gap-2 px-2 pb-4">
+        <div className="flex items-center gap-2 px-4 py-4">
           <LogoMarkIcon className="h-7 w-7 shrink-0 text-brand-600" />
           <div className="min-w-0">
             <div className="text-lg font-semibold leading-tight tracking-tight text-zinc-900">ProcurePro</div>
-            <div className="truncate text-xs text-zinc-500" title={orgName}>{orgName}</div>
+            <div className="truncate text-xs text-zinc-500" title={orgName}>
+              {orgName}
+            </div>
           </div>
         </div>
-        <div className="mx-2 mb-4 border-t border-zinc-100" />
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          {groups.map((group, i) => (
-            <div key={i}>
-              {group.label && (
-                <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{group.label}</div>
-              )}
+
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 pb-4">
+          <ul className="flex flex-col gap-0.5">
+            {primary.map((link) => {
+              const active = pathname === link.href || pathname.startsWith(link.href + "/");
+              const Icon = link.icon;
+              const count = link.badge ? badgeValue[link.badge] : 0;
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
+                      active ? "border-brand-600 bg-brand-50 text-brand-800" : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                    }`}
+                  >
+                    <Icon className={`h-[17px] w-[17px] shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`} />
+                    {link.label}
+                    {link.badge && <Badge count={count} active={active} />}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {secondary.length > 0 && (
+            <div>
+              <div className="px-3 pb-1 text-[13px] font-medium text-zinc-400">Set up &amp; review</div>
               <ul className="flex flex-col gap-0.5">
-                {group.links.map((link) => {
+                {secondary.map((link) => {
                   const isExternal = "external" in link && link.external;
                   const active = !isExternal && (pathname === link.href || pathname.startsWith(link.href + "/"));
                   const Icon = link.icon;
-                  const linkClassName = `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                    active ? "bg-brand-50 text-brand-700" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                  const className = `flex items-center gap-2.5 rounded-md border-l-2 py-1.5 pl-[10px] pr-3 text-[13px] font-medium transition-colors ${
+                    active ? "border-brand-600 bg-brand-50 text-brand-800" : "border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                   }`;
-                  const iconClassName = `h-[18px] w-[18px] shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`;
+                  const iconClassName = `h-4 w-4 shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`;
 
                   if (isExternal) {
                     return (
                       <li key={link.href}>
-                        <a href={link.href} target="_blank" rel="noopener noreferrer" className={linkClassName}>
+                        <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
                           <Icon className={iconClassName} />
                           {link.label}
                         </a>
                       </li>
                     );
                   }
-
                   return (
                     <li key={link.href}>
-                      <Link href={link.href} onClick={() => setOpen(false)} className={linkClassName}>
+                      <Link href={link.href} onClick={() => setOpen(false)} className={className}>
                         <Icon className={iconClassName} />
                         {link.label}
                       </Link>
@@ -129,7 +178,22 @@ export default function Sidebar({ profile, industry, orgName }: { profile: Profi
                 })}
               </ul>
             </div>
-          ))}
+          )}
+        </div>
+
+        <div className="flex items-center gap-2.5 border-t border-zinc-100 px-4 py-3">
+          <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-semibold text-white">
+            {initials(profile.full_name)}
+          </div>
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="truncate text-[13px] font-medium text-zinc-900">{profile.full_name}</div>
+            <div className="truncate text-[11px] text-zinc-400">{ROLE_LABELS[profile.role] ?? profile.role}</div>
+          </div>
+          <form action={signOut}>
+            <button type="submit" aria-label="Sign out" className="rounded-md px-1.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900">
+              Sign out
+            </button>
+          </form>
         </div>
       </nav>
     </>

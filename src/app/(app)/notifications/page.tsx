@@ -1,7 +1,6 @@
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { markNotificationRead, markAllNotificationsRead } from "@/app/actions/notifications";
-import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import { BellIcon } from "@/components/icons";
 import type { AppNotification } from "@/lib/database.types";
@@ -19,17 +18,18 @@ export default async function NotificationsPage() {
   const rows = notifications ?? [];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Notifications"
-        actions={
-          rows.some((n) => !n.is_read) ? (
-            <form action={markAllNotificationsRead}>
-              <button className="text-sm font-medium text-zinc-500 hover:text-brand-700">Mark all as read</button>
-            </form>
-          ) : undefined
-        }
-      />
+    <div className="max-w-2xl space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Notifications</h1>
+          <p className="mt-2 text-sm text-zinc-500">The last 50 things that happened on your requests and orders.</p>
+        </div>
+        {rows.some((n) => !n.is_read) && (
+          <form action={markAllNotificationsRead}>
+            <button className="text-sm font-medium text-zinc-500 hover:text-brand-700">Mark all as read</button>
+          </form>
+        )}
+      </div>
 
       <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
         {rows.length === 0 ? (

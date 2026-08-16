@@ -43,6 +43,7 @@ export async function actOnApproval(formData: FormData) {
 
   revalidatePath("/approvals");
   revalidatePath("/requests");
+  revalidatePath("/dashboard");
 }
 
 export async function createDelegation(formData: FormData) {

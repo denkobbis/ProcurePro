@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import PageHeader from "@/components/PageHeader";
 import { ButtonLink } from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
-import { BuildingIcon } from "@/components/icons";
+import { BuildingIcon, SparkleIcon } from "@/components/icons";
+import VendorsTable, { type VendorRow } from "./VendorsTable";
 import type { Vendor } from "@/lib/database.types";
 
 export default async function VendorsPage() {
@@ -13,65 +13,60 @@ export default async function VendorsPage() {
 
   const supabase = await createClient();
   const { data: vendors } = await supabase.from("vendors").select("*").order("name");
-  const rows = vendors ?? [];
+  const rows = (vendors ?? []) as Vendor[];
+
+  const accountGroups = new Map<string, string[]>();
+  for (const v of rows) {
+    if (!v.account_number) continue;
+    accountGroups.set(v.account_number, [...(accountGroups.get(v.account_number) ?? []), v.name]);
+  }
+  const sharedGroups = [...accountGroups.entries()].filter(([, names]) => names.length > 1);
+  const sharedVendorNames = new Set(sharedGroups.flatMap(([, names]) => names));
+
+  const tableRows: VendorRow[] = rows.map((v) => ({
+    id: v.id,
+    name: v.name,
+    ncdmb: v.ncdmb_compliant,
+    sharedAccount: sharedVendorNames.has(v.name),
+    category: v.category ?? "—",
+    contact: v.contact_email ?? "—",
+    paymentTerms: v.payment_terms ?? "—",
+    currency: v.default_currency,
+    approved: v.is_approved,
+  }));
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="Vendors"
-        actions={
-          <div className="flex items-center gap-3">
-            <Link href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
-              Export CSV
-            </Link>
-            <ButtonLink href="/vendors/new">Add vendor</ButtonLink>
-          </div>
-        }
-      />
-
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
-        {rows.length === 0 ? (
-          <EmptyState icon={<BuildingIcon />} title="No vendors yet" action={<ButtonLink href="/vendors/new" size="sm">Add vendor</ButtonLink>} />
-        ) : (
-          <table className="w-full min-w-[560px] text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50/70 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3">Payment terms</th>
-                <th className="px-4 py-3">Currency</th>
-                <th className="px-4 py-3">Approved</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {rows.map((v: Vendor) => (
-                <tr key={v.id} className="transition-colors hover:bg-brand-50/40">
-                  <td className="px-4 py-3">
-                    <Link href={`/vendors/${v.id}`} className="font-medium text-brand-700 hover:underline">
-                      {v.name}
-                    </Link>
-                    {v.ncdmb_compliant && (
-                      <span className="ml-2 rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">NCDMB</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-zinc-700">{v.category ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.contact_email ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.payment_terms ?? "—"}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.default_currency}</td>
-                  <td className="px-4 py-3">
-                    {v.is_approved ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
-                    ) : (
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Pending</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Vendors</h1>
+          <p className="mt-2 text-sm text-zinc-500">Every vendor on file, with compliance and payment details.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            Export CSV
+          </Link>
+          <ButtonLink href="/vendors/new">Add vendor</ButtonLink>
+        </div>
       </div>
+
+      {sharedGroups.length > 0 && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <div>
+            <span className="font-medium">{sharedGroups.length} bank account{sharedGroups.length === 1 ? "" : "s"} shared by multiple vendors</span> —{" "}
+            {sharedGroups.map(([, names]) => names.join(" & ")).join("; ")}. Worth confirming before the next payout.
+          </div>
+        </div>
+      )}
+
+      {rows.length === 0 ? (
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <EmptyState icon={<BuildingIcon />} title="No vendors yet" action={<ButtonLink href="/vendors/new" size="sm">Add vendor</ButtonLink>} />
+        </div>
+      ) : (
+        <VendorsTable rows={tableRows} />
+      )}
     </div>
   );
 }
