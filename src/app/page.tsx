@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { ButtonLink } from "@/components/Button";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
@@ -117,7 +118,11 @@ const PRICING_INCLUDES = [
   "Role-based access & full audit log",
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
+  const isDark = theme ? theme === "dark" : true;
+
   return (
     <div className="flex-1 bg-white dark:bg-[#0a0e1a]">
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0a0e1a]/90">
@@ -139,7 +144,7 @@ export default function LandingPage() {
             <ButtonLink href="/signup" size="sm">
               Start free trial
             </ButtonLink>
-            <ThemeToggle className="text-zinc-500 dark:text-zinc-400" />
+            <ThemeToggle initialIsDark={isDark} className="text-zinc-500 dark:text-zinc-400" />
           </div>
         </div>
       </nav>
