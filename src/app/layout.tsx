@@ -30,13 +30,14 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {/* Sets the dark class before paint, from the landing page's theme
-            toggle preference (falls back to system preference) — avoids a
-            flash of the wrong theme. Only the landing page has dark:
-            styling, so this is a no-op everywhere else. */}
+            toggle preference (falls back to dark by default for first-time
+            visitors, not system preference) — avoids a flash of the wrong
+            theme. Only the landing page has dark: styling, so this is a
+            no-op everywhere else. */}
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":true;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
           }}
         />
         {/* Emits a literal HTML comment node (a plain JSX comment compiles away and never reaches the markup), so the landing page direction contract below is grep-able in the production build for audit. */}
