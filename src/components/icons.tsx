@@ -194,6 +194,15 @@ export function ArrowLeftIcon(props: IconProps) {
   );
 }
 
+export function ChatBubbleIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 5.5h16v10.5H9.5L5.5 19v-3H4V5.5Z" />
+      <path d="M8 9.5h8M8 12.5h5" />
+    </svg>
+  );
+}
+
 export function ShieldCheckIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

@@ -8,6 +8,7 @@ const BASE_URL = process.env.DEMO_BASE_URL || "http://localhost:3000";
 const PASSWORD = "Passw0rd!123";
 const OUT_DIR = path.join(process.cwd(), "public", "landing");
 const PO_ID = "1d8349cb-321d-4792-b85d-e09542aa7148"; // PO-000006, has an FX flag
+const INVOICE_PO_ID = "e642e706-b954-4716-9fd8-0be29e5102c1"; // PO-000001, has a variance-flagged invoice
 
 async function goto(page, p) {
   await page.goto(`${BASE_URL}${p}`, { waitUntil: "load", timeout: 60000 });
@@ -68,6 +69,14 @@ async function main() {
   // Card: vendor list — NCDMB + shared-account badges.
   await goto(page, "/vendors");
   await clipShot(page, "v2_vendors", "main .rounded-lg.border.border-zinc-200.bg-white.shadow-sm", { maxHeight: 420 });
+
+  // Card: invoice match panel with a flagged price variance.
+  await goto(page, `/purchase-orders/${INVOICE_PO_ID}`);
+  await clipShot(page, "v2_invoice_match", "div.rounded-lg.border.border-zinc-200:has-text('Invoices')", { maxHeight: 500 });
+
+  // Card: approval rules admin table.
+  await goto(page, "/approval-rules");
+  await clipShot(page, "v2_approval_rules", "div.rounded-lg.border.border-zinc-200:has-text('Current rules')", { maxHeight: 460 });
 
   await browser.close();
 }

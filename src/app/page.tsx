@@ -107,6 +107,24 @@ const FEATURES = [
     width: 2624,
     height: 840,
   },
+  {
+    icon: DocumentIcon,
+    title: "Every invoice checked against what was ordered and received",
+    description:
+      "Upload the vendor's invoice and it's matched line by line against the PO and what actually arrived — a quiet price bump or a quantity that's not backed by a receipt gets flagged before it's paid.",
+    image: "/landing/v2_invoice_match.png",
+    width: 1394,
+    height: 462,
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Approval routing you configure, not we hardcode",
+    description:
+      "Set who signs off by department and amount, and in what order, from a settings screen — no waiting on us to change a threshold buried in code.",
+    image: "/landing/v2_approval_rules.png",
+    width: 1792,
+    height: 526,
+  },
 ];
 
 const PRICING_INCLUDES = [
@@ -115,6 +133,7 @@ const PRICING_INCLUDES = [
   "Multi-currency POs with landed-cost tracking",
   "NCDMB vendor compliance tracking",
   "Vendor payments via Paystack & Flutterwave",
+  "3-way invoice matching, exportable to Xero",
   "Role-based access & full audit log",
 ];
 
