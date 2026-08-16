@@ -33,6 +33,9 @@ const COLORS: Record<string, string> = {
   trialing: "bg-brand-100 text-brand-700",
   past_due: "bg-amber-100 text-amber-700",
   canceled: "bg-red-100 text-red-700",
+  pending_review: "bg-zinc-100 text-zinc-700",
+  matched: "bg-green-100 text-green-700",
+  variance: "bg-amber-100 text-amber-700",
 };
 
 export default function StatusBadge({ status }: { status: string }) {

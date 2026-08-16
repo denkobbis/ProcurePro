@@ -233,6 +233,34 @@ export interface PoLineItem {
   created_at: string;
 }
 
+export type InvoiceStatus = "pending_review" | "matched" | "variance" | "approved";
+
+export interface Invoice {
+  id: string;
+  organization_id: string;
+  po_id: string;
+  vendor_id: string;
+  invoice_number: string;
+  invoice_date: string | null;
+  currency: CurrencyCode;
+  total_amount: number;
+  file_path: string | null;
+  file_name: string | null;
+  status: InvoiceStatus;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface InvoiceLineItem {
+  id: string;
+  invoice_id: string;
+  description: string;
+  qty: number;
+  unit_price: number;
+  po_line_item_id: string | null;
+  created_at: string;
+}
+
 export interface EquipmentAsset {
   id: string;
   asset_tag: string;

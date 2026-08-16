@@ -50,9 +50,14 @@ export default async function PurchaseOrdersPage() {
           <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Purchase orders</h1>
           <p className="mt-2 text-sm text-zinc-500">Every order raised, from draft through receiving.</p>
         </div>
-        <Link href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
-          Export CSV
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/invoices/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            Export invoices (Xero)
+          </Link>
+          <Link href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+            Export CSV
+          </Link>
+        </div>
       </div>
 
       {rows.length === 0 ? (

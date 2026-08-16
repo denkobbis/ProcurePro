@@ -19,6 +19,7 @@ import {
   CreditCardIcon,
   UsersIcon,
   ExternalLinkIcon,
+  ShieldCheckIcon,
   LogoMarkIcon,
 } from "./icons";
 
@@ -52,6 +53,7 @@ const SECONDARY = [
   { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "equipment" },
   { href: "/billing", label: "Billing", icon: CreditCardIcon, roles: null },
   { href: "/users", label: "Users & departments", icon: UsersIcon, roles: ["finance_admin", "super_admin"] },
+  { href: "/approval-rules", label: "Approval rules", icon: ShieldCheckIcon, roles: ["finance_admin", "super_admin"] },
   { href: RIGSOURCE_URL, label: "AI sourcing", icon: ExternalLinkIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], external: true },
 ] as const;
 

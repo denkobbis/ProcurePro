@@ -11,9 +11,12 @@ import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments
 import { getIndustryModules } from "@/lib/industries";
 import { checkPoAnomalies, DUPLICATE_WINDOW_DAYS } from "@/lib/po-anomaly";
 import { checkFxExposure } from "@/lib/fx-exposure";
+import { matchInvoiceToPo } from "@/lib/invoice-match";
 import { SparkleIcon } from "@/components/icons";
 import { RecordHeader, Stepper, RecordSection, FactsPanel, NotePanel, PlatePanel, type StepDef } from "@/components/RecordPanels";
-import type { PoLineItem, Payment, PoStatus } from "@/lib/database.types";
+import RecordInvoiceForm from "@/components/RecordInvoiceForm";
+import InvoiceMatchPanel from "@/components/InvoiceMatchPanel";
+import type { PoLineItem, Payment, PoStatus, Invoice, InvoiceLineItem } from "@/lib/database.types";
 
 const PO_STEPS: { key: PoStatus; label: string }[] = [
   { key: "draft", label: "Drafted" },
@@ -46,11 +49,12 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
   const { data: po } = await supabase.from("purchase_orders").select("*").eq("id", id).single();
   if (!po) notFound();
 
-  const [{ data: lineItems }, { data: vendor }, { data: department }, { data: payments }] = await Promise.all([
+  const [{ data: lineItems }, { data: vendor }, { data: department }, { data: payments }, { data: invoiceRows }] = await Promise.all([
     supabase.from("po_line_items").select("*").eq("po_id", id).order("created_at"),
     supabase.from("vendors").select("*").eq("id", po.vendor_id).single(),
     supabase.from("departments").select("*").eq("id", po.department_id).single(),
     supabase.from("payments").select("*").eq("purchase_order_id", id).order("created_at", { ascending: false }),
+    supabase.from("invoices").select("*").eq("po_id", id).order("created_at", { ascending: false }),
   ]);
   const paymentAttempts = (payments ?? []) as Payment[];
   const amountPaid = paymentAttempts.filter((p) => p.status === "success").reduce((sum, p) => sum + Number(p.amount), 0);
@@ -60,6 +64,18 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
   const vendorHasPayout = Boolean(vendor?.account_number);
 
   const items = (lineItems ?? []) as PoLineItem[];
+  const invoices = (invoiceRows ?? []) as Invoice[];
+  const invoiceIds = invoices.map((inv) => inv.id);
+  const { data: allInvoiceLines } = invoiceIds.length
+    ? await supabase.from("invoice_line_items").select("*").in("invoice_id", invoiceIds)
+    : { data: [] as InvoiceLineItem[] };
+  const invoiceMatches = invoices.map((inv) => ({
+    invoice: inv,
+    match: matchInvoiceToPo(
+      ((allInvoiceLines ?? []) as InvoiceLineItem[]).filter((l) => l.invoice_id === inv.id),
+      items
+    ),
+  }));
   const landedCostNgn = po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
   const anomalies = canPay && canInitiatePayment ? await checkPoAnomalies(supabase, po) : { possibleDuplicates: [], priceJump: null };
   const hasAnomalyFlags = anomalies.possibleDuplicates.length > 0 || anomalies.priceJump !== null;
@@ -232,6 +248,24 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                   ))}
                 {items.every((li) => li.received_qty >= li.qty) && <p className="text-sm text-zinc-400">All line items fully received.</p>}
               </div>
+            </RecordSection>
+          )}
+
+          {po.status !== "draft" && (
+            <RecordSection title="Invoices">
+              {invoiceMatches.length > 0 && (
+                <div className="mb-4 space-y-3">
+                  {invoiceMatches.map(({ invoice, match }) => (
+                    <InvoiceMatchPanel key={invoice.id} invoice={invoice} match={match} />
+                  ))}
+                </div>
+              )}
+              <details>
+                <summary className="cursor-pointer text-sm font-medium text-brand-700 hover:underline">Record a vendor invoice</summary>
+                <div className="mt-3">
+                  <RecordInvoiceForm poId={po.id} />
+                </div>
+              </details>
             </RecordSection>
           )}
 

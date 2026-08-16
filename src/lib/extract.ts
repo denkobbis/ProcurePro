@@ -83,6 +83,92 @@ export async function extractRequestFields(fileBuffer: Buffer, mimeType: string)
   ]);
 }
 
+export interface ExtractedInvoiceLineItem {
+  description: string;
+  qty: number;
+  unit_price: number;
+}
+
+export interface ExtractedInvoiceFields {
+  invoice_number: string;
+  invoice_date: string;
+  total_amount: number;
+  line_items: ExtractedInvoiceLineItem[];
+}
+
+const EXTRACT_INVOICE_TOOL = {
+  name: "extract_invoice_fields",
+  description:
+    "Extract vendor invoice fields for matching against a purchase order. Only fill fields you can actually read from the document; leave a field empty (or 0 for numbers) rather than guessing.",
+  input_schema: {
+    type: "object",
+    properties: {
+      invoice_number: { type: "string", description: "The vendor's invoice number/reference" },
+      invoice_date: { type: "string", description: "Invoice date as YYYY-MM-DD, if present" },
+      total_amount: { type: "number", description: "Invoice grand total, as a plain number, no currency symbol or thousands separators" },
+      line_items: {
+        type: "array",
+        description: "Every line item billed on the invoice",
+        items: {
+          type: "object",
+          properties: {
+            description: { type: "string" },
+            qty: { type: "number" },
+            unit_price: { type: "number", description: "Per-unit price, no currency symbol" },
+          },
+          required: ["description", "qty", "unit_price"],
+        },
+      },
+    },
+    required: ["invoice_number", "invoice_date", "total_amount", "line_items"],
+  },
+};
+
+export async function extractInvoiceFields(fileBuffer: Buffer, mimeType: string): Promise<ExtractedInvoiceFields> {
+  const isPdf = mimeType === "application/pdf";
+  const isImage = mimeType.startsWith("image/");
+  if (!isPdf && !isImage) throw new Error("Unsupported file type — upload a PDF or an image (JPG/PNG).");
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set — AI extraction is not configured.");
+
+  const base64 = fileBuffer.toString("base64");
+  const res = await fetch(ANTHROPIC_API_URL, {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 1536,
+      tools: [EXTRACT_INVOICE_TOOL],
+      tool_choice: { type: "tool", name: "extract_invoice_fields" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: isPdf ? "document" : "image", source: { type: "base64", media_type: mimeType, data: base64 } },
+            { type: "text", text: "Extract the vendor invoice fields from this document using the extract_invoice_fields tool." },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Anthropic API error (${res.status}): ${body.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  const toolUse = data.content?.find((block: { type: string }) => block.type === "tool_use");
+  if (!toolUse) throw new Error("Extraction did not return structured data — try a clearer scan.");
+
+  return toolUse.input as ExtractedInvoiceFields;
+}
+
 export async function extractRequestFieldsFromText(text: string): Promise<ExtractedRequestFields> {
   const trimmed = text.trim();
   if (!trimmed) throw new Error("Type a description first.");
