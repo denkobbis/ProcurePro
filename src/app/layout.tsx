@@ -23,12 +23,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Dark mode only exists on the landing page — it reads its own theme cookie
-  // and scopes the "dark" class to its own wrapper div (see page.tsx /
-  // ThemeToggle.tsx). It must not be applied here at the html/body level:
-  // globals.css's `body { background: var(--background) }` combined with
-  // `:root.dark` would otherwise flip the whole authenticated app's body
-  // background to the landing page's dark navy on every route.
+  // The landing page's marketing-root wrapper (page.tsx) is a fixed navy
+  // identity now — no light/dark toggle (matching the pinned Precoro
+  // reference, which has none). globals.css's `.dark` scope still exists for
+  // any future scoped use but nothing currently opts into it here.
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
@@ -39,23 +37,26 @@ export default function RootLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `<!--
-        THESIS: Full enterprise procure-to-pay depth without SAP-level cost or
-        complexity -- refuses both the "toy vendor tracker" and "enterprise
-        beast" category defaults.
-        OWN-WORLD: Existing navy engineering-blueprint palette (brand-50..950),
-        Geist Sans, hand-drawn stroke icons; structural grammar borrowed from
-        professional SaaS-dashboard case studies -- stat cards with trend
-        context, chip filters, alternating feature/screenshot rhythm, dark
-        panel bookends.
-        STORY: A Nigerian oil & gas/heavy-industry ops or finance lead,
-        exhausted by WhatsApp/spreadsheet purchasing, sees the real workflow
-        demonstrated with real screenshots, recognizes NCDMB and landed-cost
-        handling as built in, starts a 14-day trial.
-        FIRST VIEWPORT: Split hero on brand-950 -- headline, subhead, dual CTA,
-        trust line left; real dashboard screenshot framed right.
-        FORM: user- and brief-pinned direction (existing navy brand + the
-        user's Behance reference for structural grammar) -- no concept-seed
-        roll, per new-work.md's pinned-direction rule.
+        THESIS: Illustrated, hand-built UI in place of literal screenshots --
+        a marketing surface that dramatizes the real product's own data
+        without photographing the app itself; refuses the screenshot-heavy
+        enterprise-SaaS default this project shipped one pass ago.
+        OWN-WORLD: Navy brand-950 declaration surfaces (hero, trust, pricing)
+        plus a new violet-to-magenta accent (accent-50..700, accent-glow) for
+        CTAs, badges, and floating annotations; hand-built SVG/React mockup
+        cards (skeleton rows, stat plates, compare cards, rule tables)
+        carrying real product figures; one real editorial photo of a person
+        at work.
+        STORY: A Nigerian oil & gas/heavy-industry buyer sees the workflow
+        dramatized through designed illustration and a real person doing the
+        job, recognizes NCDMB, landed-cost, and invoice-matching as built in,
+        starts a 14-day trial.
+        FIRST VIEWPORT: Split hero on brand-950 -- headline, subhead, dual CTA
+        left; an illustrated "Today" dashboard card with a floating
+        decision-count badge right.
+        FORM: user- and brief-pinned direction (precoro.com, reviewed live
+        with the user) -- no concept-seed roll, per new-work.md's
+        pinned-direction rule.
         FINISH: unreviewed and undocumented is unfinished; this build ends
         with the finish review, the verdict, and DESIGN.md.
         -->`,

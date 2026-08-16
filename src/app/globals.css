@@ -1,20 +1,9 @@
 @import "tailwindcss";
 
-/* Class-based dark mode (toggle-controlled, not just prefers-color-scheme) —
-   scoped to the landing page for now via ThemeToggle; the authenticated app
-   doesn't opt into this. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
   color-scheme: light;
-}
-
-.dark {
-  --background: #0a0e1a;
-  --foreground: #e4e7ec;
-  color-scheme: dark;
 }
 
 @theme inline {
@@ -36,6 +25,19 @@
   --color-brand-800: #1c3163;
   --color-brand-900: #172750;
   --color-brand-950: #0e1830;
+
+  /* Accent: a violet-to-magenta gradient, landing-page-only — the "act now"
+     color against the navy declaration surfaces (buttons, badges, floating
+     annotations on illustrated mockups). Never used in the authenticated app. */
+  --color-accent-50: #f5f0ff;
+  --color-accent-100: #ebe0ff;
+  --color-accent-200: #d6c2ff;
+  --color-accent-300: #b794f7;
+  --color-accent-400: #a06aed;
+  --color-accent-500: #8b3fe0;
+  --color-accent-600: #7827c9;
+  --color-accent-700: #611fa3;
+  --color-accent-glow: #c026d3;
 }
 
 body {
@@ -53,8 +55,11 @@ body {
   color: var(--color-brand-900);
 }
 
-/* The landing page's one authored motion moment: the hero reveals on load,
-   staggered slightly per element. Nowhere else on the page animates. */
+/* Landing-page motion system: two authored moments, not scattered effects.
+   1) The hero reveals on load (below). 2) Every later section reveals once,
+   the same way, as it enters the viewport (.reveal / .reveal-in, driven by
+   an IntersectionObserver in useScrollReveal.ts) — one consistent grammar
+   reused everywhere, not a different animation per section. */
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -68,4 +73,48 @@ body {
 
 .animate-reveal {
   animation: reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-reveal {
+    animation: none;
+  }
+}
+
+/* A slow, subtle drift for the floating annotation badges on the illustrated
+   mockup cards — the one secondary motion "material" on the page, applied
+   consistently to that one component family, never to arbitrary elements. */
+@keyframes drift {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-drift {
+  animation: drift 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift {
+    animation: none;
+  }
 }

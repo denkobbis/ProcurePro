@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "danger" | "success" | "ghost";
+type Variant = "primary" | "secondary" | "danger" | "success" | "ghost" | "accent";
 type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
@@ -10,6 +10,8 @@ const variantClasses: Record<Variant, string> = {
   danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
   success: "bg-green-700 text-white hover:bg-green-800 focus-visible:ring-green-500",
   ghost: "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-brand-500",
+  // Landing-page-only: the violet/magenta gradient CTA. Never used in the authenticated app.
+  accent: "bg-gradient-to-r from-accent-600 to-accent-glow text-white shadow-lg shadow-accent-600/25 hover:opacity-90 focus-visible:ring-accent-500",
 };
 
 const sizeClasses: Record<Size, string> = {

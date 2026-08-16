@@ -1,4 +1,5 @@
 import { signIn } from "@/app/actions/auth";
+import { Button } from "@/components/Button";
 import { LogoMarkIcon, DocumentIcon, WalletIcon, BuildingIcon } from "@/components/icons";
 
 const FEATURES = [
@@ -32,6 +33,11 @@ export default async function LoginPage({
         <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-brand-900/40"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-20 blur-[90px]"
+          style={{ background: "radial-gradient(circle, var(--color-accent-glow), transparent 70%)" }}
           aria-hidden="true"
         />
 
@@ -119,12 +125,9 @@ export default async function LoginPage({
                 placeholder="••••••••"
               />
             </div>
-            <button
-              type="submit"
-              className="w-full rounded-md bg-brand-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
-            >
+            <Button type="submit" variant="accent" className="w-full">
               Sign in
-            </button>
+            </Button>
           </form>
 
           <p className="mt-6 text-center text-xs text-zinc-400">

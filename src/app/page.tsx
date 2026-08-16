@@ -1,8 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
-import { cookies } from "next/headers";
+import Image from "next/image";
+import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/Button";
-import ThemeToggle from "@/components/ThemeToggle";
+import Reveal from "@/components/landing/Reveal";
+import FeatureCarousel from "@/components/landing/FeatureCarousel";
+import {
+  MockupFrame,
+  FloatingBadge,
+  ListRowsCard,
+  StatPlateCard,
+  CompareCard,
+  ChatExtractCard,
+  RuleTableCard,
+  MatchPanelCard,
+  HeroDashboardCard,
+} from "@/components/landing/mockups";
 import {
   LogoMarkIcon,
   DocumentIcon,
@@ -16,7 +28,7 @@ import {
   SparkleIcon,
 } from "@/components/icons";
 
-const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-brand-950 rounded-sm";
+const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 rounded-sm";
 
 const STATS = [
   { value: "6", label: "stages, one system — request to receiving" },
@@ -52,78 +64,114 @@ const LOOP = [
   { icon: InboxIcon, label: "Awaiting receipt" },
 ];
 
-const FEATURES = [
+const FEATURES: { icon: typeof DocumentIcon; title: string; description: string; render: () => ReactNode }[] = [
   {
     icon: DocumentIcon,
     title: "Every request tracked, staged, and searchable",
-    description:
-      "Submission through receiving, at a glance — stage bars instead of a status pill, and age that turns amber the moment something's slower than this org's own average.",
-    image: "/landing/v2_requests_list.png",
-    width: 2624,
-    height: 920,
+    description: "Submission through receiving, at a glance — stage bars instead of a status pill, and age that turns amber the moment something's slower than this org's own average.",
+    render: () => (
+      <ListRowsCard
+        title="Requests"
+        rows={[
+          { label: "REQ-000034 approved, ready for PO", sub: "Moved this morning", barPercent: 85 },
+          { label: "REQ-000033 approved, ready for PO", sub: "Moved yesterday", barPercent: 85 },
+          { label: "REQ-000041 moved to review", sub: "Awaiting approval", barPercent: 45 },
+        ]}
+      />
+    ),
   },
   {
     icon: SparkleIcon,
     title: "Upload a quote, skip the retyping",
-    description:
-      "Upload a vendor quote, invoice, or spec sheet and Claude fills in the request for you — description, quantity, cost, part number. You review and submit; nothing saves itself.",
-    image: "/landing/v2_ai_extract.png",
-    width: 1630,
-    height: 252,
+    description: "Upload a vendor quote, invoice, or spec sheet and Claude fills in the request for you — description, quantity, cost, part number. You review and submit; nothing saves itself.",
+    render: () => (
+      <ChatExtractCard
+        fields={[
+          { label: "Invoice", value: "DIS-4471" },
+          { label: "Vendor", value: "Delta Industrial" },
+          { label: "Qty", value: "5" },
+          { label: "Unit price", value: "₦49,000" },
+        ]}
+      />
+    ),
   },
   {
     icon: SparkleIcon,
     title: "The alerts a busy team would otherwise miss",
-    description:
-      "Slow approvals, FX moves, expiring certificates, vendors sharing a bank account — ranked by cost of waiting and surfaced the moment you sign in, computed from your own data.",
-    image: "/landing/v2_needs_you_today.png",
-    width: 1600,
-    height: 720,
+    description: "Slow approvals, FX moves, expiring certificates, vendors sharing a bank account — ranked by cost of waiting and surfaced the moment you sign in, computed from your own data.",
+    render: () => (
+      <ListRowsCard
+        title="Needs you today"
+        rows={[
+          { label: "PO-000005 Atlas Crane & Rigging", value: "$220,000", sub: "USD down 45% since pricing", flagged: true },
+          { label: "REQ-000032 Hard hats, ANSI-rated", value: "₦390,000", sub: "13 days waiting", flagged: true },
+          { label: "PO-000006 Continental Pipe & Fittings", value: "€7,200", sub: "EUR down 19% since pricing" },
+        ]}
+      />
+    ),
   },
   {
     icon: WalletIcon,
     title: "Landed cost you can trust, not just a PO number",
-    description:
-      "Multi-currency purchase orders track FX rate, freight, and customs duty automatically, with a warning the moment the Naira moves against an open order.",
-    image: "/landing/v2_landed_cost.png",
-    width: 694,
-    height: 394,
+    description: "Multi-currency purchase orders track FX rate, freight, and customs duty automatically, with a warning the moment the Naira moves against an open order.",
+    render: () => (
+      <StatPlateCard
+        label="Landed cost"
+        value="₦14,245,000.00"
+        rows={[
+          { label: "PO value", value: "₦4,040,000.00" },
+          { label: "Freight", value: "₦120,000.00" },
+          { label: "Customs duty", value: "₦85,000.00" },
+        ]}
+      />
+    ),
   },
   {
     icon: ScaleIcon,
     title: "Quotes ranked for you, not just collected",
-    description:
-      "Vendor quotes on an RFQ are auto-ranked by total price and lead time — Cheapest, Fastest, and Recommended, so picking a winner isn't a spreadsheet exercise.",
-    image: "/landing/v2_quote_compare.png",
-    width: 1792,
-    height: 710,
+    description: "Vendor quotes on an RFQ are auto-ranked by total price and lead time, so picking a winner isn't a spreadsheet exercise.",
+    render: () => (
+      <CompareCard
+        options={[
+          { label: "Naija Office Essentials", price: "₦75,000", detail: "5-day lead time", recommended: true },
+          { label: "Delta Industrial Supplies", price: "$45.00", detail: "21-day lead time" },
+        ]}
+      />
+    ),
   },
   {
     icon: ShieldCheckIcon,
     title: "Vendor compliance, built in — not bolted on",
-    description:
-      "NCDMB local content and certificate expiry live on the vendor record itself, and a shared bank account across two vendors gets flagged before it becomes a payment mistake.",
-    image: "/landing/v2_vendors.png",
-    width: 2624,
-    height: 840,
+    description: "NCDMB local content and certificate expiry live on the vendor record itself, and a shared bank account across two vendors gets flagged before it becomes a payment mistake.",
+    render: () => (
+      <ListRowsCard
+        title="Vendors"
+        rows={[
+          { label: "Zenith Industrial Chemicals", value: "71% local", sub: "NCDMB compliant" },
+          { label: "Sahara Safety Equipment", value: "62% local", sub: "NCDMB compliant" },
+          { label: "BlueWave Marine Logistics", sub: "Shares a bank account with Zenith", flagged: true },
+        ]}
+      />
+    ),
   },
   {
     icon: DocumentIcon,
     title: "Every invoice checked against what was ordered and received",
-    description:
-      "Upload the vendor's invoice and it's matched line by line against the PO and what actually arrived — a quiet price bump or a quantity that's not backed by a receipt gets flagged before it's paid.",
-    image: "/landing/v2_invoice_match.png",
-    width: 1394,
-    height: 462,
+    description: "Upload the vendor's invoice and it's matched line by line against the PO and what actually arrived — a quiet price bump or a quantity that's not backed by a receipt gets flagged before it's paid.",
+    render: () => <MatchPanelCard invoice="DIS-4471" amount="₦245,000.00" flag="Unit price is up 8.9% vs. the PO's ₦45,000.00." />,
   },
   {
     icon: ShieldCheckIcon,
     title: "Approval routing you configure, not we hardcode",
-    description:
-      "Set who signs off by department and amount, and in what order, from a settings screen — no waiting on us to change a threshold buried in code.",
-    image: "/landing/v2_approval_rules.png",
-    width: 1792,
-    height: 526,
+    description: "Set who signs off by department and amount, and in what order, from a settings screen — no waiting on us to change a threshold buried in code.",
+    render: () => (
+      <RuleTableCard
+        rows={[
+          { dept: "Operations", range: "₦0 – ₦500,000", step: "1", role: "Approver" },
+          { dept: "All departments", range: "₦500,000+", step: "2", role: "Finance / Admin" },
+        ]}
+      />
+    ),
   },
 ];
 
@@ -137,33 +185,30 @@ const PRICING_INCLUDES = [
   "Role-based access & full audit log",
 ];
 
-export default async function LandingPage() {
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value;
-  const isDark = theme ? theme === "dark" : true;
+const REAL_INTEGRATIONS = ["Paystack", "Flutterwave", "Xero"];
 
+export default function LandingPage() {
   return (
-    <div id="marketing-root" className={`flex-1 bg-white dark:bg-[#0a0e1a]${isDark ? " dark" : ""}`}>
-      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0a0e1a]/90">
+    <div id="marketing-root" className="flex-1 bg-white">
+      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-2 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <LogoMarkIcon className="h-7 w-7 text-brand-600 dark:text-brand-400" />
-            <span className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">ProcurePro</span>
+            <LogoMarkIcon className="h-7 w-7 text-brand-600" />
+            <span className="text-lg font-semibold tracking-tight text-zinc-900">ProcurePro</span>
           </div>
           <div className="flex items-center gap-5 sm:gap-6">
-            <a href="#features" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
+            <a href="#features" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
               Features
             </a>
-            <a href="#pricing" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
+            <a href="#pricing" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
               Pricing
             </a>
-            <Link href="/login" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white ${focusRing}`}>
+            <Link href="/login" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
               Sign in
             </Link>
-            <ButtonLink href="/signup" size="sm">
+            <ButtonLink href="/signup" variant="accent" size="sm">
               Start free trial
             </ButtonLink>
-            <ThemeToggle initialIsDark={isDark} className="text-zinc-500 dark:text-zinc-400" />
           </div>
         </div>
       </nav>
@@ -171,21 +216,23 @@ export default async function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-950">
         <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div
+          className="pointer-events-none absolute -right-32 top-1/4 h-96 w-96 rounded-full opacity-20 blur-[100px]"
+          style={{ background: "radial-gradient(circle, var(--color-accent-glow), transparent 70%)" }}
+          aria-hidden="true"
+        />
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:py-28">
           <div>
             <h1 className="animate-reveal text-[40px] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[62px]">
               Procurement control, without the SAP-sized budget.
             </h1>
-            <p
-              className="animate-reveal mt-6 max-w-lg text-base leading-relaxed text-brand-200 sm:text-lg"
-              style={{ animationDelay: "0.08s" }}
-            >
+            <p className="animate-reveal mt-6 max-w-lg text-base leading-relaxed text-brand-200 sm:text-lg" style={{ animationDelay: "0.08s" }}>
               ProcurePro replaces spreadsheets and WhatsApp threads with real approval chains, budget
               enforcement, and vendor compliance — built for Nigerian oil &amp; gas and heavy-industry
               teams who need enterprise depth, not enterprise cost.
             </p>
             <div className="animate-reveal mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.16s" }}>
-              <ButtonLink href="/signup" size="lg" className="gap-2">
+              <ButtonLink href="/signup" variant="accent" size="lg" className="gap-2">
                 Start 14-day free trial
                 <ArrowRightIcon className="h-4 w-4" />
               </ButtonLink>
@@ -202,121 +249,147 @@ export default async function LandingPage() {
 
             <ul className="mt-8 flex flex-wrap gap-2">
               {INDUSTRIES.map((industry) => (
-                <li
-                  key={industry}
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-brand-200"
-                >
+                <li key={industry} className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-brand-200">
                   {industry}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="relative">
-            <div className="aspect-[2624/1498] overflow-hidden rounded-xl border border-white/10 bg-zinc-50 shadow-2xl shadow-black/40">
-              <Image
-                src="/landing/v2_hero_today.png"
-                alt="ProcurePro's Today dashboard: the loop from drafted request to receiving, and a ranked queue of what needs a decision"
-                width={2624}
-                height={1498}
-                priority
-                className="h-full w-full object-contain object-top"
-              />
+          <div className="animate-reveal relative flex justify-center lg:justify-end" style={{ animationDelay: "0.1s" }}>
+            <div
+              className="pointer-events-none absolute -inset-8 rounded-full opacity-25 blur-[80px]"
+              style={{ background: "radial-gradient(circle, var(--color-accent-500), transparent 70%)" }}
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <HeroDashboardCard />
+              <FloatingBadge position="bottom-left" tone="accent">
+                11 things need a decision
+              </FloatingBadge>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stat strip */}
-      <section className="border-b border-zinc-100 bg-white px-4 py-10 sm:px-6 dark:border-white/10 dark:bg-[#0a0e1a]">
+      <section className="border-b border-zinc-100 bg-white px-4 py-10 sm:px-6">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat) => (
-            <div key={stat.label} className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              <span className="text-xl font-semibold tracking-tight text-brand-700 dark:text-brand-400">{stat.value}</span>{" "}
-              {stat.label}
+            <div key={stat.label} className="text-sm leading-relaxed text-zinc-600">
+              <span className="text-xl font-semibold tracking-tight text-brand-700">{stat.value}</span> {stat.label}
             </div>
           ))}
         </div>
       </section>
 
       {/* Problem */}
-      <section className="bg-white px-4 py-20 sm:px-6 dark:bg-[#0a0e1a]">
+      <section className="bg-white px-4 py-20 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
-            The way most teams still run procurement
-          </h2>
-          <div className="mt-12 divide-y divide-zinc-100 border-t border-zinc-100 dark:divide-white/10 dark:border-white/10">
-            {PROBLEMS.map((p) => (
-              <div key={p.title} className="flex flex-col gap-4 py-8 sm:flex-row sm:items-start sm:gap-8">
-                <div className="flex items-baseline gap-4 sm:w-64 sm:shrink-0">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
-                    <p.icon className="h-4 w-4" />
+          <Reveal>
+            <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900">The way most teams still run procurement</h2>
+          </Reveal>
+          <div className="mt-12 divide-y divide-zinc-100 border-t border-zinc-100">
+            {PROBLEMS.map((p, i) => (
+              <Reveal key={p.title} delay={i * 80}>
+                <div className="flex flex-col gap-4 py-8 sm:flex-row sm:items-start sm:gap-8">
+                  <div className="flex items-baseline gap-4 sm:w-64 sm:shrink-0">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                      <p.icon className="h-4 w-4" />
+                    </div>
+                    <h3 className="text-base font-semibold text-zinc-900">{p.title}</h3>
                   </div>
-                  <h3 className="text-base font-semibold text-zinc-900 dark:text-white">{p.title}</h3>
+                  <p className="max-w-lg text-sm leading-relaxed text-zinc-500 sm:pt-1">{p.description}</p>
                 </div>
-                <p className="max-w-lg text-sm leading-relaxed text-zinc-500 sm:pt-1 dark:text-zinc-400">{p.description}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* The loop, end to end */}
-      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 sm:px-6 dark:border-white/10 dark:bg-white/[0.02]">
+      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">The loop, end to end</h2>
-          <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
-            The same four stages your team sees on their own &ldquo;Today&rdquo; screen every morning — nothing
-            sits in an inbox waiting to be noticed.
-          </p>
+          <Reveal>
+            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">The loop, end to end</h2>
+            <p className="mt-3 max-w-xl text-base text-zinc-500">
+              The same four stages your team sees on their own &ldquo;Today&rdquo; screen every morning — nothing sits in an inbox waiting to be noticed.
+            </p>
+          </Reveal>
           <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {LOOP.map((step) => (
-              <div key={step.label} className="relative">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200 bg-white text-brand-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-brand-400">
+            {LOOP.map((step, i) => (
+              <Reveal key={step.label} delay={i * 70}>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200 bg-white text-brand-600 shadow-sm">
                   <step.icon className="h-5 w-5" />
                 </div>
-                <div className="mt-3 text-sm font-medium text-zinc-900 dark:text-white">{step.label}</div>
-              </div>
+                <div className="mt-3 text-sm font-medium text-zinc-900">{step.label}</div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-white px-4 py-20 sm:px-6 dark:bg-[#0a0e1a]">
+      <section id="features" className="bg-white px-4 py-20 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
-            Real screens, not a sales deck
-          </h2>
-          <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
-            Every image below is the actual product, cropped in close enough to read.
-          </p>
+          <Reveal>
+            <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-zinc-900">Designed around how your team actually works</h2>
+            <p className="mt-3 max-w-xl text-base text-zinc-500">Every card below reflects a real screen and real figures from the product — illustrated, not screenshotted, so the shape of the work stays legible at a glance.</p>
+          </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((feature) => (
-              <div
-                key={feature.title}
-                className="flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.02]"
-              >
-                <div className="flex aspect-[16/10] items-center justify-center border-b border-zinc-100 bg-zinc-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    width={feature.width}
-                    height={feature.height}
-                    className="h-auto max-h-full w-full object-contain"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
-                    <feature.icon className="h-4 w-4" />
+          <div className="mt-12">
+            <FeatureCarousel>
+              {FEATURES.map((feature) => (
+                <div key={feature.title} data-card className="flex w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm sm:w-[340px]">
+                  <MockupFrame>{feature.render()}</MockupFrame>
+                  <div className="p-6">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                      <feature.icon className="h-4 w-4" />
+                    </div>
+                    <h3 className="mt-3 text-lg font-semibold tracking-tight text-zinc-900">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-500">{feature.description}</p>
                   </div>
-                  <h3 className="mt-3 text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </FeatureCarousel>
           </div>
+        </div>
+      </section>
+
+      {/* Trust / proof — a real person doing real work, not a logo wall of tools we don't integrate with */}
+      <section className="relative overflow-hidden bg-brand-950 px-4 py-20 sm:px-6">
+        <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <Reveal>
+            <h2 className="text-3xl font-semibold tracking-tight text-white">Built for the team that actually runs the purchase.</h2>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-brand-200">
+              From the first request to the vendor getting paid, every step is routed, tracked, and backed by
+              real data — not a spreadsheet somebody has to remember to update.
+            </p>
+            <div className="mt-8 flex items-center gap-6">
+              {REAL_INTEGRATIONS.map((name) => (
+                <span key={name} className="text-sm font-semibold tracking-tight text-brand-300">
+                  {name}
+                </span>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-brand-400">Live payout rails and export formats — not aspirational integrations.</p>
+          </Reveal>
+          <Reveal delay={100} className="relative">
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl shadow-black/40">
+              <Image
+                src="/landing/hero-photo.jpg"
+                alt="A procurement professional reviewing a purchase on a laptop"
+                width={1600}
+                height={1067}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-transparent to-transparent" />
+            </div>
+            <FloatingBadge position="top-left" tone="accent">
+              8.9% variance caught
+            </FloatingBadge>
+          </Reveal>
         </div>
       </section>
 
@@ -324,7 +397,7 @@ export default async function LandingPage() {
       <section id="pricing" className="relative overflow-hidden bg-brand-950 px-4 py-20 sm:px-6">
         <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-4xl grid-cols-1 items-center gap-12 lg:grid-cols-[auto_1fr]">
-          <div className="mx-auto shrink-0 lg:mx-0">
+          <Reveal className="mx-auto shrink-0 lg:mx-0">
             <svg viewBox="0 0 140 140" className="h-32 w-32 sm:h-36 sm:w-36" aria-hidden="true">
               <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
               <circle
@@ -332,7 +405,7 @@ export default async function LandingPage() {
                 cy="70"
                 r="58"
                 fill="none"
-                stroke="var(--color-brand-400)"
+                stroke="var(--color-accent-400)"
                 strokeWidth="12"
                 strokeLinecap="round"
                 strokeDasharray={2 * Math.PI * 58}
@@ -346,13 +419,11 @@ export default async function LandingPage() {
                 included
               </text>
             </svg>
-          </div>
+          </Reveal>
 
-          <div className="text-center lg:text-left">
+          <Reveal delay={80} className="text-center lg:text-left">
             <h2 className="text-3xl font-semibold tracking-tight text-white">One plan. Everything included.</h2>
-            <p className="mt-3 text-base text-brand-200">
-              No tiers to compare, no features held back for a higher plan.
-            </p>
+            <p className="mt-3 text-base text-brand-200">No tiers to compare, no features held back for a higher plan.</p>
 
             <div className="mt-10 rounded-xl border border-white/10 bg-white/[0.04] p-8 text-left">
               <div className="flex items-baseline gap-1">
@@ -364,34 +435,34 @@ export default async function LandingPage() {
               <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {PRICING_INCLUDES.map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-brand-100">
-                    <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
+                    <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-accent-400" />
                     {item}
                   </li>
                 ))}
               </ul>
 
-              <ButtonLink href="/signup" size="lg" className="mt-8 w-full justify-center gap-2">
+              <ButtonLink href="/signup" variant="accent" size="lg" className="mt-8 w-full justify-center gap-2">
                 Start your free trial
                 <ArrowRightIcon className="h-4 w-4" />
               </ButtonLink>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 bg-white px-4 py-10 sm:px-6 dark:border-white/10 dark:bg-[#0a0e1a]">
+      <footer className="border-t border-zinc-200 bg-white px-4 py-10 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <LogoMarkIcon className="h-6 w-6 text-brand-600 dark:text-brand-400" />
-            <span className="text-sm font-semibold text-zinc-900 dark:text-white">ProcurePro</span>
-            <span className="text-sm text-zinc-400 dark:text-zinc-600">— Procurement control for heavy industry.</span>
+            <LogoMarkIcon className="h-6 w-6 text-brand-600" />
+            <span className="text-sm font-semibold text-zinc-900">ProcurePro</span>
+            <span className="text-sm text-zinc-400">— Procurement control for heavy industry.</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-zinc-500 dark:text-zinc-400">
-            <Link href="/login" className={`hover:text-zinc-900 dark:hover:text-white ${focusRing}`}>
+          <div className="flex items-center gap-6 text-sm text-zinc-500">
+            <Link href="/login" className={`hover:text-zinc-900 ${focusRing}`}>
               Sign in
             </Link>
-            <Link href="/signup" className={`hover:text-zinc-900 dark:hover:text-white ${focusRing}`}>
+            <Link href="/signup" className={`hover:text-zinc-900 ${focusRing}`}>
               Start free trial
             </Link>
             <span>&copy; {new Date().getFullYear()} ProcurePro</span>

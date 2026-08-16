@@ -37,7 +37,7 @@ Nigerian business context: NGN is the default currency; purchase orders support 
 
 ## Brand Commitments
 
-Name: **ProcurePro**. Existing shipped visual identity: a deep navy "engineering blueprint" color system (custom Tailwind theme tokens, not a stock palette), Geist Sans throughout, a hand-drawn stroke icon set (no external icon library), an abstract rounded-square "P" logomark. This identity is approved and should be kept — new landing-page work adopts structural/layout inspiration from a reference SaaS dashboard (donut/ring data visualizations, stat cards with trend deltas, chip-style filters, a problem→solution→feature case-study narrative structure) without adopting that reference's own teal color identity.
+Name: **ProcurePro**. Core identity: a deep navy "engineering blueprint" color system (custom Tailwind theme tokens, not a stock palette), Geist Sans throughout, a hand-drawn stroke icon set (no external icon library), an abstract rounded-square "P" logomark. **This stays fixed for the authenticated app.** The landing page (and login/signup) additionally carry a violet-to-magenta accent, pinned to precoro.com after the user reviewed it live — reserved strictly for CTAs, badges, and floating annotations, never body text or backgrounds at scale, and never inside the app. The landing page's feature imagery is hand-built illustrated UI mockups (real product figures, not literal screenshots), not photographs of the app; one real editorial photo of a person at work appears in a dedicated trust section. The landing page has no light/dark toggle — one fixed identity, matching the reference.
 
 ## Evidence on Hand
 
@@ -49,7 +49,7 @@ The real, live product itself (in-app screenshots exist in `/screenshot`). **No 
 2. Compliance and landed cost are the vertical's real teeth: NCDMB tracking and customs/freight cost visibility are regulatory/financial necessities for this audience, not feature-list filler — they deserve concrete, specific treatment, not a generic checkmark icon.
 3. No fabricated social proof, ever — a pre-launch product's landing page should earn trust through specificity about what it does, not invented traction.
 4. Speak to two readers in one page without splitting into two pages: the buyer needs to be convinced to try it; the eventual user needs to recognize their own job in the screenshots.
-5. Keep the existing navy brand identity; this is a maturity/structure upgrade to the landing experience, not a rebrand.
+5. The authenticated app's navy identity is fixed and untouched by marketing-page direction changes. The landing page itself may evolve its own visual language (e.g. the violet accent, illustrated mockups) when the user pins a new reference — it stays a distinct, marketing-only layer on top of the same navy brand, not a rebrand of the product.
 
 ## Accessibility & Inclusion
 
