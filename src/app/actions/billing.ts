@@ -22,7 +22,7 @@ export async function startSubscription() {
 
   const { authorization_url } = await paystack.initializeTransaction({
     email: profile.email,
-    amountNaira: 25000,
+    amountNaira: paystack.SUBSCRIPTION_PRICE_NAIRA,
     planCode: requirePlanCode(),
     callbackUrl: `${appUrl}/billing/callback`,
     metadata: { organization_id: org.id },

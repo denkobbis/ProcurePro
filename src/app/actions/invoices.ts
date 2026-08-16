@@ -36,8 +36,17 @@ export async function recordInvoice(formData: FormData) {
   const lineItems = parseInvoiceLineItems(formData);
   if (lineItems.length === 0) throw new Error("Add at least one line item");
 
+  // Catches a typo'd total or a line item that didn't get entered — 1% covers
+  // rounding, not a real mismatch.
+  const lineItemsTotal = lineItems.reduce((sum, l) => sum + l.qty * l.unit_price, 0);
+  if (Math.abs(totalAmount - lineItemsTotal) > Math.max(1, totalAmount * 0.01)) {
+    throw new Error(
+      `Invoice total (${totalAmount.toLocaleString()}) doesn't match the line items (${lineItemsTotal.toLocaleString()}) — check for a missing or mistyped line.`
+    );
+  }
+
   const supabase = await createClient();
-  const { data: po, error: poErr } = await supabase.from("purchase_orders").select("id, vendor_id").eq("id", poId).single();
+  const { data: po, error: poErr } = await supabase.from("purchase_orders").select("id, vendor_id, currency").eq("id", poId).single();
   if (poErr || !po) throw new Error("Purchase order not found");
 
   let filePath: string | null = null;
@@ -52,7 +61,9 @@ export async function recordInvoice(formData: FormData) {
   const { data: poLineItems } = await supabase.from("po_line_items").select("*").eq("po_id", poId);
   const match = matchInvoiceToPo(
     lineItems.map((l, i) => ({ id: `pending-${i}`, invoice_id: "pending", ...l, po_line_item_id: null, created_at: "" })),
-    (poLineItems ?? []) as PoLineItem[]
+    (poLineItems ?? []) as PoLineItem[],
+    currency,
+    po.currency
   );
 
   const { data: invoice, error: insertErr } = await supabase
@@ -81,7 +92,13 @@ export async function recordInvoice(formData: FormData) {
       unit_price: l.unit_price,
     }))
   );
-  if (lineErr) throw new Error(lineErr.message);
+  if (lineErr) {
+    // No multi-table transaction available via the JS client — compensate by
+    // deleting the invoice row rather than leaving an orphaned invoice with
+    // no line items behind.
+    await supabase.from("invoices").delete().eq("id", invoice.id);
+    throw new Error(lineErr.message);
+  }
 
   revalidatePath(`/purchase-orders/${poId}`);
 }

@@ -168,6 +168,7 @@ export async function closePo(formData: FormData) {
 
 export async function receivePoLine(formData: FormData) {
   const profile = await getCurrentProfile();
+  if (!PROCUREMENT_ROLES.includes(profile.role)) throw new Error("Only procurement officers or admins can record receiving");
   await requireActiveOrg(profile);
 
   const poId = String(formData.get("po_id") ?? "");

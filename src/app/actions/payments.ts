@@ -114,6 +114,22 @@ export async function initiatePayment(formData: FormData) {
   if (!Number.isFinite(amountNaira) || amountNaira <= 0) throw new Error("Enter a valid amount");
   if (amountNaira > remaining) throw new Error(`Amount exceeds the remaining balance of ₦${remaining.toLocaleString()}`);
 
+  // Atomic claim: flips payment_status to "processing" in the same statement
+  // that checks it isn't already paid/processing, so two near-simultaneous
+  // clicks (or a retried request) can't both pass — Postgres serializes
+  // concurrent UPDATEs on the same row, so only one of them can match this
+  // WHERE clause. Everything above this point is read-only validation; the
+  // actual provider call only happens after this claim succeeds.
+  const { data: claimedPo, error: claimErr } = await supabase
+    .from("purchase_orders")
+    .update({ payment_status: "processing" })
+    .eq("id", poId)
+    .not("payment_status", "in", "(paid,processing)")
+    .select()
+    .maybeSingle();
+  if (claimErr) throw new Error(claimErr.message);
+  if (!claimedPo) throw new Error("This PO already has a payment in progress or is already paid");
+
   const reference = `PAY-${po.po_number}-${Date.now()}`;
 
   const { data: payment, error: insertErr } = await supabase
@@ -129,7 +145,10 @@ export async function initiatePayment(formData: FormData) {
     })
     .select()
     .single();
-  if (insertErr) throw new Error(insertErr.message);
+  if (insertErr) {
+    await recomputePoPaymentStatus(supabase, poId);
+    throw new Error(insertErr.message);
+  }
 
   try {
     if (provider === "paystack") {
@@ -166,7 +185,6 @@ export async function initiatePayment(formData: FormData) {
       await supabase.from("payments").update({ provider_reference: String(transfer.id) }).eq("id", payment.id);
     }
 
-    await supabase.from("purchase_orders").update({ payment_status: "processing" }).eq("id", poId);
     await writeAudit(supabase, "payment", payment.id, "initiated", { provider, amount: amountNaira, reference });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

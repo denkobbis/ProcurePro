@@ -47,12 +47,16 @@ export async function checkBudget(
 
   // total_amount_ngn + freight/duty gives the true landed cost regardless of
   // the PO's own currency, so multi-currency POs roll up correctly into a
-  // single NGN-denominated budget.
+  // single NGN-denominated budget. Draft POs are excluded from "spent" — a
+  // draft hasn't been sent to a vendor yet, is still freely editable/
+  // cancelable, and isn't a real commitment; counting it here would double
+  // it against the request's own "committed" figure above.
   const { data: poRows } = await supabase
     .from("purchase_orders")
     .select("total_amount_ngn, freight_cost_ngn, customs_duty_ngn, requests!inner(department_id, category)")
     .eq("requests.department_id", departmentId)
-    .eq("requests.category", category);
+    .eq("requests.category", category)
+    .neq("status", "draft");
   const spent = (poRows ?? []).reduce(
     (sum: number, r: { total_amount_ngn: number; freight_cost_ngn: number; customs_duty_ngn: number }) =>
       sum + r.total_amount_ngn + r.freight_cost_ngn + r.customs_duty_ngn,

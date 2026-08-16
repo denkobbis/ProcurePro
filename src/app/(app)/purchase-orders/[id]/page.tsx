@@ -73,7 +73,9 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
     invoice: inv,
     match: matchInvoiceToPo(
       ((allInvoiceLines ?? []) as InvoiceLineItem[]).filter((l) => l.invoice_id === inv.id),
-      items
+      items,
+      inv.currency,
+      po.currency
     ),
   }));
   const landedCostNgn = po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;

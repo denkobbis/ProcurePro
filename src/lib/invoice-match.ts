@@ -26,26 +26,40 @@ const PRICE_VARIANCE_THRESHOLD_PERCENT = 2;
  * vendor; price drift is flagged too but is common enough (FX, negotiated
  * discounts) that it's advisory only, like every other flag in this app.
  *
- * Matching is best-effort: exact description match first, then remaining
- * lines paired by position — there's no shared key between an invoice line
- * and a PO line, so this is a starting point for a human to confirm, not an
- * authoritative link.
+ * Matching is best-effort: exact description match only. A line with no
+ * exact match is shown paired with the next unmatched PO line by position —
+ * purely so the UI can display a plausible qty/price comparison — but it is
+ * always flagged `notOnPo: true`, since a positional guess is not evidence
+ * the line was actually ordered. (An earlier version treated the positional
+ * guess itself as a match, which let a genuinely unordered line silently
+ * read as clean.)
+ *
+ * priceVariancePercent is only computed when both currencies are known and
+ * equal — comparing raw unit prices across currencies (e.g. a USD PO against
+ * an NGN invoice) produces a meaningless percentage.
  */
-export function matchInvoiceToPo(invoiceLines: InvoiceLineItem[], poLines: PoLineItem[]): InvoiceMatchSummary {
+export function matchInvoiceToPo(
+  invoiceLines: InvoiceLineItem[],
+  poLines: PoLineItem[],
+  invoiceCurrency?: string,
+  poCurrency?: string
+): InvoiceMatchSummary {
   const remainingPoLines = [...poLines];
   const lines: LineMatchResult[] = [];
+  const sameCurrency = !invoiceCurrency || !poCurrency || invoiceCurrency === poCurrency;
 
   for (const invoiceLine of invoiceLines) {
     const normalizedDesc = invoiceLine.description.trim().toLowerCase();
-    let matchIndex = remainingPoLines.findIndex((p) => p.description.trim().toLowerCase() === normalizedDesc);
-    if (matchIndex === -1 && remainingPoLines.length > 0) matchIndex = 0;
+    const exactMatchIndex = remainingPoLines.findIndex((p) => p.description.trim().toLowerCase() === normalizedDesc);
+    const isExactMatch = exactMatchIndex !== -1;
+    const matchIndex = isExactMatch ? exactMatchIndex : remainingPoLines.length > 0 ? 0 : -1;
 
     const poLine = matchIndex >= 0 ? remainingPoLines.splice(matchIndex, 1)[0] : null;
 
     const qtyOverPo = poLine ? invoiceLine.qty > poLine.qty : false;
     const qtyOverReceived = poLine ? invoiceLine.qty > poLine.received_qty : false;
     const priceVariancePercent =
-      poLine && poLine.unit_price > 0 ? Math.round((invoiceLine.unit_price / poLine.unit_price - 1) * 1000) / 10 : null;
+      poLine && poLine.unit_price > 0 && sameCurrency ? Math.round((invoiceLine.unit_price / poLine.unit_price - 1) * 1000) / 10 : null;
 
     lines.push({
       invoiceLine,
@@ -53,7 +67,7 @@ export function matchInvoiceToPo(invoiceLines: InvoiceLineItem[], poLines: PoLin
       qtyOverPo,
       qtyOverReceived,
       priceVariancePercent,
-      notOnPo: !poLine,
+      notOnPo: !isExactMatch,
     });
   }
 
@@ -67,7 +81,7 @@ export function matchInvoiceToPo(invoiceLines: InvoiceLineItem[], poLines: PoLin
   return {
     lines,
     unmatchedPoLines: remainingPoLines,
-    totalVariance: Math.round((invoiceTotal - poTotal) * 100) / 100,
+    totalVariance: sameCurrency ? Math.round((invoiceTotal - poTotal) * 100) / 100 : 0,
     hasIssues,
   };
 }

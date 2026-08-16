@@ -6,6 +6,11 @@ import crypto from "crypto";
 
 const BASE_URL = "https://api.paystack.co";
 
+// The one flat plan price — shared between checkout initiation and the
+// billing callback, which confirms a checkout actually paid this amount
+// before activating the org.
+export const SUBSCRIPTION_PRICE_NAIRA = 25000;
+
 function requireSecretKey(): string {
   const key = process.env.PAYSTACK_SECRET_KEY;
   if (!key) throw new Error("PAYSTACK_SECRET_KEY is not configured");
@@ -50,9 +55,11 @@ export async function initializeTransaction(params: {
 export interface PaystackTransactionData {
   status: string;
   reference: string;
+  amount: number;
   customer: { customer_code: string; email: string };
   plan_object?: { plan_code: string };
   subscription_code?: string;
+  metadata?: Record<string, unknown> | null;
 }
 
 export async function verifyTransaction(reference: string): Promise<PaystackTransactionData> {

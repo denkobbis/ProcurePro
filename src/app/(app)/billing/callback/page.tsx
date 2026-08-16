@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile, getCurrentOrganization } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { verifyTransaction } from "@/lib/paystack";
+import { verifyTransaction, SUBSCRIPTION_PRICE_NAIRA } from "@/lib/paystack";
 
 // Paystack sends the admin back here after checkout. The subscription itself
 // is authoritatively confirmed by the subscription.create webhook (which also
@@ -21,7 +21,17 @@ export default async function BillingCallbackPage({
   let succeeded = false;
   try {
     const transaction = await verifyTransaction(reference);
-    if (transaction.status === "success") {
+    // A successful Paystack status alone isn't enough — `reference` comes
+    // straight from the URL, so without checking that this specific
+    // transaction was actually initiated for this org (metadata, set at
+    // startSubscription()) and paid the real subscription price, anyone
+    // could paste any successful Paystack reference (their own, from an
+    // unrelated purchase) and activate their org for free. The
+    // subscription.create webhook remains the authoritative source of truth;
+    // this is just the immediate-feedback path, so it needs the same rigor.
+    const paidForThisOrg = transaction.metadata?.organization_id === org.id;
+    const paidFullPrice = transaction.amount === SUBSCRIPTION_PRICE_NAIRA * 100;
+    if (transaction.status === "success" && paidForThisOrg && paidFullPrice) {
       const supabase = await createClient();
       await supabase
         .from("organizations")
