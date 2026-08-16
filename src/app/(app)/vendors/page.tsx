@@ -39,11 +39,11 @@ export default async function VendorsPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Vendors</h1>
-          <p className="mt-2 text-sm text-zinc-500">Every vendor on file, with compliance and payment details.</p>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">Vendors</h1>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Every vendor on file, with compliance and payment details.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+          <Link href="/vendors/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline dark:text-zinc-400 dark:hover:text-brand-400">
             Export CSV
           </Link>
           <ButtonLink href="/vendors/new">Add vendor</ButtonLink>
@@ -51,8 +51,8 @@ export default async function VendorsPage() {
       </div>
 
       {sharedGroups.length > 0 && (
-        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+          <SparkleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
           <div>
             <span className="font-medium">{sharedGroups.length} bank account{sharedGroups.length === 1 ? "" : "s"} shared by multiple vendors</span> —{" "}
             {sharedGroups.map(([, names]) => names.join(" & ")).join("; ")}. Worth confirming before the next payout.
@@ -61,7 +61,7 @@ export default async function VendorsPage() {
       )}
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <EmptyState icon={<BuildingIcon />} title="No vendors yet" action={<ButtonLink href="/vendors/new" size="sm">Add vendor</ButtonLink>} />
         </div>
       ) : (

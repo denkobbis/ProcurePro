@@ -25,8 +25,8 @@ export default async function BillingPage({
   return (
     <div className="max-w-2xl space-y-4">
       <div>
-        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Billing</h1>
-        <p className="mt-2 text-sm text-zinc-500">ProcurePro subscription for your organization.</p>
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">Billing</h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">ProcurePro subscription for your organization.</p>
       </div>
 
       {status === "success" && <NotePanel>Subscription active — thank you.</NotePanel>}
@@ -38,7 +38,7 @@ export default async function BillingPage({
       <RecordSection title="Subscription">
         <div className="mb-4 flex items-center gap-2">
           <StatusBadge status={org.subscription_status} />
-          {locked && <span className="text-xs font-medium text-red-600">Read-only — changes are blocked until this is resolved</span>}
+          {locked && <span className="text-xs font-medium text-red-600 dark:text-red-400">Read-only — changes are blocked until this is resolved</span>}
         </div>
 
         <FactsPanel
@@ -56,7 +56,7 @@ export default async function BillingPage({
             {(org.subscription_status === "trialing" || org.subscription_status === "past_due" || org.subscription_status === "canceled") && (
               <form action={startSubscription} className="mt-4">
                 <Button type="submit">{org.subscription_status === "trialing" ? "Subscribe now" : "Update payment method"}</Button>
-                <p className="mt-2 text-xs text-zinc-500">You&apos;ll be taken to Paystack&apos;s secure checkout to enter your card.</p>
+                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">You&apos;ll be taken to Paystack&apos;s secure checkout to enter your card.</p>
               </form>
             )}
             {org.subscription_status === "active" && (
@@ -66,7 +66,7 @@ export default async function BillingPage({
             )}
           </>
         ) : (
-          <p className="mt-4 text-sm text-zinc-400">Only finance/admin can manage billing.</p>
+          <p className="mt-4 text-sm text-zinc-400 dark:text-zinc-500">Only finance/admin can manage billing.</p>
         )}
       </RecordSection>
 
@@ -74,20 +74,20 @@ export default async function BillingPage({
         <RecordSection title="Organization">
           <form action={updateOrganizationSettings} className="space-y-3">
             <div>
-              <label className="block text-xs text-zinc-500">Name</label>
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Name</label>
               <input
                 name="name"
                 defaultValue={org.name}
                 required
-                className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               />
             </div>
             <div>
-              <label className="block text-xs text-zinc-500">Line of work</label>
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Line of work</label>
               <select
                 name="industry"
                 defaultValue={org.industry}
-                className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               >
                 {INDUSTRY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -95,7 +95,7 @@ export default async function BillingPage({
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-zinc-400">Controls which features (e.g. Equipment, NCDMB compliance) show up in the sidebar.</p>
+              <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">Controls which features (e.g. Equipment, NCDMB compliance) show up in the sidebar.</p>
             </div>
             <Button type="submit" variant="secondary" size="sm">Save</Button>
           </form>

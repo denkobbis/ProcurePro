@@ -15,18 +15,18 @@ export default async function Topbar({ profile }: { profile: Profile }) {
     .eq("is_read", false);
 
   return (
-    <header className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3.5 sm:px-7">
+    <header className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3.5 dark:border-zinc-800 dark:bg-zinc-900 sm:px-7">
       <MobileMenuButton />
       <TopbarSearch />
       <div className="ml-auto flex shrink-0 items-center gap-2">
         <a
           href="/notifications"
-          className="relative flex h-9 w-9 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+          className="relative flex h-9 w-9 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           aria-label="Notifications"
         >
           <BellIcon className="h-[18px] w-[18px]" />
           {!!count && (
-            <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
+            <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white ring-2 ring-white dark:ring-zinc-900">
               {count}
             </span>
           )}
@@ -34,7 +34,7 @@ export default async function Topbar({ profile }: { profile: Profile }) {
         <ButtonLink href="/requests/new" size="sm">
           New request
         </ButtonLink>
-        <div className="ml-1 border-l border-zinc-200 pl-3">
+        <div className="ml-1 border-l border-zinc-200 pl-3 dark:border-zinc-800">
           <UserMenu fullName={profile.full_name} role={profile.role} />
         </div>
       </div>

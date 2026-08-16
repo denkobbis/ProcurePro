@@ -100,12 +100,12 @@ export default async function NewRequestPage() {
               </FormPanel>
             </div>
 
-            <div className="mt-[18px] rounded-lg border border-zinc-200 bg-white p-5">
-              <label className="flex items-center gap-2 text-sm text-zinc-700">
-                <input type="checkbox" name="submit_now" defaultChecked className="rounded border-zinc-300" />
+            <div className="mt-[18px] rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <input type="checkbox" name="submit_now" defaultChecked className="rounded border-zinc-300 dark:border-zinc-700" />
                 Submit for approval now (uncheck to save as draft)
               </label>
-              <p className="mt-2 text-xs text-zinc-400">
+              <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
                 Requesting on behalf of: {profile.full_name} — department will be set automatically.
               </p>
               <div className="mt-4">
@@ -119,16 +119,16 @@ export default async function NewRequestPage() {
         <>
           <AsidePanel title="Your approval chain">
             {(rules ?? []).length === 0 ? (
-              <p className="text-sm text-zinc-400">No approval rules configured yet.</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">No approval rules configured yet.</p>
             ) : (
               <ul className="space-y-2 text-sm">
                 {((rules ?? []) as ApprovalRule[]).map((r) => (
-                  <li key={r.id} className="flex items-center justify-between border-b border-zinc-100 pb-2 last:border-b-0 last:pb-0">
-                    <span className="text-zinc-500">
+                  <li key={r.id} className="flex items-center justify-between border-b border-zinc-100 pb-2 last:border-b-0 last:pb-0 dark:border-zinc-800">
+                    <span className="text-zinc-500 dark:text-zinc-400">
                       {formatNaira(r.min_amount)}
                       {r.max_amount != null ? ` – ${formatNaira(r.max_amount)}` : "+"}
                     </span>
-                    <span className="font-medium text-zinc-900">{ROLE_LABELS[r.approver_role] ?? r.approver_role}</span>
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{ROLE_LABELS[r.approver_role] ?? r.approver_role}</span>
                   </li>
                 ))}
               </ul>
@@ -137,7 +137,7 @@ export default async function NewRequestPage() {
 
           <AsidePanel title="Budget headroom">
             {budgetRows.length === 0 ? (
-              <p className="text-sm text-zinc-400">No budgets set up for your department this period.</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">No budgets set up for your department this period.</p>
             ) : (
               <ul className="space-y-3">
                 {budgetRows.map(({ budget, usage }) => {
@@ -146,10 +146,10 @@ export default async function NewRequestPage() {
                   return (
                     <li key={budget.id}>
                       <div className="flex items-baseline justify-between text-[13px]">
-                        <span className="text-zinc-700">{budget.category}</span>
-                        <span className="tabular-nums text-zinc-500">{formatNaira(budget.allocated_amount - used)} left</span>
+                        <span className="text-zinc-700 dark:text-zinc-300">{budget.category}</span>
+                        <span className="tabular-nums text-zinc-500 dark:text-zinc-400">{formatNaira(budget.allocated_amount - used)} left</span>
                       </div>
-                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                         <div className={`h-full rounded-full ${pct > 90 ? "bg-amber-500" : "bg-brand-600"}`} style={{ width: `${pct}%` }} />
                       </div>
                     </li>

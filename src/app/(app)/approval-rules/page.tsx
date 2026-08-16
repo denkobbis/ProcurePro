@@ -31,20 +31,20 @@ export default async function ApprovalRulesPage() {
   return (
     <div className="max-w-4xl space-y-4">
       <div>
-        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Approval rules</h1>
-        <p className="mt-2 text-sm text-zinc-500">
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">Approval rules</h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
           Who has to sign off on a request, and at what amount — routed by department and value, in the order set below.
         </p>
       </div>
 
       <RecordSection title="Current rules">
         {rows.length === 0 ? (
-          <p className="text-sm text-zinc-400">No approval rules configured yet — every request will have nothing to route through until you add one.</p>
+          <p className="text-sm text-zinc-400 dark:text-zinc-500">No approval rules configured yet — every request will have nothing to route through until you add one.</p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-zinc-200">
+          <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
             <table className="w-full min-w-[640px] text-sm">
               <thead>
-                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
                   <th className="px-4 py-2.5">Department</th>
                   <th className="px-4 py-2.5">Amount range</th>
                   <th className="px-4 py-2.5">Step</th>
@@ -52,19 +52,19 @@ export default async function ApprovalRulesPage() {
                   <th className="px-4 py-2.5"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {rows.map((r) => (
-                  <tr key={r.id} className="transition-colors hover:bg-brand-50/40">
-                    <td className="px-4 py-2.5 text-zinc-900">{r.department_id ? deptMap.get(r.department_id) ?? "—" : "All departments"}</td>
-                    <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-700">
+                  <tr key={r.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-brand-500/10">
+                    <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{r.department_id ? deptMap.get(r.department_id) ?? "—" : "All departments"}</td>
+                    <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-700 dark:text-zinc-300">
                       {formatNaira(r.min_amount)} {r.max_amount != null ? `– ${formatNaira(r.max_amount)}` : "+"}
                     </td>
-                    <td className="px-4 py-2.5 tabular-nums text-zinc-700">{r.step_order}</td>
-                    <td className="px-4 py-2.5 text-zinc-700">{ROLE_LABELS[r.approver_role] ?? r.approver_role}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-zinc-700 dark:text-zinc-300">{r.step_order}</td>
+                    <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{ROLE_LABELS[r.approver_role] ?? r.approver_role}</td>
                     <td className="px-4 py-2.5">
                       <form action={deleteApprovalRule}>
                         <input type="hidden" name="rule_id" value={r.id} />
-                        <button className="text-xs font-medium text-red-600 hover:underline">Remove</button>
+                        <button className="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Remove</button>
                       </form>
                     </td>
                   </tr>
@@ -73,7 +73,7 @@ export default async function ApprovalRulesPage() {
             </table>
           </div>
         )}
-        <p className="mt-3 text-[13px] text-zinc-400">
+        <p className="mt-3 text-[13px] text-zinc-400 dark:text-zinc-500">
           Leave department blank for a rule that applies org-wide. Step order controls sequence when a request needs more than one
           sign-off — step 1 acts first.
         </p>
@@ -81,7 +81,7 @@ export default async function ApprovalRulesPage() {
 
       <RecordSection title="Add a rule">
         <form action={createApprovalRule} className="grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
-          <select name="department_id" defaultValue="" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm">
+          <select name="department_id" defaultValue="" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
             <option value="">All departments</option>
             {(departments ?? []).map((d: Department) => (
               <option key={d.id} value={d.id}>
@@ -89,16 +89,16 @@ export default async function ApprovalRulesPage() {
               </option>
             ))}
           </select>
-          <select name="approver_role" defaultValue="approver" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm">
+          <select name="approver_role" defaultValue="approver" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
             {ROLE_OPTIONS.map((r) => (
               <option key={r} value={r}>
                 {ROLE_LABELS[r]}
               </option>
             ))}
           </select>
-          <input name="min_amount" type="number" min="0" step="0.01" required placeholder="Min amount (₦)" defaultValue="0" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-          <input name="max_amount" type="number" min="0" step="0.01" placeholder="Max amount (₦, optional — no upper bound)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-          <input name="step_order" type="number" min="1" step="1" required placeholder="Step order" defaultValue="1" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
+          <input name="min_amount" type="number" min="0" step="0.01" required placeholder="Min amount (₦)" defaultValue="0" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <input name="max_amount" type="number" min="0" step="0.01" placeholder="Max amount (₦, optional — no upper bound)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <input name="step_order" type="number" min="1" step="1" required placeholder="Step order" defaultValue="1" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           <Button type="submit" className="sm:col-span-2">Add rule</Button>
         </form>
       </RecordSection>

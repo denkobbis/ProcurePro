@@ -29,18 +29,18 @@ export default function EquipmentTable({ rows }: { rows: EquipmentRow[] }) {
   const shown = rows.filter((r) => activeMatch(r.status));
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="px-5 pt-1">
         <ListTabs tabs={tabs} active={active} onChange={setActive} />
       </div>
 
       {shown.length === 0 ? (
-        <p className="px-5 py-10 text-center text-sm text-zinc-400">No equipment in this view.</p>
+        <p className="px-5 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500">No equipment in this view.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
-              <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+              <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
                 <th className="px-5 py-3">Asset tag</th>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Category</th>
@@ -48,17 +48,17 @@ export default function EquipmentTable({ rows }: { rows: EquipmentRow[] }) {
                 <th className="px-4 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {shown.map((a) => (
-                <tr key={a.id} className="transition-colors hover:bg-brand-50/40">
+                <tr key={a.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-brand-500/10">
                   <td className="px-5 py-3">
-                    <Link href={`/equipment/${a.id}`} className="font-medium text-zinc-900 hover:text-brand-700">
+                    <Link href={`/equipment/${a.id}`} className="font-medium text-zinc-900 hover:text-brand-700 dark:text-zinc-100 dark:hover:text-brand-400">
                       {a.assetTag}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-zinc-700">{a.name}</td>
-                  <td className="px-4 py-3 text-zinc-700">{a.category}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-[17px] tabular-nums text-zinc-900">{a.dayRateLabel}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{a.name}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{a.category}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right text-[17px] tabular-nums text-zinc-900 dark:text-zinc-100">{a.dayRateLabel}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={a.status} />
                   </td>

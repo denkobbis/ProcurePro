@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,17 +19,25 @@ export const metadata: Metadata = {
   description: "Procurement management — requests, approvals, POs, and budgets in one place.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The landing page's marketing-root wrapper (page.tsx) is a fixed navy
-  // identity now — no light/dark toggle (matching the pinned Precoro
-  // reference, which has none). globals.css's `.dark` scope still exists for
-  // any future scoped use but nothing currently opts into it here.
+  // Theme is global now — light/dark applies to every screen, landing and
+  // authenticated app alike. Read server-side from a cookie (set by
+  // ThemeToggle) so the server renders the right class from the first paint;
+  // no client-side pre-hydration guess, so nothing to mismatch. Defaults to
+  // light (the app's working default per DESIGN.md) when no cookie exists yet.
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
+  const isDark = theme === "dark";
+
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${isDark ? " dark" : ""}`}
+    >
       <body className="min-h-full flex flex-col">
         {/* Emits a literal HTML comment node (a plain JSX comment compiles away and never reaches the markup), so the landing page direction contract below is grep-able in the production build for audit. */}
         <div
@@ -42,8 +51,8 @@ export default function RootLayout({
         without photographing the app itself; refuses the screenshot-heavy
         enterprise-SaaS default this project shipped one pass ago.
         OWN-WORLD: Navy brand-950 declaration surfaces (hero, trust, pricing)
-        plus a new violet-to-magenta accent (accent-50..700, accent-glow) for
-        CTAs, badges, and floating annotations; hand-built SVG/React mockup
+        plus a cyan-to-teal accent (accent-50..700, accent-glow) for CTAs,
+        badges, and floating annotations; hand-built SVG/React mockup
         cards (skeleton rows, stat plates, compare cards, rule tables)
         carrying real product figures; one real editorial photo of a person
         at work.

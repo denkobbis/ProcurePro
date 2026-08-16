@@ -130,9 +130,9 @@ export default async function RequestDetailPage({
           <RecordSection title="Attachments">
             <ul className="mb-3 space-y-1 text-sm">
               {attachmentList.map((a) => (
-                <li key={a.id} className="text-zinc-700">
+                <li key={a.id} className="text-zinc-700 dark:text-zinc-300">
                   {attachmentUrls.has(a.id) ? (
-                    <a href={attachmentUrls.get(a.id)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline">
+                    <a href={attachmentUrls.get(a.id)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline dark:text-brand-400">
                       {a.file_name}
                     </a>
                   ) : (
@@ -140,7 +140,7 @@ export default async function RequestDetailPage({
                   )}
                 </li>
               ))}
-              {attachmentList.length === 0 && <li className="text-zinc-400">No attachments.</li>}
+              {attachmentList.length === 0 && <li className="text-zinc-400 dark:text-zinc-500">No attachments.</li>}
             </ul>
             <form action={addRequestAttachment} className="flex items-center gap-2">
               <input type="hidden" name="request_id" value={request.id} />
@@ -153,16 +153,16 @@ export default async function RequestDetailPage({
             <ul className="mb-4 space-y-3">
               {(comments ?? []).map((c: RequestComment) => (
                 <li key={c.id} className="text-sm">
-                  <span className="font-medium text-zinc-900">{authorMap.get(c.author_id) ?? "—"}</span>{" "}
-                  <span className="text-zinc-400">{new Date(c.created_at).toLocaleString()}</span>
-                  <p className="text-zinc-700">{c.comment}</p>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{authorMap.get(c.author_id) ?? "—"}</span>{" "}
+                  <span className="text-zinc-400 dark:text-zinc-500">{new Date(c.created_at).toLocaleString()}</span>
+                  <p className="text-zinc-700 dark:text-zinc-300">{c.comment}</p>
                 </li>
               ))}
-              {(comments ?? []).length === 0 && <li className="text-sm text-zinc-400">No comments yet.</li>}
+              {(comments ?? []).length === 0 && <li className="text-sm text-zinc-400 dark:text-zinc-500">No comments yet.</li>}
             </ul>
             <form action={addRequestComment} className="flex gap-2">
               <input type="hidden" name="request_id" value={request.id} />
-              <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+              <input name="comment" required placeholder="Add a comment" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
               <Button type="submit" size="sm">Post</Button>
             </form>
           </RecordSection>

@@ -1,9 +1,24 @@
 @import "tailwindcss";
 
+/* Global light/dark, toggle-controlled (not just prefers-color-scheme) —
+   applies everywhere: the authenticated app and the landing/auth pages
+   alike. Uses genuine `dark:` utility variants throughout rather than
+   overriding Tailwind's built-in zinc/white palette globally, because a
+   blanket palette override would also flip `text-white` set on colored
+   buttons/badges (which must stay white regardless of app theme) — see
+   ThemeToggle.tsx and layout.tsx for how the class gets applied. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
   color-scheme: light;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -26,18 +41,20 @@
   --color-brand-900: #172750;
   --color-brand-950: #0e1830;
 
-  /* Accent: a violet-to-magenta gradient, landing-page-only — the "act now"
+  /* Accent: a cyan-to-teal gradient, landing/auth-page-only — the "act now"
      color against the navy declaration surfaces (buttons, badges, floating
-     annotations on illustrated mockups). Never used in the authenticated app. */
-  --color-accent-50: #f5f0ff;
-  --color-accent-100: #ebe0ff;
-  --color-accent-200: #d6c2ff;
-  --color-accent-300: #b794f7;
-  --color-accent-400: #a06aed;
-  --color-accent-500: #8b3fe0;
-  --color-accent-600: #7827c9;
-  --color-accent-700: #611fa3;
-  --color-accent-glow: #c026d3;
+     annotations on illustrated mockups) — an instrument-glow tone, closer to
+     the engineering-blueprint register than the earlier violet/magenta.
+     Never used as the accent inside the authenticated app. */
+  --color-accent-50: #ecfeff;
+  --color-accent-100: #cffafe;
+  --color-accent-200: #a5f3fc;
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0e7490;
+  --color-accent-700: #155e63;
+  --color-accent-glow: #2dd4bf;
 }
 
 body {

@@ -39,7 +39,7 @@ export default async function NewEquipmentAssetPage() {
       }
       aside={
         <AsidePanel title="Where this shows up">
-          <p className="text-sm text-zinc-600">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
             The day rate you set here is what leases are billed against once this asset is checked out on a request. Status starts as
             &ldquo;Available&rdquo; — it moves to &ldquo;On lease&rdquo; automatically when a lease is created.
           </p>

@@ -36,8 +36,8 @@ export default async function NewVendorPage() {
               <input name="payment_terms" className={fieldInputClass} />
             </FormField>
             <FormField label="Approval" span={12}>
-              <label className="flex items-center gap-2 text-sm text-zinc-700">
-                <input type="checkbox" name="is_approved" className="rounded border-zinc-300" />
+              <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <input type="checkbox" name="is_approved" className="rounded border-zinc-300 dark:border-zinc-600" />
                 Mark as approved (can be used on purchase orders immediately)
               </label>
             </FormField>
@@ -58,7 +58,7 @@ export default async function NewVendorPage() {
       }
       aside={
         <AsidePanel title="What happens next">
-          <ul className="space-y-2 text-sm text-zinc-600">
+          <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
             <li>Bank details and payout setup are added from the vendor&apos;s own page after saving.</li>
             <li>Unapproved vendors can still receive RFQs, but can&apos;t be selected on a purchase order until approved.</li>
             {modules.ncdmb && <li>NCDMB certificate expiry is tracked automatically and flagged before it lapses.</li>}

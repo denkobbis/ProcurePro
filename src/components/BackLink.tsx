@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "./icons";
 
 export default function BackLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-brand-700">
+    <Link href={href} className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-brand-700 dark:text-zinc-400 dark:hover:text-brand-400">
       <ArrowLeftIcon className="h-4 w-4" />
       {label}
     </Link>

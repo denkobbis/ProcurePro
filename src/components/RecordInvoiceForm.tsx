@@ -7,7 +7,8 @@ import { SparkleIcon, UploadIcon } from "@/components/icons";
 import type { ExtractedInvoiceFields } from "@/lib/extract";
 
 const CURRENCIES = ["NGN", "USD", "EUR", "GBP"] as const;
-const inputClass = "rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20";
+const inputClass =
+  "rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 
 interface LineItemInput {
   description: string;
@@ -64,12 +65,12 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
     <form action={recordInvoice} className="space-y-4">
       <input type="hidden" name="po_id" value={poId} />
 
-      <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50/50 p-4">
+      <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50/50 p-4 dark:border-brand-500/30 dark:bg-brand-500/5">
         <div className="flex items-start gap-3">
-          <SparkleIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
+          <SparkleIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-600 dark:text-brand-400" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-zinc-900">Fill this in for me</p>
-            <p className="mt-0.5 text-xs text-zinc-500">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Fill this in for me</p>
+            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
               Upload the vendor&apos;s invoice (PDF or image) and the fields below will be filled in for you to review — nothing is saved until you submit.
             </p>
             <div className="mt-3 flex items-center gap-3">
@@ -88,25 +89,25 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
                   if (file) handleFile(file);
                 }}
               />
-              {fileName && <span className="text-xs text-zinc-500">{fileName}</span>}
+              {fileName && <span className="text-xs text-zinc-500 dark:text-zinc-400">{fileName}</span>}
             </div>
-            {status === "done" && <p className="mt-2 text-xs font-medium text-green-700">Filled in below — check it over before saving.</p>}
-            {status === "error" && <p className="mt-2 text-xs font-medium text-red-600">{error}</p>}
+            {status === "done" && <p className="mt-2 text-xs font-medium text-green-700 dark:text-green-400">Filled in below — check it over before saving.</p>}
+            {status === "error" && <p className="mt-2 text-xs font-medium text-red-600 dark:text-red-400">{error}</p>}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-2">
-          <label className="block text-xs text-zinc-500">Invoice number</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice number</label>
           <input name="invoice_number" required value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
         </div>
         <div>
-          <label className="block text-xs text-zinc-500">Invoice date</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice date</label>
           <input name="invoice_date" type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
         </div>
         <div>
-          <label className="block text-xs text-zinc-500">Currency</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Currency</label>
           <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className={`mt-1 w-full ${inputClass}`}>
             {CURRENCIES.map((c) => (
               <option key={c} value={c}>
@@ -116,7 +117,7 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
           </select>
         </div>
         <div className="sm:col-span-4">
-          <label className="block text-xs text-zinc-500">Invoice total</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice total</label>
           <input
             name="total_amount"
             type="number"
@@ -131,9 +132,9 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-xs text-zinc-500">Line items</label>
+        <label className="block text-xs text-zinc-500 dark:text-zinc-400">Line items</label>
         {items.map((item, i) => (
-          <div key={i} className="flex flex-wrap items-center gap-2 rounded-md border border-zinc-100 p-2">
+          <div key={i} className="flex flex-wrap items-center gap-2 rounded-md border border-zinc-100 p-2 dark:border-zinc-800">
             <input
               name="line_description"
               placeholder="Description"
@@ -164,12 +165,17 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
               required
               className={`w-28 ${inputClass}`}
             />
-            <button type="button" onClick={() => removeItem(i)} disabled={items.length === 1} className="text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-30">
+            <button
+              type="button"
+              onClick={() => removeItem(i)}
+              disabled={items.length === 1}
+              className="text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-30 dark:text-red-400"
+            >
               Remove
             </button>
           </div>
         ))}
-        <button type="button" onClick={addItem} className="text-xs text-zinc-600 hover:underline">
+        <button type="button" onClick={addItem} className="text-xs text-zinc-600 hover:underline dark:text-zinc-400">
           + Add line item
         </button>
       </div>

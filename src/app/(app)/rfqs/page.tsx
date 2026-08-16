@@ -49,12 +49,12 @@ export default async function RfqsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">RFQs</h1>
-        <p className="mt-2 text-sm text-zinc-500">Compare vendor quotes before committing to a purchase order.</p>
+        <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">RFQs</h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Compare vendor quotes before committing to a purchase order.</p>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <EmptyState icon={<ScaleIcon />} title="No RFQs yet" description="Start one from an approved request to compare vendor quotes." />
         </div>
       ) : (

@@ -49,7 +49,7 @@ export default async function NewPurchaseOrderPage({
                   </option>
                 ))}
               </select>
-              {(vendors ?? []).length === 0 && <p className="mt-1 text-xs text-amber-600">No approved vendors yet — add one under Vendors first.</p>}
+              {(vendors ?? []).length === 0 && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">No approved vendors yet — add one under Vendors first.</p>}
             </FormField>
             <FormField label="Delivery terms" span={12} hint="e.g. Deliver to Port Harcourt yard within 10 days">
               <textarea name="delivery_terms" rows={2} className={fieldTextareaClass} />

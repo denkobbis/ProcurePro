@@ -45,18 +45,18 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
         <RecordSection title="Lease out">
           <form action={leaseOutEquipment} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="asset_id" value={asset.id} />
-            <input name="client_name" required placeholder="Client (e.g. Shell, ExxonMobil)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2" />
+            <input name="client_name" required placeholder="Client (e.g. Shell, ExxonMobil)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             <div>
-              <label className="block text-xs text-zinc-500">Start date</label>
-              <input name="start_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Start date</label>
+              <input name="start_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-500">Expected return date</label>
-              <input name="expected_return_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Expected return date</label>
+              <input name="expected_return_date" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-zinc-500">Day rate for this lease (₦)</label>
-              <input name="day_rate_ngn" type="number" min="0" step="0.01" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Day rate for this lease (₦)</label>
+              <input name="day_rate_ngn" type="number" min="0" step="0.01" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <Button type="submit" className="sm:col-span-2">Lease out</Button>
           </form>
@@ -73,15 +73,15 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
               { label: "Expected return", value: activeLease.expected_return_date },
             ]}
           />
-          <form action={markEquipmentReturned} className="mt-3 flex flex-wrap items-end gap-3 border-t border-zinc-100 pt-3">
+          <form action={markEquipmentReturned} className="mt-3 flex flex-wrap items-end gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
             <input type="hidden" name="asset_id" value={asset.id} />
             <input type="hidden" name="lease_id" value={activeLease.id} />
             <div className="flex-1">
-              <label className="block text-xs text-zinc-500">Return condition</label>
-              <input name="return_condition" placeholder="e.g. Minor wear, fully operational" className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Return condition</label>
+              <input name="return_condition" placeholder="e.g. Minor wear, fully operational" className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
-            <label className="flex items-center gap-1 text-sm text-zinc-700">
-              <input type="checkbox" name="inspection_pass" defaultChecked className="rounded border-zinc-300" />
+            <label className="flex items-center gap-1 text-sm text-zinc-700 dark:text-zinc-300">
+              <input type="checkbox" name="inspection_pass" defaultChecked className="rounded border-zinc-300 dark:border-zinc-700" />
               Inspection pass
             </label>
             <Button type="submit" variant="success" size="sm">Mark returned</Button>
@@ -90,13 +90,13 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
       )}
 
       <RecordSection title="Lease history">
-        <div className="overflow-x-auto rounded-lg border border-zinc-200">
+        <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
           {(leases ?? []).length === 0 ? (
             <EmptyState icon={<TruckIcon />} title="No lease history yet" />
           ) : (
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
                   <th className="px-5 py-2.5">Client</th>
                   <th className="px-4 py-2.5">Start</th>
                   <th className="px-4 py-2.5">Expected return</th>
@@ -105,20 +105,20 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
                   <th className="px-4 py-2.5">Condition</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {(leases ?? []).map((l: EquipmentLease) => (
-                  <tr key={l.id} className="transition-colors hover:bg-brand-50/40">
-                    <td className="px-5 py-2.5 font-medium text-zinc-900">{l.client_name}</td>
-                    <td className="px-4 py-2.5 text-zinc-700">{l.start_date}</td>
-                    <td className="px-4 py-2.5 text-zinc-700">{l.expected_return_date}</td>
-                    <td className="px-4 py-2.5 text-zinc-700">{l.actual_return_date ?? "—"}</td>
+                  <tr key={l.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-brand-500/10">
+                    <td className="px-5 py-2.5 font-medium text-zinc-900 dark:text-zinc-100">{l.client_name}</td>
+                    <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{l.start_date}</td>
+                    <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{l.expected_return_date}</td>
+                    <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">{l.actual_return_date ?? "—"}</td>
                     <td className="px-4 py-2.5">
                       <StatusBadge status={l.status} />
                     </td>
-                    <td className="px-4 py-2.5 text-zinc-700">
+                    <td className="px-4 py-2.5 text-zinc-700 dark:text-zinc-300">
                       {l.return_condition ?? "—"}
                       {l.return_inspection_pass !== null && (
-                        <span className={`ml-1 text-xs font-medium ${l.return_inspection_pass ? "text-green-700" : "text-red-600"}`}>
+                        <span className={`ml-1 text-xs font-medium ${l.return_inspection_pass ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                           {l.return_inspection_pass ? "Pass" : "Fail"}
                         </span>
                       )}

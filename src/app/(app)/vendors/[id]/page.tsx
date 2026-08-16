@@ -19,8 +19,8 @@ function pct(n: number | null) {
 function expiryBadge(expiryDate?: string | null) {
   if (!expiryDate) return null;
   const daysLeft = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
-  if (daysLeft < 0) return <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Expired</span>;
-  if (daysLeft <= 60) return <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Expires in {daysLeft}d</span>;
+  if (daysLeft < 0) return <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">Expired</span>;
+  if (daysLeft <= 60) return <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">Expires in {daysLeft}d</span>;
   return null;
 }
 
@@ -63,11 +63,11 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
         badges={
           <>
             {vendor.is_approved ? (
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Approved</span>
             ) : (
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Pending</span>
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">Pending</span>
             )}
-            {vendor.ncdmb_compliant && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">NCDMB</span>}
+            {vendor.ncdmb_compliant && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">NCDMB</span>}
           </>
         }
       />
@@ -81,7 +81,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
       <RecordSection title="Reliability scorecard">
         {scorecard.quoteCount === 0 && scorecard.poCount === 0 ? (
-          <p className="text-sm text-zinc-400">No quote or order history yet — the scorecard fills in as this vendor is used.</p>
+          <p className="text-sm text-zinc-400 dark:text-zinc-500">No quote or order history yet — the scorecard fills in as this vendor is used.</p>
         ) : (
           <StatsRow
             stats={[
@@ -102,10 +102,10 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             { label: "Payment terms", value: vendor.payment_terms ?? "—" },
           ]}
         />
-        <form action={updateVendorApproval} className="mt-3 flex items-center gap-2 border-t border-zinc-100 pt-3">
+        <form action={updateVendorApproval} className="mt-3 flex items-center gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-800">
           <input type="hidden" name="vendor_id" value={vendor.id} />
-          <input type="checkbox" name="is_approved" defaultChecked={vendor.is_approved} className="rounded border-zinc-300" />
-          <label className="text-sm text-zinc-700">Approved for use on purchase orders</label>
+          <input type="checkbox" name="is_approved" defaultChecked={vendor.is_approved} className="rounded border-zinc-300 dark:border-zinc-600" />
+          <label className="text-sm text-zinc-700 dark:text-zinc-300">Approved for use on purchase orders</label>
           <Button type="submit" variant="secondary" size="sm" className="ml-auto">Save</Button>
         </form>
       </RecordSection>
@@ -122,7 +122,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             showNcdmb={modules.ncdmb}
           />
           {modules.ncdmb && expiryBadge(vendor.ncdmb_certificate_expiry) && (
-            <p className="text-sm text-zinc-600">NCDMB certificate {expiryBadge(vendor.ncdmb_certificate_expiry)}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">NCDMB certificate {expiryBadge(vendor.ncdmb_certificate_expiry)}</p>
           )}
           <Button type="submit" size="sm">Save</Button>
         </form>
@@ -136,7 +136,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
             rows={3}
             defaultValue={vendor.performance_notes ?? ""}
             placeholder="e.g. Late delivery on PO#123, otherwise reliable"
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <Button type="submit" size="sm">Save notes</Button>
         </form>
@@ -144,15 +144,15 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
       <RecordSection title="Payout details">
         {vendor.account_number ? (
-          <p className="mb-3 text-sm text-zinc-700">
+          <p className="mb-3 text-sm text-zinc-700 dark:text-zinc-300">
             {vendor.bank_name} — {vendor.account_number} ({vendor.account_name})
-            {vendor.paystack_recipient_code && <span className="ml-2 text-xs text-green-700">Paystack verified</span>}
+            {vendor.paystack_recipient_code && <span className="ml-2 text-xs text-green-700 dark:text-green-400">Paystack verified</span>}
           </p>
         ) : (
-          <p className="mb-3 text-sm text-zinc-400">No payout details on file — a payment can&apos;t be initiated until these are set.</p>
+          <p className="mb-3 text-sm text-zinc-400 dark:text-zinc-500">No payout details on file — a payment can&apos;t be initiated until these are set.</p>
         )}
         {banksError ? (
-          <p className="text-sm text-amber-700">
+          <p className="text-sm text-amber-700 dark:text-amber-400">
             Payouts aren&apos;t configured yet ({banksError === "PAYSTACK_SECRET_KEY is not configured" ? "PAYSTACK_SECRET_KEY is not set" : banksError}).
           </p>
         ) : (
@@ -163,9 +163,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
       <RecordSection title="Documents">
         <ul className="mb-3 space-y-1 text-sm">
           {documents.map((d) => (
-            <li key={d.file_path} className="text-zinc-700">
+            <li key={d.file_path} className="text-zinc-700 dark:text-zinc-300">
               {documentUrls.has(d.file_path) ? (
-                <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline">
+                <a href={documentUrls.get(d.file_path)} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline dark:text-brand-400">
                   {d.document_type ? `${d.document_type} — ${d.file_name}` : d.file_name}
                 </a>
               ) : d.document_type ? (
@@ -176,12 +176,12 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
               {expiryBadge(d.expiry_date)}
             </li>
           ))}
-          {documents.length === 0 && <li className="text-zinc-400">No documents uploaded (e.g. CAC certificate, tax ID, insurance).</li>}
+          {documents.length === 0 && <li className="text-zinc-400 dark:text-zinc-500">No documents uploaded (e.g. CAC certificate, tax ID, insurance).</li>}
         </ul>
         <form action={uploadVendorDocument} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
           <input type="hidden" name="vendor_id" value={vendor.id} />
-          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2" />
-          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+          <input name="document_type" placeholder="Type (e.g. CAC Certificate)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:col-span-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <input name="expiry_date" type="date" title="Expiry date (optional)" className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           <input type="file" name="document" className="text-sm" />
           <Button type="submit" variant="secondary" size="sm" className="sm:col-span-4">Upload</Button>
         </form>

@@ -30,18 +30,18 @@ export default function VendorsTable({ rows }: { rows: VendorRow[] }) {
   const shown = rows.filter(activeMatch);
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="px-5 pt-1">
         <ListTabs tabs={tabs} active={active} onChange={setActive} filters={["Category", "Currency"]} />
       </div>
 
       {shown.length === 0 ? (
-        <p className="px-5 py-10 text-center text-sm text-zinc-400">No vendors in this view.</p>
+        <p className="px-5 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500">No vendors in this view.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-sm">
             <thead>
-              <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+              <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
                 <th className="px-5 py-3">Vendor</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3">Contact</th>
@@ -50,29 +50,29 @@ export default function VendorsTable({ rows }: { rows: VendorRow[] }) {
                 <th className="px-4 py-3">Approved</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {shown.map((v) => (
-                <tr key={v.id} className="transition-colors hover:bg-brand-50/40">
+                <tr key={v.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-zinc-800">
                   <td className="px-5 py-3">
-                    <Link href={`/vendors/${v.id}`} className="block font-medium text-zinc-900 hover:text-brand-700">
+                    <Link href={`/vendors/${v.id}`} className="block font-medium text-zinc-900 hover:text-brand-700 dark:text-zinc-100 dark:hover:text-brand-400">
                       {v.name}
                     </Link>
                     {(v.ncdmb || v.sharedAccount) && (
                       <div className="mt-0.5 flex gap-1.5 text-[13px]">
-                        {v.ncdmb && <span className="rounded-full bg-brand-50 px-1.5 py-0.5 text-[11px] font-medium text-brand-700">NCDMB</span>}
-                        {v.sharedAccount && <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">Shared account</span>}
+                        {v.ncdmb && <span className="rounded-full bg-brand-50 px-1.5 py-0.5 text-[11px] font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">NCDMB</span>}
+                        {v.sharedAccount && <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">Shared account</span>}
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-zinc-700">{v.category}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.contact}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.paymentTerms}</td>
-                  <td className="px-4 py-3 text-zinc-700">{v.currency}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{v.category}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{v.contact}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{v.paymentTerms}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{v.currency}</td>
                   <td className="px-4 py-3">
                     {v.approved ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Approved</span>
                     ) : (
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Pending</span>
+                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">Pending</span>
                     )}
                   </td>
                 </tr>

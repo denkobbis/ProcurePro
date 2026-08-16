@@ -6,6 +6,7 @@ import { signOut } from "@/app/actions/auth";
 import type { Profile, OrganizationIndustry } from "@/lib/database.types";
 import { getIndustryModules } from "@/lib/industries";
 import { useMobileNav } from "./MobileNavContext";
+import ThemeToggle from "./ThemeToggle";
 import {
   DashboardIcon,
   DocumentIcon,
@@ -68,7 +69,7 @@ function Badge({ count, active }: { count: number; active: boolean }) {
   return (
     <span
       className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${
-        active ? "bg-brand-600 text-white" : "bg-zinc-100 text-zinc-600"
+        active ? "bg-brand-600 text-white" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
       }`}
     >
       {count}
@@ -81,11 +82,13 @@ export default function Sidebar({
   industry,
   orgName,
   counts,
+  initialIsDark,
 }: {
   profile: Profile;
   industry: OrganizationIndustry;
   orgName: string;
   counts: SidebarCounts;
+  initialIsDark: boolean;
 }) {
   const pathname = usePathname();
   const { open, setOpen } = useMobileNav();
@@ -108,15 +111,15 @@ export default function Sidebar({
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav
-        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-transform duration-200 ease-in-out md:static md:z-auto md:w-[232px] md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-transform duration-200 ease-in-out md:static md:z-auto md:w-[232px] md:translate-x-0 dark:border-zinc-800 dark:bg-zinc-900 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center gap-2 px-4 py-4">
-          <LogoMarkIcon className="h-7 w-7 shrink-0 text-brand-600" />
+          <LogoMarkIcon className="h-7 w-7 shrink-0 text-brand-600 dark:text-brand-400" />
           <div className="min-w-0">
-            <div className="text-lg font-semibold leading-tight tracking-tight text-zinc-900">ProcurePro</div>
-            <div className="truncate text-xs text-zinc-500" title={orgName}>
+            <div className="text-lg font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">ProcurePro</div>
+            <div className="truncate text-xs text-zinc-500 dark:text-zinc-400" title={orgName}>
               {orgName}
             </div>
           </div>
@@ -134,10 +137,12 @@ export default function Sidebar({
                     href={link.href}
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
-                      active ? "border-brand-600 bg-brand-50 text-brand-800" : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                      active
+                        ? "border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300"
+                        : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                     }`}
                   >
-                    <Icon className={`h-[17px] w-[17px] shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`} />
+                    <Icon className={`h-[17px] w-[17px] shrink-0 ${active ? "text-brand-600 dark:text-brand-400" : "text-zinc-400 dark:text-zinc-500"}`} />
                     {link.label}
                     {link.badge && <Badge count={count} active={active} />}
                   </Link>
@@ -148,16 +153,18 @@ export default function Sidebar({
 
           {secondary.length > 0 && (
             <div>
-              <div className="px-3 pb-1 text-[13px] font-medium text-zinc-400">Set up &amp; review</div>
+              <div className="px-3 pb-1 text-[13px] font-medium text-zinc-400 dark:text-zinc-500">Set up &amp; review</div>
               <ul className="flex flex-col gap-0.5">
                 {secondary.map((link) => {
                   const isExternal = "external" in link && link.external;
                   const active = !isExternal && (pathname === link.href || pathname.startsWith(link.href + "/"));
                   const Icon = link.icon;
                   const className = `flex items-center gap-2.5 rounded-md border-l-2 py-1.5 pl-[10px] pr-3 text-[13px] font-medium transition-colors ${
-                    active ? "border-brand-600 bg-brand-50 text-brand-800" : "border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                    active
+                      ? "border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300"
+                      : "border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                   }`;
-                  const iconClassName = `h-4 w-4 shrink-0 ${active ? "text-brand-600" : "text-zinc-400"}`;
+                  const iconClassName = `h-4 w-4 shrink-0 ${active ? "text-brand-600 dark:text-brand-400" : "text-zinc-400 dark:text-zinc-500"}`;
 
                   if (isExternal) {
                     return (
@@ -183,16 +190,21 @@ export default function Sidebar({
           )}
         </div>
 
-        <div className="flex items-center gap-2.5 border-t border-zinc-100 px-4 py-3">
+        <div className="flex items-center gap-2.5 border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
           <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-semibold text-white">
             {initials(profile.full_name)}
           </div>
           <div className="min-w-0 flex-1 leading-tight">
-            <div className="truncate text-[13px] font-medium text-zinc-900">{profile.full_name}</div>
-            <div className="truncate text-[11px] text-zinc-400">{ROLE_LABELS[profile.role] ?? profile.role}</div>
+            <div className="truncate text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{profile.full_name}</div>
+            <div className="truncate text-[11px] text-zinc-400 dark:text-zinc-500">{ROLE_LABELS[profile.role] ?? profile.role}</div>
           </div>
+          <ThemeToggle initialIsDark={initialIsDark} className="text-zinc-400 dark:text-zinc-500" />
           <form action={signOut}>
-            <button type="submit" aria-label="Sign out" className="rounded-md px-1.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900">
+            <button
+              type="submit"
+              aria-label="Sign out"
+              className="rounded-md px-1.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            >
               Sign out
             </button>
           </form>

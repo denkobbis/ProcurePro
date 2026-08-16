@@ -10,20 +10,20 @@ export default function InvoiceMatchPanel({ invoice, match }: { invoice: Invoice
   );
 
   return (
-    <div className="rounded-md border border-zinc-200 p-3">
+    <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <span className="font-medium text-zinc-900">{invoice.invoice_number}</span>
-          {invoice.invoice_date && <span className="ml-2 text-xs text-zinc-400">{invoice.invoice_date}</span>}
+          <span className="font-medium text-zinc-900 dark:text-zinc-100">{invoice.invoice_number}</span>
+          {invoice.invoice_date && <span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">{invoice.invoice_date}</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm tabular-nums text-zinc-900">{formatMoney(invoice.total_amount, invoice.currency)}</span>
+          <span className="text-sm tabular-nums text-zinc-900 dark:text-zinc-100">{formatMoney(invoice.total_amount, invoice.currency)}</span>
           <StatusBadge status={invoice.status} />
         </div>
       </div>
 
       {issues.length === 0 ? (
-        <p className="mt-2 text-xs text-zinc-500">Every line matches the PO — quantities are within what was ordered and received.</p>
+        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Every line matches the PO — quantities are within what was ordered and received.</p>
       ) : (
         <div className="mt-2 space-y-1.5">
           {issues.map((l, i) => (

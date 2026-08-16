@@ -40,19 +40,19 @@ export default function UserMenu({ fullName, role }: { fullName: string; role: s
         onClick={() => setOpen((o) => !o)}
         aria-label="Account menu"
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-md py-1 pl-1 pr-1.5 hover:bg-zinc-100"
+        className="flex items-center gap-1.5 rounded-md py-1 pl-1 pr-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
       >
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-semibold text-white">
           {initials(fullName)}
         </div>
-        <ChevronDownIcon className="hidden h-3.5 w-3.5 text-zinc-400 sm:block" />
+        <ChevronDownIcon className="hidden h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500 sm:block" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg">
-          <div className="border-b border-zinc-100 px-3.5 py-3">
-            <div className="truncate text-sm font-medium text-zinc-900">{fullName}</div>
-            <div className="truncate text-xs text-zinc-500">{ROLE_LABELS[role] ?? role}</div>
+        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="border-b border-zinc-100 px-3.5 py-3 dark:border-zinc-800">
+            <div className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{fullName}</div>
+            <div className="truncate text-xs text-zinc-500 dark:text-zinc-400">{ROLE_LABELS[role] ?? role}</div>
           </div>
           <button
             type="button"
@@ -60,13 +60,13 @@ export default function UserMenu({ fullName, role }: { fullName: string; role: s
               setOpen(false);
               setFeedbackOpen(true);
             }}
-            className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50"
+            className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <ChatBubbleIcon className="h-4 w-4 text-zinc-400" />
+            <ChatBubbleIcon className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
             Send feedback
           </button>
           <form action={signOut}>
-            <button type="submit" className="block w-full px-3.5 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
+            <button type="submit" className="block w-full px-3.5 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
               Sign out
             </button>
           </form>
@@ -97,19 +97,19 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900" onClick={(e) => e.stopPropagation()}>
         {status === "done" ? (
           <>
-            <h2 className="text-sm font-semibold text-zinc-900">Thanks — got it.</h2>
-            <p className="mt-1 text-sm text-zinc-500">We read every note that comes through here.</p>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Thanks — got it.</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">We read every note that comes through here.</p>
             <Button type="button" size="sm" variant="secondary" className="mt-4" onClick={onClose}>
               Close
             </Button>
           </>
         ) : (
           <form action={handleSubmit}>
-            <h2 className="text-sm font-semibold text-zinc-900">Send feedback</h2>
-            <p className="mt-1 text-xs text-zinc-500">Bug, missing feature, or just a gripe — tell us what&apos;s on your mind.</p>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Send feedback</h2>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Bug, missing feature, or just a gripe — tell us what&apos;s on your mind.</p>
             <input type="hidden" name="page_path" value={pathname ?? ""} />
             <textarea
               name="message"
@@ -117,7 +117,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
               autoFocus
               rows={5}
               placeholder="What's working, what isn't, what you wish it did..."
-              className="mt-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="mt-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             />
             {status === "error" && <p className="mt-2 text-xs font-medium text-red-600">{error}</p>}
             <div className="mt-4 flex items-center justify-end gap-2">

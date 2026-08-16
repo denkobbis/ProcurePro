@@ -6,11 +6,11 @@ type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500",
-  secondary: "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 focus-visible:ring-brand-500",
+  secondary: "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 focus-visible:ring-brand-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800",
   danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
   success: "bg-green-700 text-white hover:bg-green-800 focus-visible:ring-green-500",
-  ghost: "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-brand-500",
-  // Landing-page-only: the violet/magenta gradient CTA. Never used in the authenticated app.
+  ghost: "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-brand-500 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+  // Landing/auth-page-only: the cyan/teal gradient CTA. Never used in the authenticated app.
   accent: "bg-gradient-to-r from-accent-600 to-accent-glow text-white shadow-lg shadow-accent-600/25 hover:opacity-90 focus-visible:ring-accent-500",
 };
 

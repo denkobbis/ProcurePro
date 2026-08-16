@@ -32,12 +32,12 @@ export default function SpendCopilot() {
   }
 
   return (
-    <section className="rounded-lg border border-dashed border-brand-300 bg-brand-50/50 p-5">
-      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-900">
-        <SparkleIcon className="h-4 w-4 text-brand-600" />
+    <section className="rounded-lg border border-dashed border-brand-300 bg-brand-50/50 p-5 dark:border-brand-500/30 dark:bg-brand-500/5">
+      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <SparkleIcon className="h-4 w-4 text-brand-600 dark:text-brand-400" />
         Ask about your spend
       </h2>
-      <p className="mt-0.5 text-xs text-zinc-500">Ask in plain words — answers are computed from your actual vendor and budget data.</p>
+      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Ask in plain words — answers are computed from your actual vendor and budget data.</p>
 
       <form
         onSubmit={(e) => {
@@ -50,7 +50,7 @@ export default function SpendCopilot() {
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="e.g. How much have we spent with Delta Engineering?"
-          className="min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         />
         <Button type="submit" size="sm" disabled={status === "loading" || !question.trim()}>
           {status === "loading" ? "Thinking…" : "Ask"}
@@ -66,7 +66,7 @@ export default function SpendCopilot() {
               setQuestion(ex);
               ask(ex);
             }}
-            className="rounded-full border border-brand-200 bg-white px-2.5 py-1 text-xs text-brand-700 hover:bg-brand-100"
+            className="rounded-full border border-brand-200 bg-white px-2.5 py-1 text-xs text-brand-700 hover:bg-brand-100 dark:border-brand-500/30 dark:bg-zinc-900 dark:text-brand-400 dark:hover:bg-brand-500/10"
           >
             {ex}
           </button>
@@ -74,7 +74,13 @@ export default function SpendCopilot() {
       </div>
 
       {answer && (
-        <p className={`mt-3 rounded-md border px-3 py-2 text-sm ${status === "error" ? "border-red-200 bg-red-50 text-red-700" : "border-zinc-200 bg-white text-zinc-800"}`}>
+        <p
+          className={`mt-3 rounded-md border px-3 py-2 text-sm ${
+            status === "error"
+              ? "border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+              : "border-zinc-200 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+          }`}
+        >
           {answer}
         </p>
       )}

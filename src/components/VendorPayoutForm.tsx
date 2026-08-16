@@ -21,11 +21,11 @@ export default function VendorPayoutForm({
       <input type="hidden" name="paystack_bank_code" value={bankCode} />
       <input type="hidden" name="bank_name" value={selectedBank?.name ?? ""} />
       <div>
-        <label className="block text-xs text-zinc-500">Bank</label>
+        <label className="block text-xs text-zinc-500 dark:text-zinc-400">Bank</label>
         <select
           value={bankCode}
           onChange={(e) => setBankCode(e.target.value)}
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         >
           <option value="">Select bank</option>
           {banks.map((b) => (
@@ -36,11 +36,11 @@ export default function VendorPayoutForm({
         </select>
       </div>
       <div>
-        <label className="block text-xs text-zinc-500">Account number</label>
+        <label className="block text-xs text-zinc-500 dark:text-zinc-400">Account number</label>
         <input
           name="account_number"
           required
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         />
       </div>
       <div className="flex items-end">

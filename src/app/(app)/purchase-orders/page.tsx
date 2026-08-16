@@ -47,21 +47,21 @@ export default async function PurchaseOrdersPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Purchase orders</h1>
-          <p className="mt-2 text-sm text-zinc-500">Every order raised, from draft through receiving.</p>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">Purchase orders</h1>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Every order raised, from draft through receiving.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/invoices/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+          <Link href="/invoices/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline dark:text-zinc-400 dark:hover:text-brand-400">
             Export invoices (Xero)
           </Link>
-          <Link href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+          <Link href="/purchase-orders/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline dark:text-zinc-400 dark:hover:text-brand-400">
             Export CSV
           </Link>
         </div>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <EmptyState
             icon={<CartIcon />}
             title="No purchase orders yet"

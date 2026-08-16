@@ -125,7 +125,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             />
 
             {(po.carrier || po.tracking_number || po.eta || po.customs_reference) && (
-              <div className="mt-2 border-t border-zinc-100 pt-2">
+              <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
                 <FactsPanel
                   facts={[
                     ...(po.carrier ? [{ label: "Carrier", value: po.carrier }] : []),
@@ -139,10 +139,10 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
               </div>
             )}
 
-            <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-200">
+            <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
               <table className="w-full min-w-[640px] text-sm">
                 <thead>
-                  <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                  <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
                     <th className="px-4 py-2.5">Description</th>
                     <th className="px-4 py-2.5">MPN / Brand</th>
                     <th className="whitespace-nowrap px-4 py-2.5 text-right">Qty</th>
@@ -151,22 +151,22 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                     <th className="whitespace-nowrap px-4 py-2.5">Received</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {items.map((li) => (
-                    <tr key={li.id} className="transition-colors hover:bg-brand-50/40">
-                      <td className="px-4 py-2.5 text-zinc-900">{li.description}</td>
-                      <td className="px-4 py-2.5 text-zinc-500">
+                    <tr key={li.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-zinc-800/60">
+                      <td className="px-4 py-2.5 text-zinc-900 dark:text-zinc-100">{li.description}</td>
+                      <td className="px-4 py-2.5 text-zinc-500 dark:text-zinc-400">
                         {li.mpn || li.oem_brand ? `${li.mpn ?? ""}${li.mpn && li.oem_brand ? " · " : ""}${li.oem_brand ?? ""}` : "—"}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-zinc-700">{li.qty}</td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-zinc-700">{formatMoney(li.unit_price, po.currency)}</td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-right text-[17px] tabular-nums font-medium text-zinc-900">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{li.qty}</td>
+                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-zinc-700 dark:text-zinc-300">{formatMoney(li.unit_price, po.currency)}</td>
+                      <td className="whitespace-nowrap px-4 py-2.5 text-right text-[17px] tabular-nums font-medium text-zinc-900 dark:text-zinc-100">
                         {formatMoney(li.qty * li.unit_price, po.currency)}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-700">
+                      <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-700 dark:text-zinc-300">
                         {li.received_qty} / {li.qty}
                         {li.quality_pass !== null && (
-                          <span className={`ml-2 text-xs font-medium ${li.quality_pass ? "text-green-700" : "text-red-600"}`}>
+                          <span className={`ml-2 text-xs font-medium ${li.quality_pass ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                             {li.quality_pass ? "Pass" : "Fail"}
                           </span>
                         )}
@@ -197,9 +197,9 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             <RecordSection title="Shipping">
               <form action={markPoInTransit} className="grid grid-cols-1 gap-3 sm:grid-cols-4">
                 <input type="hidden" name="po_id" value={po.id} />
-                <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-                <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
-                <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+                <input name="carrier" placeholder="Carrier" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+                <input name="tracking_number" placeholder="Tracking / B/L number" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+                <input name="eta" type="date" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
                 <Button type="submit" size="sm">Mark in transit</Button>
               </form>
             </RecordSection>
@@ -209,7 +209,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             <RecordSection title="Customs">
               <form action={markPoCustomsCleared} className="flex flex-wrap gap-3">
                 <input type="hidden" name="po_id" value={po.id} />
-                <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+                <input name="customs_reference" placeholder="Customs reference / bill number" className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
                 <Button type="submit" size="sm">Mark cleared customs</Button>
               </form>
             </RecordSection>
@@ -221,14 +221,14 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                 {items
                   .filter((li) => li.received_qty < li.qty)
                   .map((li) => (
-                    <form key={li.id} action={receivePoLine} className="flex flex-wrap items-end gap-3 rounded-md border border-zinc-100 p-3">
+                    <form key={li.id} action={receivePoLine} className="flex flex-wrap items-end gap-3 rounded-md border border-zinc-100 p-3 dark:border-zinc-800">
                       <input type="hidden" name="po_id" value={po.id} />
                       <input type="hidden" name="line_item_id" value={li.id} />
-                      <div className="flex-1 text-sm text-zinc-700">
-                        {li.description} <span className="text-zinc-400">({li.received_qty}/{li.qty} received)</span>
+                      <div className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        {li.description} <span className="text-zinc-400 dark:text-zinc-500">({li.received_qty}/{li.qty} received)</span>
                       </div>
                       <div>
-                        <label className="block text-xs text-zinc-500">Qty received now</label>
+                        <label className="block text-xs text-zinc-500 dark:text-zinc-400">Qty received now</label>
                         <input
                           name="received_qty"
                           type="number"
@@ -236,17 +236,17 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                           step="0.01"
                           max={li.qty - li.received_qty}
                           required
-                          className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                          className="w-28 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                         />
                       </div>
-                      <label className="flex items-center gap-1 text-sm text-zinc-700">
-                        <input type="checkbox" name="quality_pass" defaultChecked className="rounded border-zinc-300" />
+                      <label className="flex items-center gap-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        <input type="checkbox" name="quality_pass" defaultChecked className="rounded border-zinc-300 dark:border-zinc-700" />
                         Quality pass
                       </label>
                       <Button type="submit" variant="success" size="sm">Record</Button>
                     </form>
                   ))}
-                {items.every((li) => li.received_qty >= li.qty) && <p className="text-sm text-zinc-400">All line items fully received.</p>}
+                {items.every((li) => li.received_qty >= li.qty) && <p className="text-sm text-zinc-400 dark:text-zinc-500">All line items fully received.</p>}
               </div>
             </RecordSection>
           )}
@@ -261,7 +261,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                 </div>
               )}
               <details>
-                <summary className="cursor-pointer text-sm font-medium text-brand-700 hover:underline">Record a vendor invoice</summary>
+                <summary className="cursor-pointer text-sm font-medium text-brand-700 hover:underline dark:text-brand-400">Record a vendor invoice</summary>
                 <div className="mt-3">
                   <RecordInvoiceForm poId={po.id} />
                 </div>
@@ -272,7 +272,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
           {(canPay || paymentAttempts.length > 0) && (
             <RecordSection title="Payment to vendor">
               {amountPaid > 0 && (
-                <p className="mb-3 text-sm text-zinc-600">
+                <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
                   {formatNaira(amountPaid)} paid of {formatNaira(po.total_amount_ngn)} — {formatNaira(amountRemaining)} remaining
                 </p>
               )}
@@ -305,7 +305,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                   <form action={initiatePayment} className="mb-4 space-y-2">
                     <input type="hidden" name="po_id" value={po.id} />
                     <div>
-                      <label className="block text-xs text-zinc-500">Amount (defaults to the full remaining balance)</label>
+                      <label className="block text-xs text-zinc-500 dark:text-zinc-400">Amount (defaults to the full remaining balance)</label>
                       <input
                         name="amount"
                         type="number"
@@ -313,7 +313,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                         max={amountRemaining}
                         step="0.01"
                         placeholder={String(amountRemaining)}
-                        className="mt-1 w-48 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        className="mt-1 w-48 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -322,7 +322,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                     </div>
                   </form>
                 ) : (
-                  <p className="mb-4 text-sm text-amber-700">
+                  <p className="mb-4 text-sm text-amber-700 dark:text-amber-400">
                     This vendor has no payout details on file yet — add them on the{" "}
                     <Link href={`/vendors/${po.vendor_id}`} className="underline">vendor page</Link> before paying.
                   </p>
@@ -330,24 +330,24 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
               ) : null}
 
               {paymentAttempts.length === 0 ? (
-                <p className="text-sm text-zinc-400">No payment attempts yet.</p>
+                <p className="text-sm text-zinc-400 dark:text-zinc-500">No payment attempts yet.</p>
               ) : (
                 <div className="space-y-2">
                   {paymentAttempts.map((p) => (
-                    <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-md border border-zinc-100 p-3 text-sm">
+                    <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-md border border-zinc-100 p-3 text-sm dark:border-zinc-800">
                       <StatusBadge status={p.status} />
-                      <span className="text-zinc-700 capitalize">{p.provider}</span>
-                      <span className="text-zinc-900 font-medium">{formatNaira(p.amount)}</span>
-                      <span className="text-zinc-400">{new Date(p.initiated_at).toLocaleString()}</span>
-                      {p.provider_reference && <span className="text-zinc-400">Ref: {p.provider_reference}</span>}
-                      {p.failure_reason && <span className="text-red-600">{p.failure_reason}</span>}
+                      <span className="text-zinc-700 capitalize dark:text-zinc-300">{p.provider}</span>
+                      <span className="text-zinc-900 font-medium dark:text-zinc-100">{formatNaira(p.amount)}</span>
+                      <span className="text-zinc-400 dark:text-zinc-500">{new Date(p.initiated_at).toLocaleString()}</span>
+                      {p.provider_reference && <span className="text-zinc-400 dark:text-zinc-500">Ref: {p.provider_reference}</span>}
+                      {p.failure_reason && <span className="text-red-600 dark:text-red-400">{p.failure_reason}</span>}
                       {canPay && p.provider === "paystack" && p.status === "pending" && (
                         <form action={finalizePaystackPayment} className="flex items-center gap-2">
                           <input type="hidden" name="payment_id" value={p.id} />
                           <input
                             name="otp"
                             placeholder="OTP (if requested)"
-                            className="w-32 rounded-md border border-zinc-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            className="w-32 rounded-md border border-zinc-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                           />
                           <Button type="submit" variant="secondary" size="sm">Finalize</Button>
                         </form>

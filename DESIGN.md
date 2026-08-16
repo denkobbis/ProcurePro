@@ -13,12 +13,12 @@ colors:
   brand-800: "#1c3163"
   brand-900: "#172750"
   brand-950: "#0e1830"
-  accent-50: "#f5f0ff"
-  accent-400: "#a06aed"
-  accent-500: "#8b3fe0"
-  accent-600: "#7827c9"
-  accent-700: "#611fa3"
-  accent-glow: "#c026d3"
+  accent-50: "#ecfeff"
+  accent-400: "#22d3ee"
+  accent-500: "#06b6d4"
+  accent-600: "#0e7490"
+  accent-700: "#155e63"
+  accent-glow: "#2dd4bf"
   zinc-canvas: "#fafafa"
   zinc-border: "#e4e4e7"
   zinc-ink: "#18181b"
@@ -87,13 +87,15 @@ ProcurePro reads as an instrument panel for people who move steel, freight, and 
 
 The build is Restrained-to-Committed: the authenticated app (dashboard tables, forms, lists) stays flat, white, and zinc-neutral so operational data stays scannable; navy is spent deliberately on a small number of "declaration" surfaces — the landing hero, the features-to-trust transition, the pricing section, and the dashboard's welcome banner — where the brand needs to announce itself. Icons are a single hand-drawn stroke set (no external icon library), keeping the whole system in one visual register instead of mixing icon styles. Typography is single-family throughout (Geist Sans for both display and body) — there is no display-face pairing; hierarchy comes from weight and size, not a second font.
 
-**Landing-page pivot (pinned to precoro.com, reviewed live with the user):** the marketing site now carries a violet-to-magenta accent (`accent-50..700`, `accent-glow`) reserved for calls to action, floating annotation badges, and one CTA-only Button variant — never used in the authenticated app, which stays navy/zinc only. The landing page also replaced its real product screenshots with hand-built SVG/React "illustrated mockup" cards (see Components) that dramatize real product figures without photographing the app, and dropped its light/dark toggle in favor of one fixed identity, matching the reference.
+**Landing-page pivot (pinned to precoro.com, reviewed live with the user):** the marketing site now carries a cyan-to-teal accent (`accent-50..700`, `accent-glow`) reserved for calls to action, floating annotation badges, and one CTA-only Button variant — never used in the authenticated app, which stays navy/zinc only. The landing page also replaced its real product screenshots with hand-built SVG/React "illustrated mockup" cards (see Components) that dramatize real product figures without photographing the app.
+
+**Site-wide light/dark mode:** every screen — the authenticated app, login, and signup — now supports both themes via a single cookie-controlled `.dark` class on `<html>` (`ThemeToggle.tsx`, toggled from the Sidebar's bottom bar in-app and from a corner button on the auth pages). Defaults to light, matching the app's established "flat, scannable" working mode. This is genuine `dark:` Tailwind variant coverage on every component and page, not a palette override — `text-white` set on colored buttons/badges is deliberately left untouched so it doesn't invert. The landing page's own marketing sections (hero, features-to-trust, pricing) are a separate, fixed-navy identity pinned to the Precoro reference and carry no `dark:` classes at all — they render identically regardless of the global toggle, the same way Precoro itself has no toggle.
 
 Motion is now two authored moments, not one: (1) the landing hero still staggers in on load (`animate-reveal`, 0.7s, custom ease); (2) every later landing section reveals once as it enters the viewport, via a shared `.reveal`/`.reveal-in` IntersectionObserver pattern (`Reveal.tsx`) — one consistent grammar reused everywhere, not a different effect per section. A third, narrower motion "material" — `animate-drift`, a slow 5s float — is reserved for the floating annotation badges on illustrated mockups only. The authenticated app still animates nothing beyond ordinary hover/transition-colors.
 
 **Key Characteristics:**
 - Deep navy (brand-950/900) as a rare, declarative surface color; white/zinc as the working default
-- Violet-to-magenta accent (landing CTAs, badges, floating annotations only — never the app)
+- Cyan-to-teal accent (landing CTAs, badges, floating annotations only — never the app)
 - Single-family typography (Geist Sans) — hierarchy by weight/size, not font pairing
 - Hand-drawn stroke icons (1.75px stroke, round caps/joins), never a third-party icon library
 - Flat white cards with a hairline border and a soft resting shadow — no heavy elevation
@@ -111,7 +113,7 @@ Deep navy anchored by a wide neutral zinc/white field — the palette is used sp
 - **Blueprint Navy Text** (`--color-brand-200`/`--color-brand-300`, #b8cff0 / #8cb0e4): body copy and secondary text set on navy-950 surfaces, where zinc grays would fail contrast.
 
 ### Accent (landing page only)
-- **Accent Gradient** (`--color-accent-600` → `--color-accent-glow`, #7827c9 → #c026d3): the Button `accent` variant — every primary landing CTA ("Start free trial", "Sign in" submit). Never used in the authenticated app.
+- **Accent Gradient** (`--color-accent-600` → `--color-accent-glow`, #0e7490 → #2dd4bf): the Button `accent` variant — every primary landing CTA ("Start free trial", "Sign in" submit). Never used in the authenticated app.
 - **Accent Badge** (`--color-accent-600`/`--color-accent-glow` solid): floating annotation pills on illustrated mockup cards and the hero/trust photo (e.g. "11 things need a decision").
 - **Accent Glow** (`--color-accent-glow` at low opacity, blurred): a soft radial glow behind hero/auth-page dark panels, paired with the existing `.bg-brand-glow`.
 
@@ -125,7 +127,7 @@ Deep navy anchored by a wide neutral zinc/white field — the palette is used sp
 ### Named Rules
 **The Bookend Rule.** Deep navy (brand-950) is reserved for a small, fixed set of declaration surfaces — landing hero, the features-to-trust photo section, pricing section, dashboard welcome banner, and the login/signup dark panel. Every other application surface (tables, forms, lists, cards) stays on the white/zinc neutral field. Navy is a punctuation mark, not the app's ambient color.
 
-**The Two-Accent Rule** (revised from The Single-Accent Rule). The brand-navy ramp remains the only accent color in the authenticated app. The landing page additionally carries the violet/magenta accent ramp, strictly for calls to action, badges, and floating annotations — never for body text, backgrounds at scale, or anywhere in the app. Semantic states (danger/warning/success) still borrow directly from Tailwind's stock red/amber/green scales in both worlds.
+**The Two-Accent Rule** (revised from The Single-Accent Rule). The brand-navy ramp remains the only accent color in the authenticated app. The landing page additionally carries the cyan/teal accent ramp, strictly for calls to action, badges, and floating annotations — never for body text, backgrounds at scale, or anywhere in the app. Semantic states (danger/warning/success) still borrow directly from Tailwind's stock red/amber/green scales in both worlds.
 
 ## Typography
 
@@ -216,6 +218,6 @@ The landing page's feature grid no longer uses product screenshots. Each card's 
 - **Don't** introduce a second display typeface. Geist Sans carries every role; hierarchy is weight/size only.
 - **Don't** add shadow or elevation as a stacking signal — it exists only to mark liftable/interactive surfaces (see The Lift-on-Hover Rule).
 - **Don't** extend the navy background beyond its fixed bookend surfaces (see The Bookend Rule) — the count grew deliberately once this pass (adding the trust/photo section and the login/signup panel); a further "just this once" addition still needs the same deliberate reasoning, not habit.
-- **Don't** use the violet/accent ramp anywhere in the authenticated app, or for anything on the landing page beyond CTAs, badges, and floating annotations — it is a landing-only, action-only color.
+- **Don't** use the cyan/teal accent ramp anywhere in the authenticated app, or for anything on the landing page beyond CTAs, badges, and floating annotations — it is a landing-only, action-only color.
 - **Don't** animate outside the two authored systems (hero reveal, scroll reveal) plus the one motion material (badge drift); the app's stillness is still deliberate, and the landing page's motion is still a fixed, reused grammar, not scattered effects.
 - **Don't** fabricate stat-strip, social-proof, or illustrated-mockup numbers — every stat card and every figure inside an illustrated mockup ties to a real, checkable product fact (a real PO, a real variance, a real approval rule), per PRODUCT.md's no-fabricated-proof commitment.

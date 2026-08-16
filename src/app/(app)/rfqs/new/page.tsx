@@ -29,7 +29,7 @@ export default async function NewRfqPage({
       form={
         <FormPanel title={request.request_number} note={request.description}>
           <div className="col-span-12">
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
               This creates an RFQ so you can add quotes from multiple vendors and compare before picking a winner. You can still
               convert straight to a PO instead from the request page if you already know the vendor.
             </p>
@@ -44,16 +44,16 @@ export default async function NewRfqPage({
         <AsidePanel title="This request">
           <dl className="space-y-1.5 text-[13px]">
             <div className="flex justify-between">
-              <dt className="text-zinc-500">Quantity</dt>
-              <dd className="tabular-nums text-zinc-900">{request.qty}</dd>
+              <dt className="text-zinc-500 dark:text-zinc-400">Quantity</dt>
+              <dd className="tabular-nums text-zinc-900 dark:text-zinc-100">{request.qty}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-zinc-500">Est. unit cost</dt>
-              <dd className="tabular-nums text-zinc-900">{formatNaira(request.est_unit_cost)}</dd>
+              <dt className="text-zinc-500 dark:text-zinc-400">Est. unit cost</dt>
+              <dd className="tabular-nums text-zinc-900 dark:text-zinc-100">{formatNaira(request.est_unit_cost)}</dd>
             </div>
-            <div className="flex justify-between border-t border-zinc-100 pt-1.5 font-medium">
-              <dt className="text-zinc-700">Est. total</dt>
-              <dd className="tabular-nums text-zinc-900">{formatNaira(request.qty * request.est_unit_cost)}</dd>
+            <div className="flex justify-between border-t border-zinc-100 pt-1.5 font-medium dark:border-zinc-800">
+              <dt className="text-zinc-700 dark:text-zinc-300">Est. total</dt>
+              <dd className="tabular-nums text-zinc-900 dark:text-zinc-100">{formatNaira(request.qty * request.est_unit_cost)}</dd>
             </div>
           </dl>
         </AsidePanel>

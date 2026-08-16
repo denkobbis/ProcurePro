@@ -30,14 +30,14 @@ export default function LineItemsEditor({ initialItems }: { initialItems: LineIt
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <div key={i} className="space-y-2 rounded-md border border-zinc-100 p-3">
+        <div key={i} className="space-y-2 rounded-md border border-zinc-100 p-3 dark:border-zinc-800">
           <input
             name="line_description"
             placeholder="Description"
             value={item.description}
             onChange={(e) => updateItem(i, "description", e.target.value)}
             required
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input
@@ -45,14 +45,14 @@ export default function LineItemsEditor({ initialItems }: { initialItems: LineIt
               placeholder="Manufacturer part number (optional)"
               value={item.mpn ?? ""}
               onChange={(e) => updateItem(i, "mpn", e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
             <input
               name="line_oem_brand"
               placeholder="OEM brand (optional)"
               value={item.oemBrand ?? ""}
               onChange={(e) => updateItem(i, "oemBrand", e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -65,7 +65,7 @@ export default function LineItemsEditor({ initialItems }: { initialItems: LineIt
               value={item.qty}
               onChange={(e) => updateItem(i, "qty", e.target.value)}
               required
-              className="w-24 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm sm:flex-none"
+              className="w-24 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:flex-none"
             />
             <input
               name="line_unit_price"
@@ -76,20 +76,20 @@ export default function LineItemsEditor({ initialItems }: { initialItems: LineIt
               value={item.unitPrice}
               onChange={(e) => updateItem(i, "unitPrice", e.target.value)}
               required
-              className="w-32 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm sm:flex-none"
+              className="w-32 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:flex-none"
             />
             <button
               type="button"
               onClick={() => removeItem(i)}
               disabled={items.length === 1}
-              className="ml-auto text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-30"
+              className="ml-auto text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-30 dark:text-red-400"
             >
               Remove
             </button>
           </div>
         </div>
       ))}
-      <button type="button" onClick={addItem} className="text-xs text-zinc-600 hover:underline">
+      <button type="button" onClick={addItem} className="text-xs text-zinc-600 hover:underline dark:text-zinc-400">
         + Add line item
       </button>
     </div>

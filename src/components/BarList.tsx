@@ -6,7 +6,7 @@ export default function BarList({ rows, limit }: { rows: SpendRow[]; limit?: num
   const max = Math.max(1, ...shown.map((r) => r.amount));
 
   if (shown.length === 0) {
-    return <p className="text-sm text-zinc-400">No data yet.</p>;
+    return <p className="text-sm text-zinc-400 dark:text-zinc-500">No data yet.</p>;
   }
 
   return (
@@ -14,10 +14,10 @@ export default function BarList({ rows, limit }: { rows: SpendRow[]; limit?: num
       {shown.map((r) => (
         <li key={r.label}>
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-zinc-700">{r.label}</span>
-            <span className="tabular-nums font-medium text-zinc-900">{formatNaira(r.amount)}</span>
+            <span className="text-zinc-700 dark:text-zinc-300">{r.label}</span>
+            <span className="tabular-nums font-medium text-zinc-900 dark:text-zinc-100">{formatNaira(r.amount)}</span>
           </div>
-          <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
             <div className="h-full rounded-full bg-brand-600" style={{ width: `${(r.amount / max) * 100}%` }} />
           </div>
         </li>

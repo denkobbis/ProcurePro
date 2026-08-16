@@ -81,11 +81,11 @@ export default async function RequestsPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900">Requests</h1>
-          <p className="mt-2 text-sm text-zinc-500">Every purchase request from submission through receiving.</p>
+          <h1 className="text-[38px] font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">Requests</h1>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Every purchase request from submission through receiving.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline">
+          <Link href="/requests/export" className="text-sm font-medium text-zinc-500 hover:text-brand-700 hover:underline dark:text-zinc-400 dark:hover:text-brand-400">
             Export CSV
           </Link>
           <ButtonLink href="/requests/new">New request</ButtonLink>
@@ -93,7 +93,7 @@ export default async function RequestsPage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <EmptyState
             icon={<DocumentIcon />}
             title="No requests yet"
