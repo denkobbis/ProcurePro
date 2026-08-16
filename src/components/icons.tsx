@@ -143,6 +143,15 @@ export function MenuIcon(props: IconProps) {
   );
 }
 
+export function PanelLeftIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+      <path d="M9.5 4.5v15" />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
@@ -257,11 +266,23 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+export function LogOutIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 4.5H6a1.5 1.5 0 0 0-1.5 1.5v12A1.5 1.5 0 0 0 6 19.5h3" />
+      <path d="M15 15.5 20 12l-5-3.5" />
+      <path d="M20 12H9" />
+    </svg>
+  );
+}
+
 export function LogoMarkIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" {...props}>
       <rect width="24" height="24" rx="6" fill="currentColor" />
       <path d="M8 7h5.2a3.3 3.3 0 0 1 0 6.6H10v3.4H8V7Zm2 2v2.6h3.2a1.3 1.3 0 0 0 0-2.6H10Z" fill="white" />
+      {/* A checkmark tucked into the P's counter — approvals, not just a letterform. */}
+      <path d="M10.6 10.3 11.6 11.3 13 9.3" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

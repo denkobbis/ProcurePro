@@ -10,6 +10,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const profile = await getCurrentProfile();
   const cookieStore = await cookies();
   const isDark = cookieStore.get("theme")?.value === "dark";
+  const sidebarCollapsed = cookieStore.get("sidebar_collapsed")?.value === "true";
   const org = await getCurrentOrganization(profile);
   const locked = isOrgLocked(org);
   const trialDaysLeft = daysUntilTrialEnd(org);
@@ -36,6 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             orgName={org.name}
             counts={{ requestsOpen: requestsOpen ?? 0, approvalsAwaiting, poOpen: poOpen ?? 0 }}
             initialIsDark={isDark}
+            initialCollapsed={sidebarCollapsed}
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">

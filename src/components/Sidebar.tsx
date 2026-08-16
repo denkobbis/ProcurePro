@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
@@ -22,6 +23,8 @@ import {
   ExternalLinkIcon,
   ShieldCheckIcon,
   LogoMarkIcon,
+  PanelLeftIcon,
+  LogOutIcon,
 } from "./icons";
 
 const RIGSOURCE_URL = "https://rigsource.vercel.app";
@@ -83,16 +86,25 @@ export default function Sidebar({
   orgName,
   counts,
   initialIsDark,
+  initialCollapsed,
 }: {
   profile: Profile;
   industry: OrganizationIndustry;
   orgName: string;
   counts: SidebarCounts;
   initialIsDark: boolean;
+  initialCollapsed: boolean;
 }) {
   const pathname = usePathname();
   const { open, setOpen } = useMobileNav();
+  const [collapsed, setCollapsed] = useState(initialCollapsed);
   const modules = getIndustryModules(industry);
+
+  function toggleCollapsed() {
+    const next = !collapsed;
+    setCollapsed(next);
+    document.cookie = `sidebar_collapsed=${next}; path=/; max-age=31536000; SameSite=Lax`;
+  }
 
   const badgeValue: Record<NonNullable<(typeof PRIMARY)[number]["badge"]>, number> = {
     requests: counts.requestsOpen,
@@ -111,13 +123,22 @@ export default function Sidebar({
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav
-        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-transform duration-200 ease-in-out md:static md:z-auto md:w-[232px] md:translate-x-0 dark:border-zinc-800 dark:bg-zinc-900 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-in-out md:relative md:translate-x-0 dark:border-zinc-800 dark:bg-zinc-900 ${
           open ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } ${collapsed ? "md:w-[76px]" : "md:w-[232px]"}`}
       >
-        <div className="flex items-center gap-2 px-4 py-4">
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute -right-3 top-16 z-10 hidden h-6 w-6 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-400 shadow-sm hover:text-zinc-700 md:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-200"
+        >
+          <PanelLeftIcon className="h-3.5 w-3.5" />
+        </button>
+
+        <div className={`flex items-center gap-2 px-4 py-4 ${collapsed ? "md:justify-center md:px-0" : ""}`}>
           <LogoMarkIcon className="h-7 w-7 shrink-0 text-brand-600 dark:text-brand-400" />
-          <div className="min-w-0">
+          <div className={`min-w-0 ${collapsed ? "md:hidden" : ""}`}>
             <div className="text-lg font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">ProcurePro</div>
             <div className="truncate text-xs text-zinc-500 dark:text-zinc-400" title={orgName}>
               {orgName}
@@ -125,7 +146,7 @@ export default function Sidebar({
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 pb-4">
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto overflow-x-hidden px-3 pb-4">
           <ul className="flex flex-col gap-0.5">
             {primary.map((link) => {
               const active = pathname === link.href || pathname.startsWith(link.href + "/");
@@ -136,15 +157,18 @@ export default function Sidebar({
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
+                    title={collapsed ? link.label : undefined}
                     className={`flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
+                      collapsed ? "md:justify-center md:pr-[10px]" : ""
+                    } ${
                       active
                         ? "border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300"
                         : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                     }`}
                   >
                     <Icon className={`h-[17px] w-[17px] shrink-0 ${active ? "text-brand-600 dark:text-brand-400" : "text-zinc-400 dark:text-zinc-500"}`} />
-                    {link.label}
-                    {link.badge && <Badge count={count} active={active} />}
+                    <span className={collapsed ? "md:hidden" : ""}>{link.label}</span>
+                    {link.badge && <span className={collapsed ? "md:hidden" : "contents"}><Badge count={count} active={active} /></span>}
                   </Link>
                 </li>
               );
@@ -153,34 +177,37 @@ export default function Sidebar({
 
           {secondary.length > 0 && (
             <div>
-              <div className="px-3 pb-1 text-[13px] font-medium text-zinc-400 dark:text-zinc-500">Set up &amp; review</div>
+              <div className={`px-3 pb-1 text-[13px] font-medium text-zinc-400 dark:text-zinc-500 ${collapsed ? "md:hidden" : ""}`}>Set up &amp; review</div>
               <ul className="flex flex-col gap-0.5">
                 {secondary.map((link) => {
                   const isExternal = "external" in link && link.external;
                   const active = !isExternal && (pathname === link.href || pathname.startsWith(link.href + "/"));
                   const Icon = link.icon;
                   const className = `flex items-center gap-2.5 rounded-md border-l-2 py-1.5 pl-[10px] pr-3 text-[13px] font-medium transition-colors ${
+                    collapsed ? "md:justify-center md:pr-[10px]" : ""
+                  } ${
                     active
                       ? "border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300"
                       : "border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                   }`;
                   const iconClassName = `h-4 w-4 shrink-0 ${active ? "text-brand-600 dark:text-brand-400" : "text-zinc-400 dark:text-zinc-500"}`;
+                  const labelSpan = <span className={collapsed ? "md:hidden" : ""}>{link.label}</span>;
 
                   if (isExternal) {
                     return (
                       <li key={link.href}>
-                        <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+                        <a href={link.href} target="_blank" rel="noopener noreferrer" title={collapsed ? link.label : undefined} className={className}>
                           <Icon className={iconClassName} />
-                          {link.label}
+                          {labelSpan}
                         </a>
                       </li>
                     );
                   }
                   return (
                     <li key={link.href}>
-                      <Link href={link.href} onClick={() => setOpen(false)} className={className}>
+                      <Link href={link.href} onClick={() => setOpen(false)} title={collapsed ? link.label : undefined} className={className}>
                         <Icon className={iconClassName} />
-                        {link.label}
+                        {labelSpan}
                       </Link>
                     </li>
                   );
@@ -190,11 +217,11 @@ export default function Sidebar({
           )}
         </div>
 
-        <div className="flex items-center gap-2.5 border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
+        <div className={`flex items-center gap-2.5 border-t border-zinc-100 px-4 py-3 dark:border-zinc-800 ${collapsed ? "md:flex-col md:gap-2 md:px-2" : ""}`}>
           <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-semibold text-white">
             {initials(profile.full_name)}
           </div>
-          <div className="min-w-0 flex-1 leading-tight">
+          <div className={`min-w-0 flex-1 leading-tight ${collapsed ? "md:hidden" : ""}`}>
             <div className="truncate text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{profile.full_name}</div>
             <div className="truncate text-[11px] text-zinc-400 dark:text-zinc-500">{ROLE_LABELS[profile.role] ?? profile.role}</div>
           </div>
@@ -203,9 +230,13 @@ export default function Sidebar({
             <button
               type="submit"
               aria-label="Sign out"
-              className="rounded-md px-1.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              title={collapsed ? "Sign out" : undefined}
+              className={`flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 ${
+                collapsed ? "md:h-7 md:w-7 md:justify-center md:px-0" : ""
+              }`}
             >
-              Sign out
+              <LogOutIcon className={`h-3.5 w-3.5 shrink-0 ${collapsed ? "hidden md:block" : "hidden"}`} />
+              <span className={collapsed ? "md:hidden" : ""}>Sign out</span>
             </button>
           </form>
         </div>
