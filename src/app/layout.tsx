@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { cookies } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,30 +18,19 @@ export const metadata: Metadata = {
   description: "Procurement management — requests, approvals, POs, and budgets in one place.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Theme is read from a cookie server-side (set by ThemeToggle) rather than
-  // detected client-side via a pre-hydration script — a script tag rendered
-  // through React's tree trips React 19's "script tag in component" hydration
-  // mismatch (logs a warning in dev, and in production the client render gets
-  // discarded and re-generated from the server output, silently reverting the
-  // class the script had just set). Reading the cookie server-side means the
-  // server renders the correct class from the start, so there's nothing for
-  // hydration to mismatch against. Defaults to dark for first-time visitors
-  // with no cookie yet. Only the landing page has dark: styling, so this is a
-  // no-op everywhere else.
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value;
-  const isDark = theme ? theme === "dark" : true;
-
+  // Dark mode only exists on the landing page — it reads its own theme cookie
+  // and scopes the "dark" class to its own wrapper div (see page.tsx /
+  // ThemeToggle.tsx). It must not be applied here at the html/body level:
+  // globals.css's `body { background: var(--background) }` combined with
+  // `:root.dark` would otherwise flip the whole authenticated app's body
+  // background to the landing page's dark navy on every route.
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${isDark ? " dark" : ""}`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         {/* Emits a literal HTML comment node (a plain JSX comment compiles away and never reaches the markup), so the landing page direction contract below is grep-able in the production build for audit. */}
         <div

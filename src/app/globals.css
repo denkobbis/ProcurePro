@@ -11,7 +11,7 @@
   color-scheme: light;
 }
 
-:root.dark {
+.dark {
   --background: #0a0e1a;
   --foreground: #e4e7ec;
   color-scheme: dark;

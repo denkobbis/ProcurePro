@@ -124,7 +124,7 @@ export default async function LandingPage() {
   const isDark = theme ? theme === "dark" : true;
 
   return (
-    <div className="flex-1 bg-white dark:bg-[#0a0e1a]">
+    <div id="marketing-root" className={`flex-1 bg-white dark:bg-[#0a0e1a]${isDark ? " dark" : ""}`}>
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0a0e1a]/90">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-2 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">

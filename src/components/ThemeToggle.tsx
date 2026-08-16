@@ -12,7 +12,11 @@ export default function ThemeToggle({ initialIsDark, className = "" }: { initial
   function toggle() {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
+    // Scoped to the marketing page's own wrapper, not document.documentElement —
+    // dark mode only exists on the landing page, and applying the class at the
+    // html/body level bled a dark background into the (unstyled-for-dark)
+    // authenticated app on every route.
+    document.getElementById("marketing-root")?.classList.toggle("dark", next);
     document.cookie = `theme=${next ? "dark" : "light"}; path=/; max-age=31536000; SameSite=Lax`;
   }
 

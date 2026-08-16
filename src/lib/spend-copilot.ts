@@ -18,6 +18,14 @@ const TOOLS = [
     },
   },
   {
+    name: "get_top_vendors",
+    description: "Vendors ranked by total NGN spend (landed cost), highest first. Use for questions like 'who is our top vendor' or 'which vendors do we spend the most with' — no vendor name needed.",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "How many vendors to return, default 5" } },
+    },
+  },
+  {
     name: "get_budget_status",
     description: "Current-period budget status (allocated, committed, spent, available) for a department/category. Omit either filter to list more broadly.",
     input_schema: {
@@ -82,6 +90,28 @@ async function executeTool(supabase: SupabaseClient, name: string, input: Record
         total_spend_ngn: Math.round(totals.get(v.id) ?? 0),
       })),
     };
+  }
+
+  if (name === "get_top_vendors") {
+    const limit = typeof input.limit === "number" && input.limit > 0 ? Math.floor(input.limit) : 5;
+    const { data: vendors } = await supabase.from("vendors").select("id, name");
+    if (!vendors || vendors.length === 0) return { error: "No vendors found." };
+
+    const { data: pos } = await supabase.from("purchase_orders").select("vendor_id, total_amount_ngn, freight_cost_ngn, customs_duty_ngn");
+    const totals = new Map<string, number>();
+    for (const po of (pos ?? []) as Array<{ vendor_id: string; total_amount_ngn: number; freight_cost_ngn: number; customs_duty_ngn: number }>) {
+      const landed = po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
+      totals.set(po.vendor_id, (totals.get(po.vendor_id) ?? 0) + landed);
+    }
+
+    const ranked = (vendors as Array<{ id: string; name: string }>)
+      .map((v) => ({ name: v.name, total_spend_ngn: Math.round(totals.get(v.id) ?? 0) }))
+      .filter((v) => v.total_spend_ngn > 0)
+      .sort((a, b) => b.total_spend_ngn - a.total_spend_ngn)
+      .slice(0, limit);
+
+    if (ranked.length === 0) return { error: "No vendors with recorded spend yet." };
+    return { vendors: ranked };
   }
 
   if (name === "get_budget_status") {
