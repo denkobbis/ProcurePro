@@ -3,6 +3,7 @@ import type { Profile } from "@/lib/database.types";
 import MobileMenuButton from "./MobileMenuButton";
 import TopbarSearch from "./TopbarSearch";
 import { ButtonLink } from "./Button";
+import UserMenu from "./UserMenu";
 import { BellIcon } from "./icons";
 
 export default async function Topbar({ profile }: { profile: Profile }) {
@@ -33,6 +34,9 @@ export default async function Topbar({ profile }: { profile: Profile }) {
         <ButtonLink href="/requests/new" size="sm">
           New request
         </ButtonLink>
+        <div className="ml-1 border-l border-zinc-200 pl-3">
+          <UserMenu fullName={profile.full_name} role={profile.role} />
+        </div>
       </div>
     </header>
   );
