@@ -15,8 +15,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://procurepro-woad.vercel.app"),
-  title: "ProcurePro",
-  description: "Procurement management — requests, approvals, POs, and budgets in one place.",
+  title: "ProcurePro | NCDMB-Ready Procurement Software for Nigeria",
+  description:
+    "Procurement software for Nigerian oil & gas and heavy-industry teams — approvals, purchase orders, landed cost, and NCDMB compliance tracking in one place. 14-day free trial, no card required.",
+  keywords: [
+    "procurement software Nigeria",
+    "NCDMB compliance software",
+    "purchase order software Nigeria",
+    "oil and gas procurement software",
+    "vendor management software Nigeria",
+  ],
 };
 
 export default async function RootLayout({

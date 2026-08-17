@@ -194,8 +194,30 @@ export default async function LandingPage({
   searchParams: Promise<{ utm_source?: string; utm_medium?: string; utm_campaign?: string }>;
 }) {
   const { utm_source, utm_medium, utm_campaign } = await searchParams;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "ProcurePro",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description:
+      "Procurement software for Nigerian oil & gas and heavy-industry teams — approvals, purchase orders, landed cost, and NCDMB compliance tracking in one place.",
+    offers: {
+      "@type": "Offer",
+      price: "25000",
+      priceCurrency: "NGN",
+      priceValidUntil: "2027-12-31",
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Nigeria",
+    },
+  };
+
   return (
     <div id="marketing-root" className="flex-1 bg-white">
+      {/* Static, inert JSON-LD — no client-side mutation, so nothing for hydration to mismatch against. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-2 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
