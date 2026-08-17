@@ -2,6 +2,8 @@
 // the handful of endpoints we use). Unlike email, this is NOT optional
 // infrastructure — a missing key throws, because a caller triggering a
 // payment needs to know it didn't happen, not have it silently no-op.
+import crypto from "crypto";
+
 const BASE_URL = "https://api.flutterwave.com/v3";
 
 function requireSecretKey(): string {
@@ -73,5 +75,11 @@ export async function initiateTransfer(params: {
 export function verifyWebhookSignature(signatureHeader: string | null): boolean {
   const expected = process.env.FLUTTERWAVE_WEBHOOK_SECRET_HASH;
   if (!expected || !signatureHeader) return false;
-  return signatureHeader === expected;
+  const a = Buffer.from(signatureHeader);
+  const b = Buffer.from(expected);
+  // timingSafeEqual throws on a length mismatch rather than returning false,
+  // and a plain === comparison leaks the secret one byte at a time via
+  // response-time differences over enough requests.
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }

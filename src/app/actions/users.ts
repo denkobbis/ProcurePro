@@ -33,6 +33,20 @@ export async function createUser(formData: FormData) {
 
   if (!email || !fullName || !password) throw new Error("Email, name, and a temporary password are required");
   if (password.length < 8) throw new Error("Temporary password must be at least 8 characters");
+  // A finance_admin passes the same ADMIN_ROLES check as a super_admin above
+  // — without this, a finance_admin could mint a peer super_admin account.
+  if (role === "super_admin" && profile.role !== "super_admin") {
+    throw new Error("Only a super admin can grant super admin access");
+  }
+  if (departmentId) {
+    // departments RLS already scopes SELECT to the caller's own org, so a
+    // department_id belonging to a different org simply won't come back —
+    // catches a cross-org id before it reaches the service-role trigger,
+    // which would otherwise insert it unchecked.
+    const supabase = await createClient();
+    const { data: dept } = await supabase.from("departments").select("id").eq("id", departmentId).maybeSingle();
+    if (!dept) throw new Error("Invalid department");
+  }
 
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.createUser({

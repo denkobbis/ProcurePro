@@ -125,13 +125,12 @@ export async function uploadVendorDocument(formData: FormData) {
   const { error: uploadErr } = await supabase.storage.from("attachments").upload(path, file);
   if (uploadErr) throw new Error(uploadErr.message);
 
-  const { data: vendor } = await supabase.from("vendors").select("documents").eq("id", vendorId).single();
-  const documents = [
-    ...(vendor?.documents ?? []),
-    { file_path: path, file_name: file.name, uploaded_at: new Date().toISOString(), document_type: documentType, expiry_date: expiryDate },
-  ];
-
-  const { error } = await supabase.from("vendors").update({ documents }).eq("id", vendorId);
+  // Atomic append (see migration) — a read-modify-write here would let two
+  // concurrent uploads to the same vendor silently drop one entry.
+  const { error } = await supabase.rpc("append_vendor_document", {
+    p_vendor_id: vendorId,
+    p_document: { file_path: path, file_name: file.name, uploaded_at: new Date().toISOString(), document_type: documentType, expiry_date: expiryDate },
+  });
   if (error) throw new Error(error.message);
 
   revalidatePath(`/vendors/${vendorId}`);
