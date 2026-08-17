@@ -80,6 +80,19 @@ function Badge({ count, active }: { count: number; active: boolean }) {
   );
 }
 
+function CollapsedBadge({ count, active }: { count: number; active: boolean }) {
+  if (!count) return null;
+  return (
+    <span
+      className={`absolute right-1.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold tabular-nums ${
+        active ? "bg-brand-600 text-white" : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
+      }`}
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
 export default function Sidebar({
   profile,
   industry,
@@ -157,8 +170,8 @@ export default function Sidebar({
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    title={collapsed ? link.label : undefined}
-                    className={`flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
+                    title={collapsed ? `${link.label}${count ? ` (${count})` : ""}` : undefined}
+                    className={`relative flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
                       collapsed ? "md:justify-center md:pr-[10px]" : ""
                     } ${
                       active
@@ -169,6 +182,11 @@ export default function Sidebar({
                     <Icon className={`h-[17px] w-[17px] shrink-0 ${active ? "text-brand-600 dark:text-brand-400" : "text-zinc-400 dark:text-zinc-500"}`} />
                     <span className={collapsed ? "md:hidden" : ""}>{link.label}</span>
                     {link.badge && <span className={collapsed ? "md:hidden" : "contents"}><Badge count={count} active={active} /></span>}
+                    {link.badge && collapsed && (
+                      <span className="hidden md:block">
+                        <CollapsedBadge count={count} active={active} />
+                      </span>
+                    )}
                   </Link>
                 </li>
               );
