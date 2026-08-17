@@ -281,8 +281,6 @@ export function LogoMarkIcon(props: IconProps) {
     <svg viewBox="0 0 24 24" fill="none" {...props}>
       <rect width="24" height="24" rx="6" fill="currentColor" />
       <path d="M8 7h5.2a3.3 3.3 0 0 1 0 6.6H10v3.4H8V7Zm2 2v2.6h3.2a1.3 1.3 0 0 0 0-2.6H10Z" fill="white" />
-      {/* A checkmark tucked into the P's counter — approvals, not just a letterform. */}
-      <path d="M10.6 10.3 11.6 11.3 13 9.3" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
