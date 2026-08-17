@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/Button";
 import Reveal from "@/components/landing/Reveal";
 import FeatureCarousel from "@/components/landing/FeatureCarousel";
+import { DemoRequestForm } from "@/components/landing/DemoRequestForm";
 import {
   MockupFrame,
   FloatingBadge,
@@ -187,7 +188,12 @@ const PRICING_INCLUDES = [
 
 const REAL_INTEGRATIONS = ["Paystack", "Flutterwave", "Xero"];
 
-export default function LandingPage() {
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ utm_source?: string; utm_medium?: string; utm_campaign?: string }>;
+}) {
+  const { utm_source, utm_medium, utm_campaign } = await searchParams;
   return (
     <div id="marketing-root" className="flex-1 bg-white">
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
@@ -202,6 +208,9 @@ export default function LandingPage() {
             </a>
             <a href="#pricing" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
               Pricing
+            </a>
+            <a href="#demo" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
+              Request a demo
             </a>
             <Link href="/login" className={`text-sm font-medium text-zinc-600 hover:text-zinc-900 ${focusRing}`}>
               Sign in
@@ -446,6 +455,36 @@ export default function LandingPage() {
                 <ArrowRightIcon className="h-4 w-4" />
               </ButtonLink>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Demo request */}
+      <section id="demo" className="relative overflow-hidden bg-brand-950 px-4 py-20 sm:px-6">
+        <div className="bg-brand-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <Reveal>
+            <h2 className="text-3xl font-semibold tracking-tight text-white">Not sure the trial is for you?</h2>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-brand-200">
+              Tell us how procurement runs at your company and we&rsquo;ll walk through ProcurePro against your real
+              workflow — your POs, your vendors, your approval chain — in a 20-minute call. Nothing to install, no card.
+            </p>
+            <ul className="mt-8 space-y-4">
+              {[
+                "See your approval chain and budget checks, not a canned demo",
+                "Ask anything about NCDMB tracking, landed cost, or payments",
+                "Leave with a concrete plan to try it with your own team",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-brand-100">
+                  <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-accent-400" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <DemoRequestForm utmSource={utm_source} utmMedium={utm_medium} utmCampaign={utm_campaign} />
           </Reveal>
         </div>
       </section>

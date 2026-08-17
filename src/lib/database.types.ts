@@ -351,6 +351,20 @@ export interface Payment {
   created_at: string;
 }
 
+export interface MarketingLead {
+  id: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string | null;
+  message: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  status: "new" | "contacted" | "won" | "lost";
+  created_at: string;
+}
+
 // Minimal Database shape so @supabase/ssr generics compile.
 // Not exhaustive (RPC return types are cast at call sites).
 export type Database = Record<string, unknown>;

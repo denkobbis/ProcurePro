@@ -1,0 +1,231 @@
+<title>ProcurePro One-Pager</title>
+<style>
+  :root {
+    --navy-950: #0e1830;
+    --navy-900: #172750;
+    --navy-800: #1c3163;
+    --navy-700: #223d7c;
+    --navy-600: #2c4f9e;
+    --navy-500: #3b69be;
+    --navy-300: #8cb0e4;
+    --navy-200: #b8cff0;
+    --navy-100: #dce7f8;
+    --navy-50: #eff4fc;
+    --accent-700: #611fa3;
+    --accent-600: #7827c9;
+    --accent-500: #8b3fe0;
+    --accent-glow: #c026d3;
+    --ink: #18181b;
+    --body-text: #52525b;
+    --line: #e4e4e7;
+    --canvas: #fafafa;
+    --bg: #ffffff;
+    --amber: #b45309;
+    --amber-bg: #fffbeb;
+    --amber-line: #fde68a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet {
+    max-width: 880px;
+    margin: 0 auto;
+    background: var(--bg);
+    box-shadow: 0 1px 3px rgba(14,24,48,0.08);
+  }
+  .band {
+    position: relative;
+    background: var(--navy-950);
+    background-image: radial-gradient(circle at 12% 18%, rgba(140,176,228,0.22), transparent 55%),
+                       radial-gradient(circle at 92% 30%, rgba(192,38,211,0.16), transparent 50%);
+    color: white;
+    padding: 40px 48px 34px;
+    overflow: hidden;
+  }
+  .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logomark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--navy-600);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: white; flex-shrink: 0;
+  }
+  .brand-name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--navy-200); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px;
+    padding: 5px 12px; background: rgba(255,255,255,0.05); white-space: nowrap;
+  }
+  h1 {
+    margin: 26px 0 0;
+    font-size: 34px;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    font-weight: 650;
+    max-width: 620px;
+  }
+  .lede {
+    margin: 14px 0 0;
+    max-width: 560px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--navy-200);
+  }
+  .band-stats {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+  }
+  .band-stat .num { font-size: 19px; font-weight: 650; color: white; letter-spacing: -0.01em; }
+  .band-stat .lbl { margin-top: 3px; font-size: 11.5px; line-height: 1.4; color: var(--navy-300); }
+
+  .body { padding: 38px 48px 8px; }
+  .section-label {
+    font-size: 11px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--accent-600);
+  }
+  .section-title {
+    margin: 6px 0 0;
+    font-size: 20px; font-weight: 650; letter-spacing: -0.01em; color: var(--ink);
+  }
+
+  .problems { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .problem {
+    border: 1px solid var(--line); border-radius: 10px; padding: 16px;
+    background: var(--bg);
+  }
+  .problem .ptitle { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .problem .pdesc { margin-top: 6px; font-size: 12.5px; line-height: 1.55; color: var(--body-text); }
+
+  .features { margin-top: 34px; }
+  .feature-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; }
+  .feature { display: flex; gap: 11px; align-items: flex-start; }
+  .fdot {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 7px;
+    background: var(--navy-50); color: var(--navy-600);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .ftext .ftitle { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+  .ftext .fdesc { margin-top: 3px; font-size: 11.5px; line-height: 1.5; color: var(--body-text); }
+
+  .proof {
+    margin-top: 34px;
+    border: 1px solid var(--amber-line);
+    background: var(--amber-bg);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .proof .pn { font-size: 20px; font-weight: 700; color: var(--amber); white-space: nowrap; }
+  .proof .pd { font-size: 12.5px; line-height: 1.55; color: #7c4a06; }
+
+  .foot {
+    margin-top: 34px;
+    background: var(--navy-950);
+    background-image: radial-gradient(circle at 85% 20%, rgba(192,38,211,0.18), transparent 55%);
+    color: white;
+    padding: 30px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .price-block .amt { font-size: 30px; font-weight: 650; letter-spacing: -0.01em; }
+  .price-block .amt span { font-size: 14px; font-weight: 500; color: var(--navy-300); }
+  .price-block .sub { margin-top: 4px; font-size: 12px; color: var(--navy-300); }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(90deg, var(--accent-600), var(--accent-glow));
+    color: white; font-weight: 600; font-size: 13.5px;
+    padding: 12px 22px; border-radius: 8px; white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(120,39,201,0.35);
+  }
+  .closing { padding: 18px 48px 30px; font-size: 11px; color: #a1a1aa; text-align: center; }
+
+  @media (max-width: 720px) {
+    .band, .body, .foot { padding-left: 24px; padding-right: 24px; }
+    .band-stats, .problems, .feature-grid { grid-template-columns: 1fr 1fr; }
+    .foot { flex-direction: column; align-items: flex-start; }
+    h1 { font-size: 27px; }
+  }
+</style>
+
+<div class="sheet">
+  <div class="band">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="logomark">P</div>
+        <div class="brand-name">ProcurePro</div>
+      </div>
+      <div class="tag">Built for Nigerian Oil &amp; Gas</div>
+    </div>
+    <h1>Procurement control, without the SAP-sized budget.</h1>
+    <p class="lede">ProcurePro replaces spreadsheets and WhatsApp threads with real approval chains, budget enforcement, and vendor compliance — enterprise procure-to-pay depth at a price and simplicity point built for mid-market Nigerian companies.</p>
+    <div class="band-stats">
+      <div class="band-stat"><div class="num">6</div><div class="lbl">stages, one system — request to receiving</div></div>
+      <div class="band-stat"><div class="num">9</div><div class="lbl">AI-assisted checks running quietly in the background</div></div>
+      <div class="band-stat"><div class="num">2</div><div class="lbl">payout rails built in — Paystack &amp; Flutterwave</div></div>
+      <div class="band-stat"><div class="num">₦25k</div><div class="lbl">flat per month, 14-day trial, no card required</div></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="section-label">The problem</div>
+    <div class="section-title">The way most teams still run procurement</div>
+    <div class="problems">
+      <div class="problem">
+        <div class="ptitle">Approvals buried in email and WhatsApp</div>
+        <div class="pdesc">By the time a PO gets sign-off, nobody remembers who approved what, or why it was urgent.</div>
+      </div>
+      <div class="problem">
+        <div class="ptitle">Budgets discovered after they're blown</div>
+        <div class="pdesc">Spend visibility means asking finance for a spreadsheet, days after the money's already gone.</div>
+      </div>
+      <div class="problem">
+        <div class="ptitle">Vendor compliance lives in someone's head</div>
+        <div class="pdesc">NCDMB certificates, local content percentages, bank details — tracked nowhere, until an audit or a payment asks.</div>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="section-label">What's built in</div>
+      <div class="section-title">Full requisition-to-payment depth</div>
+      <div class="feature-grid">
+        <div class="feature"><div class="fdot">1</div><div class="ftext"><div class="ftitle">Multi-step approvals</div><div class="fdesc">Routing by department and amount, configured by your admin — not hardcoded.</div></div></div>
+        <div class="feature"><div class="fdot">2</div><div class="ftext"><div class="ftitle">AI request drafting</div><div class="fdesc">Upload a vendor quote or invoice; description, quantity, and cost fill themselves in.</div></div></div>
+        <div class="feature"><div class="fdot">3</div><div class="ftext"><div class="ftitle">Landed cost tracking</div><div class="fdesc">Multi-currency POs roll up FX rate, freight, and customs duty automatically.</div></div></div>
+        <div class="feature"><div class="fdot">4</div><div class="ftext"><div class="ftitle">RFQ &amp; quote comparison</div><div class="fdesc">Vendor quotes auto-ranked by price and lead time — no spreadsheet exercise.</div></div></div>
+        <div class="feature"><div class="fdot">5</div><div class="ftext"><div class="ftitle">3-way invoice matching</div><div class="fdesc">Every invoice checked against the PO and what was actually received before it's paid.</div></div></div>
+        <div class="feature"><div class="fdot">6</div><div class="ftext"><div class="ftitle">NCDMB vendor compliance</div><div class="fdesc">Local content percentage and certificate expiry live on the vendor record itself.</div></div></div>
+        <div class="feature"><div class="fdot">7</div><div class="ftext"><div class="ftitle">Vendor payouts, direct</div><div class="fdesc">Pay a PO's vendor from inside the app via Paystack or Flutterwave transfer.</div></div></div>
+        <div class="feature"><div class="fdot">8</div><div class="ftext"><div class="ftitle">Xero-ready export</div><div class="fdesc">Invoice data exports straight into your accountant's Bills import format.</div></div></div>
+        <div class="feature"><div class="fdot">9</div><div class="ftext"><div class="ftitle">Full audit log</div><div class="fdesc">Every approval, edit, and payment is attributable and timestamped.</div></div></div>
+      </div>
+    </div>
+
+    <div class="proof">
+      <div class="pn">8.9%</div>
+      <div class="pd"><strong>A real catch, not a hypothetical:</strong> in testing, ProcurePro's invoice matching flagged a vendor invoice priced 8.9% above the agreed PO rate — the exact kind of quiet overcharge that slips through a spreadsheet-based process.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="price-block">
+      <div class="amt">₦25,000<span> / month</span></div>
+      <div class="sub">One plan, everything included. 14-day free trial, no card required.</div>
+    </div>
+    <div class="cta">Book a walkthrough →</div>
+  </div>
+  <div class="closing">ProcurePro — Procurement control for heavy industry. procurepro-woad.vercel.app</div>
+</div>
