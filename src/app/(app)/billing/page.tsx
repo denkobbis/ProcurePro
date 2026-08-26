@@ -101,6 +101,26 @@ export default async function BillingPage({
           </form>
         </RecordSection>
       )}
+
+      <RecordSection title="Legal & support">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Questions about your subscription or a billing issue?{" "}
+          <a href="mailto:den.kobbis@gmail.com" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+            den.kobbis@gmail.com
+          </a>
+        </p>
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <a href="/legal/terms" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+            Terms of Service
+          </a>
+          <a href="/legal/privacy" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+            Privacy Policy
+          </a>
+          <a href="/legal/refund" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+            Refund Policy
+          </a>
+        </div>
+      </RecordSection>
     </div>
   );
 }

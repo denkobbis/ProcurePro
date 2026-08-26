@@ -529,6 +529,22 @@ export default async function LandingPage({
             <span>&copy; {new Date().getFullYear()} ProcurePro</span>
           </div>
         </div>
+        <div className="mx-auto mt-6 flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-zinc-100 pt-6 text-xs text-zinc-400 sm:flex-row">
+          <a href="mailto:den.kobbis@gmail.com" className={`hover:text-zinc-700 ${focusRing}`}>
+            den.kobbis@gmail.com
+          </a>
+          <div className="flex items-center gap-5">
+            <Link href="/legal/terms" className={`hover:text-zinc-700 ${focusRing}`}>
+              Terms of Service
+            </Link>
+            <Link href="/legal/privacy" className={`hover:text-zinc-700 ${focusRing}`}>
+              Privacy Policy
+            </Link>
+            <Link href="/legal/refund" className={`hover:text-zinc-700 ${focusRing}`}>
+              Refund Policy
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

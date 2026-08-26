@@ -176,6 +176,18 @@ export default async function SignupPage({
           </form>
 
           <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            By creating an account, you agree to our{" "}
+            <a href="/legal/terms" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+              Terms
+            </a>{" "}
+            and{" "}
+            <a href="/legal/privacy" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+              Privacy Policy
+            </a>
+            .
+          </p>
+
+          <p className="mt-3 text-center text-xs text-zinc-400 dark:text-zinc-500">
             Already have an account?{" "}
             <a href="/login" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
               Sign in
