@@ -2,6 +2,7 @@ import { getCurrentProfile, getCurrentOrganization, isOrgLocked, ADMIN_ROLES } f
 import { startSubscription, cancelSubscription } from "@/app/actions/billing";
 import { updateOrganizationSettings } from "@/app/actions/organization";
 import { Button } from "@/components/Button";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import StatusBadge from "@/components/StatusBadge";
 import { formatNaira } from "@/lib/money";
 import { INDUSTRY_OPTIONS } from "@/lib/industries";
@@ -61,7 +62,14 @@ export default async function BillingPage({
             )}
             {org.subscription_status === "active" && (
               <form action={cancelSubscription} className="mt-4">
-                <Button type="submit" variant="danger" size="sm">Cancel subscription</Button>
+                <ConfirmSubmitButton
+                  type="submit"
+                  variant="danger"
+                  size="sm"
+                  confirmMessage="Cancel your ProcurePro subscription? This takes effect immediately — the organization will be locked to read-only until you resubscribe."
+                >
+                  Cancel subscription
+                </ConfirmSubmitButton>
               </form>
             )}
           </>
@@ -74,8 +82,9 @@ export default async function BillingPage({
         <RecordSection title="Organization">
           <form action={updateOrganizationSettings} className="space-y-3">
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Name</label>
+              <label htmlFor="org-name-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Name</label>
               <input
+                id="org-name-field"
                 name="name"
                 defaultValue={org.name}
                 required
@@ -83,8 +92,9 @@ export default async function BillingPage({
               />
             </div>
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Line of work</label>
+              <label htmlFor="org-industry-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Line of work</label>
               <select
+                id="org-industry-field"
                 name="industry"
                 defaultValue={org.industry}
                 className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"

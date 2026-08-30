@@ -34,6 +34,7 @@ export default function MoneyInput({
   placeholder,
   className,
   id,
+  "aria-describedby": ariaDescribedBy,
 }: {
   name: string;
   value?: string;
@@ -43,6 +44,7 @@ export default function MoneyInput({
   placeholder?: string;
   className?: string;
   id?: string;
+  "aria-describedby"?: string;
 }) {
   const isControlled = value !== undefined;
   const [internal, setInternal] = useState(() => (defaultValue != null && defaultValue !== "" ? String(defaultValue) : ""));
@@ -59,6 +61,7 @@ export default function MoneyInput({
         value={display}
         placeholder={placeholder}
         required={required}
+        aria-describedby={ariaDescribedBy}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onChange={(e) => {

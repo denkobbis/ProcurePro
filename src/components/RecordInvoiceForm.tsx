@@ -100,16 +100,16 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-2">
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice number</label>
-          <input name="invoice_number" required value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
+          <label htmlFor="invoice-number-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice number</label>
+          <input id="invoice-number-field" name="invoice_number" required value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
         </div>
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice date</label>
-          <input name="invoice_date" type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
+          <label htmlFor="invoice-date-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice date</label>
+          <input id="invoice-date-field" name="invoice_date" type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className={`mt-1 w-full ${inputClass}`} />
         </div>
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Currency</label>
-          <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className={`mt-1 w-full ${inputClass}`}>
+          <label htmlFor="invoice-currency-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Currency</label>
+          <select id="invoice-currency-field" name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className={`mt-1 w-full ${inputClass}`}>
             {CURRENCIES.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -118,8 +118,9 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
           </select>
         </div>
         <div className="sm:col-span-4">
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice total</label>
+          <label htmlFor="invoice-total-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice total</label>
           <MoneyInput
+            id="invoice-total-field"
             name="total_amount"
             required
             value={totalAmount}
@@ -164,6 +165,7 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
               type="button"
               onClick={() => removeItem(i)}
               disabled={items.length === 1}
+              aria-label={`Remove line item ${i + 1}`}
               className="text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-30 dark:text-red-400"
             >
               Remove

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import { actOnApproval, createDelegation, removeDelegation } from "@/app/actions/approvals";
 import { Button } from "@/components/Button";
+import ConfirmButton from "@/components/ConfirmButton";
 import EmptyState from "@/components/EmptyState";
 import { CheckCircleIcon } from "@/components/icons";
 import { getBottleneckFlags } from "@/lib/approval-bottleneck";
@@ -106,9 +107,13 @@ export default async function ApprovalsPage() {
                           <form action={actOnApproval}>
                             <input type="hidden" name="approval_id" value={a.id} />
                             <input type="hidden" name="action" value="rejected" />
-                            <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                            <ConfirmButton
+                              type="submit"
+                              confirmMessage={`Reject "${a.description}" (${a.request_number})? The requester will need to submit a new request if they want to try again.`}
+                              className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                            >
                               Reject
-                            </button>
+                            </ConfirmButton>
                           </form>
                           <form action={actOnApproval}>
                             <input type="hidden" name="approval_id" value={a.id} />
@@ -138,16 +143,16 @@ export default async function ApprovalsPage() {
         </p>
         <form action={createDelegation} className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-xs text-zinc-500 dark:text-zinc-400">Delegate&apos;s email</label>
-            <input name="delegate_email" type="email" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+            <label htmlFor="delegate-email-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Delegate&apos;s email</label>
+            <input id="delegate-email-field" name="delegate_email" type="email" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           </div>
           <div>
-            <label className="block text-xs text-zinc-500 dark:text-zinc-400">Start date</label>
-            <input name="start_date" type="date" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+            <label htmlFor="delegate-start-date-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Start date</label>
+            <input id="delegate-start-date-field" name="start_date" type="date" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           </div>
           <div>
-            <label className="block text-xs text-zinc-500 dark:text-zinc-400">End date</label>
-            <input name="end_date" type="date" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+            <label htmlFor="delegate-end-date-field" className="block text-xs text-zinc-500 dark:text-zinc-400">End date</label>
+            <input id="delegate-end-date-field" name="end_date" type="date" required className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           </div>
           <Button type="submit">Delegate</Button>
         </form>

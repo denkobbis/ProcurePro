@@ -20,8 +20,8 @@ export default function NcdmbFields({
   return (
     <div className="space-y-3 rounded-md border border-zinc-100 p-3 dark:border-zinc-800">
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Default currency</label>
-        <select name="default_currency" defaultValue={defaultCurrency} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+        <label htmlFor="default-currency-field" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Default currency</label>
+        <select id="default-currency-field" name="default_currency" defaultValue={defaultCurrency} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
           {CURRENCIES.map((c) => (
             <option key={c} value={c}>
               {c}
@@ -37,16 +37,18 @@ export default function NcdmbFields({
           </label>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">NCDMB certificate number</label>
+              <label htmlFor="ncdmb-certificate-number-field" className="block text-xs text-zinc-500 dark:text-zinc-400">NCDMB certificate number</label>
               <input
+                id="ncdmb-certificate-number-field"
                 name="ncdmb_certificate_number"
                 defaultValue={defaultCertificateNumber}
                 className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               />
             </div>
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Certificate expiry</label>
+              <label htmlFor="ncdmb-certificate-expiry-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Certificate expiry</label>
               <input
+                id="ncdmb-certificate-expiry-field"
                 name="ncdmb_certificate_expiry"
                 type="date"
                 defaultValue={defaultCertificateExpiry}
@@ -55,8 +57,9 @@ export default function NcdmbFields({
             </div>
           </div>
           <div>
-            <label className="block text-xs text-zinc-500 dark:text-zinc-400">Local content percentage</label>
+            <label htmlFor="local-content-percentage-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Local content percentage</label>
             <input
+              id="local-content-percentage-field"
               name="local_content_percentage"
               type="number"
               min="0"

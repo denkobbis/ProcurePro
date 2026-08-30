@@ -33,6 +33,15 @@ export default function UserMenu({ fullName, role }: { fullName: string; role: s
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -82,6 +91,32 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const focusable = dialog?.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    focusable?.[0]?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose, status]);
 
   async function handleSubmit(formData: FormData) {
     setStatus("loading");
@@ -97,10 +132,17 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="feedback-modal-title"
+        className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+        onClick={(e) => e.stopPropagation()}
+      >
         {status === "done" ? (
           <>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Thanks — got it.</h2>
+            <h2 id="feedback-modal-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Thanks — got it.</h2>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">We read every note that comes through here.</p>
             <Button type="button" size="sm" variant="secondary" className="mt-4" onClick={onClose}>
               Close
@@ -108,7 +150,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
           </>
         ) : (
           <form action={handleSubmit}>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Send feedback</h2>
+            <h2 id="feedback-modal-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Send feedback</h2>
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Bug, missing feature, or just a gripe — tell us what&apos;s on your mind.</p>
             <input type="hidden" name="page_path" value={pathname ?? ""} />
             <textarea

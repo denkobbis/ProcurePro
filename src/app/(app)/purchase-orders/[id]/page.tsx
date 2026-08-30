@@ -6,6 +6,7 @@ import { formatNaira, formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import PrintButton from "@/components/PrintButton";
 import { Button, ButtonLink } from "@/components/Button";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import MoneyInput from "@/components/MoneyInput";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
 import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments";
@@ -231,8 +232,9 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                         {li.description} <span className="text-zinc-400 dark:text-zinc-500">({li.received_qty}/{li.qty} received)</span>
                       </div>
                       <div>
-                        <label className="block text-xs text-zinc-500 dark:text-zinc-400">Qty received now</label>
+                        <label htmlFor={`received-qty-${li.id}`} className="block text-xs text-zinc-500 dark:text-zinc-400">Qty received now</label>
                         <input
+                          id={`received-qty-${li.id}`}
                           name="received_qty"
                           type="number"
                           min="0.01"
@@ -308,16 +310,34 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                   <form action={initiatePayment} className="mb-4 space-y-2">
                     <input type="hidden" name="po_id" value={po.id} />
                     <div>
-                      <label className="block text-xs text-zinc-500 dark:text-zinc-400">Amount (defaults to the full remaining balance)</label>
+                      <label htmlFor="payment-amount-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Amount (defaults to the full remaining balance)</label>
                       <MoneyInput
+                        id="payment-amount-field"
                         name="amount"
                         placeholder={new Intl.NumberFormat("en-NG").format(amountRemaining)}
                         className="mt-1 w-48 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button type="submit" name="provider" value="paystack" size="sm">Pay via Paystack</Button>
-                      <Button type="submit" name="provider" value="flutterwave" variant="secondary" size="sm">Pay via Flutterwave</Button>
+                      <ConfirmSubmitButton
+                        type="submit"
+                        name="provider"
+                        value="paystack"
+                        size="sm"
+                        confirmMessage={`Send up to ${formatNaira(amountRemaining)} to this vendor via Paystack now? This can't be undone.`}
+                      >
+                        Pay via Paystack
+                      </ConfirmSubmitButton>
+                      <ConfirmSubmitButton
+                        type="submit"
+                        name="provider"
+                        value="flutterwave"
+                        variant="secondary"
+                        size="sm"
+                        confirmMessage={`Send up to ${formatNaira(amountRemaining)} to this vendor via Flutterwave now? This can't be undone.`}
+                      >
+                        Pay via Flutterwave
+                      </ConfirmSubmitButton>
                     </div>
                   </form>
                 ) : (

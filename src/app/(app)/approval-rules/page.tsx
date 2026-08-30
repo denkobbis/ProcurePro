@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createApprovalRule, deleteApprovalRule } from "@/app/actions/approval-rules";
 import { formatNaira } from "@/lib/money";
 import { Button } from "@/components/Button";
+import ConfirmButton from "@/components/ConfirmButton";
 import MoneyInput from "@/components/MoneyInput";
 import { RecordSection } from "@/components/RecordPanels";
 import type { ApprovalRule, Department } from "@/lib/database.types";
@@ -65,7 +66,13 @@ export default async function ApprovalRulesPage() {
                     <td className="px-4 py-2.5">
                       <form action={deleteApprovalRule}>
                         <input type="hidden" name="rule_id" value={r.id} />
-                        <button className="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Remove</button>
+                        <ConfirmButton
+                          type="submit"
+                          confirmMessage={`Remove this approval rule (step ${r.step_order}, ${ROLE_LABELS[r.approver_role] ?? r.approver_role})? Requests already in flight will keep their current approvals.`}
+                          className="text-xs font-medium text-red-600 hover:underline dark:text-red-400"
+                        >
+                          Remove
+                        </ConfirmButton>
                       </form>
                     </td>
                   </tr>

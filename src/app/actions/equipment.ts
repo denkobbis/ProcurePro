@@ -19,6 +19,11 @@ export async function createEquipmentAsset(formData: FormData) {
   if (!assetTag || !name || !category) throw new Error("Asset tag, name, and category are required");
 
   const supabase = await createClient();
+  const { data: existing } = await supabase.from("equipment_assets").select("asset_tag");
+  if ((existing ?? []).some((a) => a.asset_tag.toLowerCase() === assetTag.toLowerCase())) {
+    throw new Error(`An asset tagged "${assetTag}" already exists`);
+  }
+
   const { data: asset, error } = await supabase
     .from("equipment_assets")
     .insert({ asset_tag: assetTag, name, category, day_rate_ngn: dayRateNgn, notes, created_by: profile.id })

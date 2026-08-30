@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useFormStatus } from "react-dom";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { SpinnerIcon } from "./icons";
 
 type Variant = "primary" | "secondary" | "danger" | "success" | "ghost" | "accent";
 type Size = "sm" | "md" | "lg";
@@ -34,10 +38,23 @@ export function Button({
   size = "md",
   className = "",
   children,
+  disabled,
+  type,
   ...rest
 }: CommonProps & ButtonHTMLAttributes<HTMLButtonElement>) {
+  // Safe to call outside a <form> too — React returns {pending: false, ...} by default.
+  const { pending } = useFormStatus();
+  const isSubmitting = type === "submit" && pending;
+
   return (
-    <button className={`${shared} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`} {...rest}>
+    <button
+      type={type}
+      disabled={disabled || isSubmitting}
+      aria-busy={isSubmitting || undefined}
+      className={`${shared} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      {...rest}
+    >
+      {isSubmitting && <SpinnerIcon className="h-3.5 w-3.5 shrink-0 animate-spin" />}
       {children}
     </button>
   );

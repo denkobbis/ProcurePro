@@ -14,6 +14,11 @@ export async function createDepartment(formData: FormData) {
   if (!name) throw new Error("Department name is required");
 
   const supabase = await createClient();
+  const { data: existing } = await supabase.from("departments").select("name");
+  if ((existing ?? []).some((d) => d.name.toLowerCase() === name.toLowerCase())) {
+    throw new Error(`A department named "${name}" already exists`);
+  }
+
   const { error } = await supabase.from("departments").insert({ name });
   if (error) throw new Error(error.message);
 

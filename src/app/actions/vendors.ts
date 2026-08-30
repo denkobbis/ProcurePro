@@ -26,6 +26,11 @@ export async function createVendor(formData: FormData) {
   if (!name) throw new Error("Vendor name is required");
 
   const supabase = await createClient();
+  const { data: existing } = await supabase.from("vendors").select("name");
+  if ((existing ?? []).some((v) => v.name.toLowerCase() === name.toLowerCase())) {
+    throw new Error(`A vendor named "${name}" already exists`);
+  }
+
   const { data: vendor, error } = await supabase
     .from("vendors")
     .insert({

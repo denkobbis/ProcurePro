@@ -45,32 +45,32 @@ export default async function AwardRfqQuotePage({
         <input type="hidden" name="rfq_id" value={rfq.id} />
 
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Delivery terms</label>
-          <textarea name="delivery_terms" rows={2} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <label htmlFor="delivery-terms-field" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Delivery terms</label>
+          <textarea id="delivery-terms-field" name="delivery_terms" rows={2} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
         </div>
 
         <div className="space-y-3 rounded-md border border-zinc-100 p-3 dark:border-zinc-800">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Landed cost</label>
+          <span className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Landed cost</span>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Currency is fixed by the quote ({quote.currency}) — set the FX rate and any freight/customs cost.</p>
           {quote.currency !== "NGN" && (
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">FX rate to ₦ (1 {quote.currency} = ? NGN)</label>
-              <input name="fx_rate_to_ngn" type="number" step="0.000001" min="0" defaultValue={1} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <label htmlFor="award-fx-rate-field" className="block text-xs text-zinc-500 dark:text-zinc-400">FX rate to ₦ (1 {quote.currency} = ? NGN)</label>
+              <input id="award-fx-rate-field" name="fx_rate_to_ngn" type="number" step="0.000001" min="0" defaultValue={1} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
           )}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
-              <MoneyInput name="freight_cost_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <label htmlFor="award-freight-cost-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
+              <MoneyInput id="award-freight-cost-field" name="freight_cost_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
-              <MoneyInput name="customs_duty_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <label htmlFor="award-customs-duty-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
+              <MoneyInput id="award-customs-duty-field" name="customs_duty_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
           </div>
         </div>
 
-        <Button type="submit" variant="success">Award &amp; create Purchase Order</Button>
+        <Button type="submit" variant="success">Award &amp; create PO</Button>
       </form>
     </div>
   );

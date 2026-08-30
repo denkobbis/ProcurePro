@@ -63,8 +63,8 @@ export function Stepper({ steps }: { steps: StepDef[] }) {
             />
             {i < steps.length - 1 && <span className={`h-px flex-1 ${s.state === "done" ? "bg-brand-600" : "bg-zinc-200 dark:bg-zinc-800"}`} />}
           </div>
-          <span className={`text-[12px] font-medium ${s.state === "todo" ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100"}`}>{s.label}</span>
-          {s.date && <span className="text-[11px] text-zinc-400 dark:text-zinc-500">{s.date}</span>}
+          <span className={`text-[12px] font-medium ${s.state === "todo" ? "text-zinc-500 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100"}`}>{s.label}</span>
+          {s.date && <span className="text-[11px] text-zinc-500 dark:text-zinc-500">{s.date}</span>}
         </div>
       ))}
     </div>
@@ -140,7 +140,7 @@ export function PlatePanel({
 }
 
 export function TimelineList({ items }: { items: Array<{ title: ReactNode; meta?: string; when?: string }> }) {
-  if (items.length === 0) return <p className="text-sm text-zinc-400 dark:text-zinc-500">Nothing yet.</p>;
+  if (items.length === 0) return <p className="text-sm text-zinc-500 dark:text-zinc-500">Nothing yet.</p>;
   return (
     <ul className="space-y-3">
       {items.map((it, i) => (
@@ -148,7 +148,7 @@ export function TimelineList({ items }: { items: Array<{ title: ReactNode; meta?
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-600" />
           <div className="min-w-0 flex-1">
             <div className="text-sm text-zinc-900 dark:text-zinc-100">{it.title}</div>
-            <div className="mt-0.5 flex gap-2 text-[12px] text-zinc-400 dark:text-zinc-500">
+            <div className="mt-0.5 flex gap-2 text-[12px] text-zinc-500 dark:text-zinc-500">
               {it.meta && <span>{it.meta}</span>}
               {it.when && <span>{it.when}</span>}
             </div>

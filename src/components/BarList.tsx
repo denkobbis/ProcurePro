@@ -6,7 +6,7 @@ export default function BarList({ rows, limit }: { rows: SpendRow[]; limit?: num
   const max = Math.max(1, ...shown.map((r) => r.amount));
 
   if (shown.length === 0) {
-    return <p className="text-sm text-zinc-400 dark:text-zinc-500">No data yet.</p>;
+    return <p className="text-sm text-zinc-500 dark:text-zinc-500">No data yet.</p>;
   }
 
   return (

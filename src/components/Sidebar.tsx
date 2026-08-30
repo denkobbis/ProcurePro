@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
@@ -85,6 +85,7 @@ function CollapsedBadge({ count, active }: { count: number; active: boolean }) {
   if (!count) return null;
   return (
     <span
+      aria-hidden="true"
       className={`absolute right-1.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold tabular-nums ${
         active ? "bg-brand-600 text-white" : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
       }`}
@@ -114,6 +115,15 @@ export default function Sidebar({
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const modules = getIndustryModules(industry);
 
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, setOpen]);
+
   function toggleCollapsed() {
     const next = !collapsed;
     setCollapsed(next);
@@ -138,6 +148,7 @@ export default function Sidebar({
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav
+        id="app-sidebar"
         className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-in-out md:relative md:translate-x-0 dark:border-zinc-800 dark:bg-zinc-900 ${
           open ? "translate-x-0" : "-translate-x-full"
         } ${collapsed ? "md:w-[76px]" : "md:w-[232px]"}`}
@@ -172,6 +183,8 @@ export default function Sidebar({
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    aria-label={collapsed ? `${link.label}${count ? ` (${count})` : ""}` : undefined}
                     title={collapsed ? `${link.label}${count ? ` (${count})` : ""}` : undefined}
                     className={`relative flex items-center gap-2.5 rounded-md border-l-2 py-2 pl-[10px] pr-3 text-sm font-medium transition-colors ${
                       collapsed ? "md:justify-center md:pr-[10px]" : ""
@@ -216,7 +229,14 @@ export default function Sidebar({
                   if (isExternal) {
                     return (
                       <li key={link.href}>
-                        <a href={link.href} target="_blank" rel="noopener noreferrer" title={collapsed ? link.label : undefined} className={className}>
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={collapsed ? link.label : undefined}
+                          title={collapsed ? link.label : undefined}
+                          className={className}
+                        >
                           <Icon className={iconClassName} />
                           {labelSpan}
                         </a>
@@ -225,7 +245,14 @@ export default function Sidebar({
                   }
                   return (
                     <li key={link.href}>
-                      <Link href={link.href} onClick={() => setOpen(false)} title={collapsed ? link.label : undefined} className={className}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        aria-label={collapsed ? link.label : undefined}
+                        title={collapsed ? link.label : undefined}
+                        className={className}
+                      >
                         <Icon className={iconClassName} />
                         {labelSpan}
                       </Link>

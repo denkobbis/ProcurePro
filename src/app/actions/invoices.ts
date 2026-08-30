@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
+import { formatMoney } from "@/lib/money";
 import { matchInvoiceToPo } from "@/lib/invoice-match";
 import type { PoLineItem } from "@/lib/database.types";
 
@@ -41,7 +42,7 @@ export async function recordInvoice(formData: FormData) {
   const lineItemsTotal = lineItems.reduce((sum, l) => sum + l.qty * l.unit_price, 0);
   if (Math.abs(totalAmount - lineItemsTotal) > Math.max(1, totalAmount * 0.01)) {
     throw new Error(
-      `Invoice total (${totalAmount.toLocaleString()}) doesn't match the line items (${lineItemsTotal.toLocaleString()}) — check for a missing or mistyped line.`
+      `Invoice total (${formatMoney(totalAmount, currency)}) doesn't match the line items (${formatMoney(lineItemsTotal, currency)}) — check for a missing or mistyped line.`
     );
   }
 

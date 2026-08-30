@@ -19,13 +19,15 @@ export default function ListTabs({
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800">
-      <div className="flex flex-wrap gap-5">
+      <div role="tablist" className="flex flex-wrap gap-5">
         {tabs.map((t) => {
           const isActive = t.key === active;
           return (
             <button
               key={t.key}
               type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onChange(t.key)}
               className={`flex items-center gap-1.5 border-b-2 pb-2.5 text-sm font-medium transition-colors ${
                 isActive ? "border-brand-600 text-zinc-900 dark:text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"

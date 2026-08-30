@@ -75,7 +75,15 @@ export default function UsersTable({ rows, rigsourceEnabled }: { rows: UserRow[]
                   {u.isActive && !u.isSelf && (
                     <form action={deactivateUser}>
                       <input type="hidden" name="user_id" value={u.id} />
-                      <button className="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Deactivate</button>
+                      <button
+                        type="submit"
+                        onClick={(e) => {
+                          if (!window.confirm(`Deactivate ${u.fullName}? They'll immediately lose access to this organization.`)) e.preventDefault();
+                        }}
+                        className="text-xs font-medium text-red-600 hover:underline dark:text-red-400"
+                      >
+                        Deactivate
+                      </button>
                     </form>
                   )}
                 </td>

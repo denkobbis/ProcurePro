@@ -17,8 +17,8 @@ export default function CurrencyFields({
     <div className="space-y-3 rounded-md border border-zinc-100 p-3 dark:border-zinc-800">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Currency</label>
-          <select name="currency" defaultValue={defaultCurrency} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+          <label htmlFor="currency-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Currency</label>
+          <select id="currency-field" name="currency" defaultValue={defaultCurrency} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
             {CURRENCIES.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -27,8 +27,9 @@ export default function CurrencyFields({
           </select>
         </div>
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">FX rate to ₦ (1 unit = ? NGN)</label>
+          <label htmlFor="fx-rate-field" className="block text-xs text-zinc-500 dark:text-zinc-400">FX rate to ₦ (1 unit = ? NGN)</label>
           <input
+            id="fx-rate-field"
             name="fx_rate_to_ngn"
             type="number"
             step="0.000001"
@@ -40,23 +41,25 @@ export default function CurrencyFields({
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
+          <label htmlFor="freight-cost-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
           <MoneyInput
+            id="freight-cost-field"
             name="freight_cost_ngn"
             defaultValue={defaultFreightCost}
             className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </div>
         <div>
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
+          <label htmlFor="customs-duty-field" className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
           <MoneyInput
+            id="customs-duty-field"
             name="customs_duty_ngn"
             defaultValue={defaultCustomsDuty}
             className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </div>
       </div>
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+      <p className="text-xs text-zinc-500 dark:text-zinc-500">
         Freight and customs duty are entered in Naira (what you actually pay locally), regardless of the PO&apos;s own currency.
       </p>
     </div>

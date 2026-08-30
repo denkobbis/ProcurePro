@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeftIcon } from "./icons";
 
@@ -25,11 +25,29 @@ export function FormField({
   span?: 4 | 6 | 8 | 12;
   children: ReactNode;
 }) {
+  // Single-input fields (the common case) get an auto-generated id so the
+  // label is properly associated; composite children (e.g. CurrencyFields,
+  // NcdmbFields) already label their own internal inputs, so the injected id
+  // is simply unused by them — no worse than before, strictly better for the
+  // common case.
+  const id = `field-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const child = isValidElement(children)
+    ? cloneElement(children as ReactElement<{ id?: string; "aria-describedby"?: string }>, {
+        id,
+        "aria-describedby": hintId,
+      })
+    : children;
+
   return (
     <div className={SPAN_CLASS[span]}>
-      <label className="block text-[12px] font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</label>
-      <div className="mt-1.5">{children}</div>
-      {hint && <p className="mt-1 text-[12px] text-zinc-400 dark:text-zinc-500">{hint}</p>}
+      <label htmlFor={id} className="block text-[12px] font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</label>
+      <div className="mt-1.5">{child}</div>
+      {hint && (
+        <p id={hintId} className="mt-1 text-[12px] text-zinc-400 dark:text-zinc-500">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
