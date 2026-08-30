@@ -57,16 +57,14 @@ export async function updateVendorPayout(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("vendors")
-    .update({
-      bank_name: bankName,
-      account_number: accountNumber,
-      account_name: resolved.account_name,
-      paystack_recipient_code: recipient.recipient_code,
-      flutterwave_bank_code: flutterwaveBankCode,
-    })
-    .eq("id", vendorId);
+  const { error } = await supabase.rpc("update_vendor_payout", {
+    p_vendor_id: vendorId,
+    p_bank_name: bankName,
+    p_account_number: accountNumber,
+    p_account_name: resolved.account_name,
+    p_paystack_recipient_code: recipient.recipient_code,
+    p_flutterwave_bank_code: flutterwaveBankCode,
+  });
   if (error) throw new Error(error.message);
 
   revalidatePath(`/vendors/${vendorId}`);

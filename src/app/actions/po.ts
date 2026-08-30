@@ -105,17 +105,8 @@ export async function markPoSent(formData: FormData) {
 
   const poId = String(formData.get("po_id") ?? "");
   const supabase = await createClient();
-  // No status filter here previously — a direct POST could jump a PO into
-  // sent_to_vendor from any state, including one already sent/received/closed.
-  const { data: updated, error } = await supabase
-    .from("purchase_orders")
-    .update({ status: "sent_to_vendor" })
-    .eq("id", poId)
-    .eq("status", "draft")
-    .select("id")
-    .maybeSingle();
+  const { error } = await supabase.rpc("mark_po_sent", { p_po_id: poId });
   if (error) throw new Error(error.message);
-  if (!updated) throw new Error("This PO is not in draft status");
 
   await notifyPoSent(supabase, poId);
 
@@ -169,18 +160,8 @@ export async function closePo(formData: FormData) {
 
   const poId = String(formData.get("po_id") ?? "");
   const supabase = await createClient();
-  // No status filter here previously — a direct POST could close a PO that
-  // was never fully received (or already closed), silently pulling it out
-  // of active receiving/payment workflows while still incomplete.
-  const { data: updated, error } = await supabase
-    .from("purchase_orders")
-    .update({ status: "closed" })
-    .eq("id", poId)
-    .eq("status", "fully_received")
-    .select("id")
-    .maybeSingle();
+  const { error } = await supabase.rpc("close_po", { p_po_id: poId });
   if (error) throw new Error(error.message);
-  if (!updated) throw new Error("This PO is not fully received yet");
 
   revalidatePath(`/purchase-orders/${poId}`);
 }
