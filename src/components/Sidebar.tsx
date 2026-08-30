@@ -55,6 +55,7 @@ const SECONDARY = [
   { href: "/budgets", label: "Budgets", icon: WalletIcon, roles: null },
   { href: "/rfqs", label: "RFQs", icon: ScaleIcon, roles: ["procurement_officer", "finance_admin", "super_admin"] },
   { href: "/equipment", label: "Equipment", icon: TruckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "equipment" },
+  { href: "/compliance", label: "Compliance", icon: ShieldCheckIcon, roles: ["procurement_officer", "finance_admin", "super_admin"], module: "ncdmb" },
   { href: "/billing", label: "Billing", icon: CreditCardIcon, roles: null },
   { href: "/users", label: "Users & departments", icon: UsersIcon, roles: ["finance_admin", "super_admin"] },
   { href: "/approval-rules", label: "Approval rules", icon: ShieldCheckIcon, roles: ["finance_admin", "super_admin"] },
@@ -129,6 +130,7 @@ export default function Sidebar({
   const secondary = SECONDARY.filter((l) => {
     if (l.roles && !(l.roles as readonly string[]).includes(profile.role)) return false;
     if ("module" in l && l.module === "equipment" && !modules.equipment) return false;
+    if ("module" in l && l.module === "ncdmb" && !modules.ncdmb) return false;
     return true;
   });
 

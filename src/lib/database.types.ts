@@ -107,6 +107,17 @@ export interface Vendor {
   flutterwave_bank_code: string | null;
 }
 
+export interface NcdmbComplianceRule {
+  id: string;
+  organization_id: string;
+  category: string;
+  minimum_local_content_percentage: number | null;
+  requires_certificate: boolean;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
 export interface Budget {
   id: string;
   department_id: string;
