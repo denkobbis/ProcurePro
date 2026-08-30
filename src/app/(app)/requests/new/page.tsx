@@ -5,6 +5,7 @@ import { checkBudget } from "@/lib/budget";
 import { formatNaira } from "@/lib/money";
 import { Button } from "@/components/Button";
 import RequestAutoFill from "@/components/RequestAutoFill";
+import MoneyInput from "@/components/MoneyInput";
 import { FormShell, FormPanel, AsidePanel, FormField, fieldInputClass, fieldTextareaClass } from "@/components/FormLayout";
 import type { Vendor, ApprovalRule, Budget } from "@/lib/database.types";
 
@@ -69,7 +70,7 @@ export default async function NewRequestPage() {
                 <input name="qty" type="number" min="0.01" step="0.01" required className={fieldInputClass} />
               </FormField>
               <FormField label="Estimated unit cost (₦)" span={6}>
-                <input name="est_unit_cost" type="number" min="0" step="0.01" required className={fieldInputClass} />
+                <MoneyInput name="est_unit_cost" required className={fieldInputClass} />
               </FormField>
               <FormField label="Justification" span={12}>
                 <textarea name="justification" rows={2} className={fieldTextareaClass} placeholder="Why is this purchase needed?" />

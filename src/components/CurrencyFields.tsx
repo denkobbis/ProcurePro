@@ -1,3 +1,5 @@
+import MoneyInput from "./MoneyInput";
+
 const CURRENCIES = ["NGN", "USD", "EUR", "GBP"] as const;
 
 export default function CurrencyFields({
@@ -39,22 +41,16 @@ export default function CurrencyFields({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
-          <input
+          <MoneyInput
             name="freight_cost_ngn"
-            type="number"
-            step="0.01"
-            min="0"
             defaultValue={defaultFreightCost}
             className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </div>
         <div>
           <label className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
-          <input
+          <MoneyInput
             name="customs_duty_ngn"
-            type="number"
-            step="0.01"
-            min="0"
             defaultValue={defaultCustomsDuty}
             className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />

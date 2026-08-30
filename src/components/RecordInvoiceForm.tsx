@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { recordInvoice } from "@/app/actions/invoices";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import { SparkleIcon, UploadIcon } from "@/components/icons";
 import type { ExtractedInvoiceFields } from "@/lib/extract";
 
@@ -118,14 +119,11 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
         </div>
         <div className="sm:col-span-4">
           <label className="block text-xs text-zinc-500 dark:text-zinc-400">Invoice total</label>
-          <input
+          <MoneyInput
             name="total_amount"
-            type="number"
-            min="0"
-            step="0.01"
             required
             value={totalAmount}
-            onChange={(e) => setTotalAmount(e.target.value)}
+            onChange={setTotalAmount}
             className={`mt-1 w-40 ${inputClass}`}
           />
         </div>
@@ -154,14 +152,11 @@ export default function RecordInvoiceForm({ poId }: { poId: string }) {
               required
               className={`w-20 ${inputClass}`}
             />
-            <input
+            <MoneyInput
               name="line_unit_price"
-              type="number"
-              step="0.01"
-              min="0"
               placeholder="Unit price"
               value={item.unitPrice}
-              onChange={(e) => updateItem(i, "unitPrice", e.target.value)}
+              onChange={(raw) => updateItem(i, "unitPrice", raw)}
               required
               className={`w-28 ${inputClass}`}
             />

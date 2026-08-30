@@ -16,9 +16,33 @@ export default function RequestAutoFill({ formId }: { formId: string }) {
   function applyFields(fields: ExtractedRequestFields) {
     const form = document.getElementById(formId) as HTMLFormElement | null;
     if (!form) return;
+
+    // Setting .value directly (the plain JS way) doesn't reliably notify a
+    // React-controlled field: React patches the value setter to track the
+    // "last known value," and if that tracker isn't bypassed, dispatching
+    // input afterward can be seen as a no-op change. Writing through the
+    // native prototype setter first is the standard workaround.
+    const nativeInputSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")!.set!;
+    const nativeTextareaSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")!.set!;
+
     const set = (name: string, value: string) => {
-      const el = form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
-      if (el && value) el.value = value;
+      let el = form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
+      if (!el || !value) return;
+      // MoneyInput renders a hidden input (carrying the real field name) with
+      // its comma-formatted, React-controlled visible sibling immediately
+      // before it in the DOM — write through the visible one instead, or the
+      // display silently goes out of sync with what actually submits.
+      if (el.tagName === "INPUT" && (el as HTMLInputElement).type === "hidden" && el.previousElementSibling instanceof HTMLInputElement) {
+        el = el.previousElementSibling;
+      }
+      if (el instanceof HTMLSelectElement) {
+        el.value = value;
+      } else if (el instanceof HTMLTextAreaElement) {
+        nativeTextareaSetter.call(el, value);
+      } else {
+        nativeInputSetter.call(el, value);
+      }
+      el.dispatchEvent(new Event("input", { bubbles: true }));
     };
     set("description", fields.description);
     set("category", fields.category);

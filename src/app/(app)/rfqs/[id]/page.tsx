@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import EmptyState from "@/components/EmptyState";
 import { ScaleIcon, SparkleIcon } from "@/components/icons";
 import { addRfqQuote } from "@/app/actions/rfq";
@@ -119,7 +120,7 @@ export default async function RfqDetailPage({ params }: { params: Promise<{ id: 
                 </option>
               ))}
             </select>
-            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+            <MoneyInput name="unit_price" required placeholder="Unit price" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             <select name="currency" defaultValue="NGN" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>

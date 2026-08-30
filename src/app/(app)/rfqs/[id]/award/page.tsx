@@ -6,6 +6,7 @@ import { awardRfqQuote } from "@/app/actions/rfq";
 import PageHeader from "@/components/PageHeader";
 import BackLink from "@/components/BackLink";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 
 export default async function AwardRfqQuotePage({
   params,
@@ -60,11 +61,11 @@ export default async function AwardRfqQuotePage({
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs text-zinc-500 dark:text-zinc-400">Freight cost (₦)</label>
-              <input name="freight_cost_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <MoneyInput name="freight_cost_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <div>
               <label className="block text-xs text-zinc-500 dark:text-zinc-400">Customs duty (₦)</label>
-              <input name="customs_duty_ngn" type="number" step="0.01" min="0" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <MoneyInput name="customs_duty_ngn" defaultValue={0} className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createApprovalRule, deleteApprovalRule } from "@/app/actions/approval-rules";
 import { formatNaira } from "@/lib/money";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import { RecordSection } from "@/components/RecordPanels";
 import type { ApprovalRule, Department } from "@/lib/database.types";
 
@@ -96,8 +97,8 @@ export default async function ApprovalRulesPage() {
               </option>
             ))}
           </select>
-          <input name="min_amount" type="number" min="0" step="0.01" required placeholder="Min amount (₦)" defaultValue="0" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
-          <input name="max_amount" type="number" min="0" step="0.01" placeholder="Max amount (₦, optional — no upper bound)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <MoneyInput name="min_amount" required placeholder="Min amount (₦)" defaultValue="0" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <MoneyInput name="max_amount" placeholder="Max amount (₦, optional — no upper bound)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           <input name="step_order" type="number" min="1" step="1" required placeholder="Step order" defaultValue="1" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
           <Button type="submit" className="sm:col-span-2">Add rule</Button>
         </form>

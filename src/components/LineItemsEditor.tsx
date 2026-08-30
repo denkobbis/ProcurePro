@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import MoneyInput from "./MoneyInput";
 
 export interface LineItemInput {
   description: string;
@@ -67,14 +68,11 @@ export default function LineItemsEditor({ initialItems }: { initialItems: LineIt
               required
               className="w-24 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:flex-none"
             />
-            <input
+            <MoneyInput
               name="line_unit_price"
-              type="number"
-              step="0.01"
-              min="0"
               placeholder="Unit price"
               value={item.unitPrice}
-              onChange={(e) => updateItem(i, "unitPrice", e.target.value)}
+              onChange={(raw) => updateItem(i, "unitPrice", raw)}
               required
               className="w-32 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:flex-none"
             />

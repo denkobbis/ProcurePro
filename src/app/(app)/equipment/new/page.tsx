@@ -1,6 +1,7 @@
 import { getCurrentProfile, requireRole, PROCUREMENT_ROLES } from "@/lib/auth";
 import { createEquipmentAsset } from "@/app/actions/equipment";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import { FormShell, FormPanel, AsidePanel, FormField, fieldInputClass, fieldTextareaClass } from "@/components/FormLayout";
 
 export default async function NewEquipmentAssetPage() {
@@ -25,7 +26,7 @@ export default async function NewEquipmentAssetPage() {
               <input name="name" required className={fieldInputClass} />
             </FormField>
             <FormField label="Day rate (₦)" span={6}>
-              <input name="day_rate_ngn" type="number" min="0" step="0.01" required className={fieldInputClass} />
+              <MoneyInput name="day_rate_ngn" required className={fieldInputClass} />
             </FormField>
             <FormField label="Notes" span={12}>
               <textarea name="notes" rows={2} className={fieldTextareaClass} />

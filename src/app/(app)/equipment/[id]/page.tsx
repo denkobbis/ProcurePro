@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import EmptyState from "@/components/EmptyState";
 import { TruckIcon } from "@/components/icons";
 import { leaseOutEquipment, markEquipmentReturned } from "@/app/actions/equipment";
@@ -56,7 +57,7 @@ export default async function EquipmentDetailPage({ params }: { params: Promise<
             </div>
             <div className="sm:col-span-2">
               <label className="block text-xs text-zinc-500 dark:text-zinc-400">Day rate for this lease (₦)</label>
-              <input name="day_rate_ngn" type="number" min="0" step="0.01" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+              <MoneyInput name="day_rate_ngn" defaultValue={asset.day_rate_ngn} required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             </div>
             <Button type="submit" className="sm:col-span-2">Lease out</Button>
           </form>

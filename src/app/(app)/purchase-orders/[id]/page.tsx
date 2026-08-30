@@ -6,6 +6,7 @@ import { formatNaira, formatMoney } from "@/lib/money";
 import StatusBadge from "@/components/StatusBadge";
 import PrintButton from "@/components/PrintButton";
 import { Button, ButtonLink } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import { markPoSent, markPoInTransit, markPoCustomsCleared, closePo, receivePoLine } from "@/app/actions/po";
 import { initiatePayment, finalizePaystackPayment } from "@/app/actions/payments";
 import { getIndustryModules } from "@/lib/industries";
@@ -308,13 +309,9 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
                     <input type="hidden" name="po_id" value={po.id} />
                     <div>
                       <label className="block text-xs text-zinc-500 dark:text-zinc-400">Amount (defaults to the full remaining balance)</label>
-                      <input
+                      <MoneyInput
                         name="amount"
-                        type="number"
-                        min="0.01"
-                        max={amountRemaining}
-                        step="0.01"
-                        placeholder={String(amountRemaining)}
+                        placeholder={new Intl.NumberFormat("en-NG").format(amountRemaining)}
                         className="mt-1 w-48 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                       />
                     </div>
