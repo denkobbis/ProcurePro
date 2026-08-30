@@ -29,7 +29,11 @@ export default async function ApprovalsPage() {
   const supabase = await createClient();
   const { data: approvals } = await supabase.from("v_actionable_approvals").select("*").order("created_at");
 
-  const list = (approvals ?? []) as ActionableApproval[];
+  // The view can still include a request whose requester's role happens to
+  // match the step's approver_role (visible to them for transparency via
+  // approvals_select) — act_on_approval blocks them from acting on it
+  // regardless, so don't show it as something they can act on here.
+  const list = ((approvals ?? []) as ActionableApproval[]).filter((a) => a.requester_id !== profile.id);
   const bottleneckFlags = await getBottleneckFlags(supabase, list);
   const requesterIds = [...new Set(list.map((a) => a.requester_id))];
   const { data: requesters } = requesterIds.length
