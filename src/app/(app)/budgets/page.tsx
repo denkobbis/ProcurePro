@@ -1,9 +1,10 @@
 import { getCurrentProfile, ADMIN_ROLES } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { checkBudget } from "@/lib/budget";
+import { getBudgetUsageForAll } from "@/lib/budget";
 import { formatNaira } from "@/lib/money";
 import { createBudget } from "@/app/actions/budgets";
 import { Button } from "@/components/Button";
+import MoneyInput from "@/components/MoneyInput";
 import EmptyState from "@/components/EmptyState";
 import { WalletIcon } from "@/components/icons";
 import { RecordSection } from "@/components/RecordPanels";
@@ -20,12 +21,11 @@ export default async function BudgetsPage() {
   ]);
   const deptMap = new Map((departments ?? []).map((d: Department) => [d.id, d.name]));
 
-  const rows = await Promise.all(
-    (budgets ?? []).map(async (b: Budget) => {
-      const usage = await checkBudget(supabase, b.department_id, b.category, 0);
-      return { budget: b, usage };
-    })
-  );
+  const usageByKey = await getBudgetUsageForAll(supabase, budgets ?? []);
+  const rows = (budgets ?? []).map((b: Budget) => ({
+    budget: b,
+    usage: usageByKey.get(`${b.department_id}::${b.category}`) ?? { committed: 0, spent: 0 },
+  }));
 
   return (
     <div className="max-w-4xl space-y-4">
@@ -101,7 +101,7 @@ export default async function BudgetsPage() {
               <option value="quarterly">Quarterly</option>
               <option value="annual">Annual</option>
             </select>
-            <input name="allocated_amount" type="number" min="0" step="0.01" required placeholder="Allocated amount (₦)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+            <MoneyInput name="allocated_amount" required placeholder="Allocated amount (₦)" className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             <div>
               <label className="block text-xs text-zinc-500 dark:text-zinc-400">Period start</label>
               <input name="period_start" type="date" required className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />

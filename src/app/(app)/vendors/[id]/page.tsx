@@ -9,8 +9,23 @@ import { listBanks } from "@/lib/paystack";
 import { getIndustryModules } from "@/lib/industries";
 import { getVendorScorecard } from "@/lib/vendor-score";
 import { findVendorsSharingAccount } from "@/lib/vendor-fraud";
+import { evaluateVendorCompliance, type ComplianceVerdict } from "@/lib/ncdmb-compliance";
 import { RecordHeader, RecordSection, FactsPanel, NotePanel, StatsRow } from "@/components/RecordPanels";
-import type { VendorDocument } from "@/lib/database.types";
+import type { VendorDocument, NcdmbComplianceRule } from "@/lib/database.types";
+
+const VERDICT_LABEL: Record<ComplianceVerdict, string> = {
+  compliant: "Compliant",
+  at_risk: "At risk",
+  non_compliant: "Non-compliant",
+  not_rated: "Not rated",
+};
+
+const VERDICT_CLASS: Record<ComplianceVerdict, string> = {
+  compliant: "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400",
+  at_risk: "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+  non_compliant: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400",
+  not_rated: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+};
 
 function pct(n: number | null) {
   return n == null ? "—" : `${Math.round(n * 100)}%`;
@@ -37,13 +52,21 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
 
   const documents = (vendor.documents ?? []) as VendorDocument[];
   const documentUrls = new Map<string, string>();
-  for (const d of documents) {
-    const { data } = await supabase.storage.from("attachments").createSignedUrl(d.file_path, 3600);
-    if (data) documentUrls.set(d.file_path, data.signedUrl);
+  if (documents.length > 0) {
+    const { data } = await supabase.storage.from("attachments").createSignedUrls(documents.map((d) => d.file_path), 3600);
+    for (const row of data ?? []) {
+      if (row.path && row.signedUrl) documentUrls.set(row.path, row.signedUrl);
+    }
   }
 
   const scorecard = await getVendorScorecard(supabase, vendor.id);
   const sharedAccountVendors = vendor.account_number ? await findVendorsSharingAccount(supabase, vendor.account_number, vendor.id) : [];
+
+  let compliance: ReturnType<typeof evaluateVendorCompliance> | null = null;
+  if (modules.ncdmb) {
+    const { data: rulesData } = await supabase.from("ncdmb_compliance_rules").select("*");
+    compliance = evaluateVendorCompliance(vendor, (rulesData ?? []) as NcdmbComplianceRule[]);
+  }
 
   let banks: { name: string; code: string }[] = [];
   let banksError: string | null = null;
@@ -127,6 +150,29 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           <Button type="submit" size="sm">Save</Button>
         </form>
       </RecordSection>
+
+      {compliance && (
+        <RecordSection title="Compliance status">
+          <div className="flex items-center gap-2">
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${VERDICT_CLASS[compliance.verdict]}`}>{VERDICT_LABEL[compliance.verdict]}</span>
+            {compliance.rule && <span className="text-sm text-zinc-500 dark:text-zinc-400">against the &ldquo;{compliance.rule.category}&rdquo; rule</span>}
+          </div>
+          <ul className="mt-2 space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+            {compliance.reasons.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+          {!compliance.rule && (
+            <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+              Set a rule for the &ldquo;{vendor.category ?? "(no category)"}&rdquo; category on the{" "}
+              <a href="/compliance" className="text-brand-600 hover:underline dark:text-brand-400">
+                Compliance
+              </a>{" "}
+              page to rate this vendor.
+            </p>
+          )}
+        </RecordSection>
+      )}
 
       <RecordSection title="Performance notes">
         <form action={updatePerformanceNotes} className="space-y-2">

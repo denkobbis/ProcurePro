@@ -39,7 +39,10 @@ export async function checkPoAnomalies(supabase: SupabaseClient, po: PoForAnomal
 
   let priceJump: PoAnomalyFlags["priceJump"] = null;
   if (others.length >= MIN_HISTORY_FOR_PRICE_CHECK) {
-    const avg = others.reduce((sum, p) => sum + p.total_amount_ngn, 0) / others.length;
+    // total_amount_ngn arrives from Supabase as a string — Number(...) it,
+    // or `+` concatenates instead of summing and avg comes out NaN, which
+    // silently disables this whole check (NaN > 0 is always false).
+    const avg = others.reduce((sum, p) => sum + Number(p.total_amount_ngn), 0) / others.length;
     if (avg > 0 && po.total_amount_ngn > avg * PRICE_JUMP_MULTIPLIER) {
       priceJump = { historicalAvgNgn: Math.round(avg), percentAbove: Math.round((po.total_amount_ngn / avg - 1) * 100) };
     }

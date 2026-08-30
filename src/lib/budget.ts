@@ -58,8 +58,11 @@ export async function checkBudget(
     .eq("requests.category", category)
     .neq("status", "draft");
   const spent = (poRows ?? []).reduce(
+    // Postgres numeric columns come back from the Supabase client as strings
+    // (see vendor-score.ts) — Number(...) each one, or `+` silently
+    // concatenates instead of adding and every budget check downstream breaks.
     (sum: number, r: { total_amount_ngn: number; freight_cost_ngn: number; customs_duty_ngn: number }) =>
-      sum + r.total_amount_ngn + r.freight_cost_ngn + r.customs_duty_ngn,
+      sum + Number(r.total_amount_ngn) + Number(r.freight_cost_ngn) + Number(r.customs_duty_ngn),
     0
   );
 
@@ -75,4 +78,61 @@ export async function checkBudget(
     wouldExceed,
     hardBlock: budget.hard_block,
   };
+}
+
+export interface BudgetUsage {
+  committed: number;
+  spent: number;
+}
+
+function usageKey(departmentId: string, category: string): string {
+  return `${departmentId}::${category}`;
+}
+
+// Batched equivalent of calling checkBudget() once per row on a list of
+// budgets — two queries total instead of ~2 per budget, then grouped by
+// (department_id, category) in memory. Use this on any page rendering many
+// budgets at once (e.g. /budgets); checkBudget itself stays the right tool
+// for a single live check (e.g. validating one new request).
+export async function getBudgetUsageForAll(
+  supabase: SupabaseClient,
+  budgets: Array<{ department_id: string; category: string }>
+): Promise<Map<string, BudgetUsage>> {
+  const usage = new Map<string, BudgetUsage>();
+  for (const b of budgets) usage.set(usageKey(b.department_id, b.category), { committed: 0, spent: 0 });
+
+  const departmentIds = [...new Set(budgets.map((b) => b.department_id))];
+  if (departmentIds.length === 0) return usage;
+
+  const [{ data: requestRows }, { data: poRows }] = await Promise.all([
+    supabase
+      .from("requests")
+      .select("department_id, category, qty, est_unit_cost")
+      .in("department_id", departmentIds)
+      .in("status", ["submitted", "under_review", "approved"]),
+    supabase
+      .from("purchase_orders")
+      .select("total_amount_ngn, freight_cost_ngn, customs_duty_ngn, requests!inner(department_id, category)")
+      .in("requests.department_id", departmentIds)
+      .neq("status", "draft"),
+  ]);
+
+  for (const r of (requestRows ?? []) as { department_id: string; category: string; qty: number; est_unit_cost: number }[]) {
+    const entry = usage.get(usageKey(r.department_id, r.category));
+    if (entry) entry.committed += Number(r.qty) * Number(r.est_unit_cost);
+  }
+
+  for (const r of (poRows ?? []) as {
+    total_amount_ngn: number;
+    freight_cost_ngn: number;
+    customs_duty_ngn: number;
+    requests: { department_id: string; category: string } | { department_id: string; category: string }[] | null;
+  }[]) {
+    const req = Array.isArray(r.requests) ? r.requests[0] : r.requests;
+    if (!req) continue;
+    const entry = usage.get(usageKey(req.department_id, req.category));
+    if (entry) entry.spent += Number(r.total_amount_ngn) + Number(r.freight_cost_ngn) + Number(r.customs_duty_ngn);
+  }
+
+  return usage;
 }

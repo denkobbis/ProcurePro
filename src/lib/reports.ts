@@ -16,7 +16,9 @@ interface PoWithRequest {
 }
 
 function landedCost(po: PoWithRequest): number {
-  return po.total_amount_ngn + po.freight_cost_ngn + po.customs_duty_ngn;
+  // These numeric columns arrive from Supabase as strings — Number(...) each
+  // one, or `+` concatenates instead of summing and every report is garbled.
+  return Number(po.total_amount_ngn) + Number(po.freight_cost_ngn) + Number(po.customs_duty_ngn);
 }
 
 async function fetchPosWithContext(supabase: SupabaseClient) {
