@@ -1,10 +1,17 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export type SubmitDemoRequestResult = { ok: true } | { ok: false; error: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEMO_REQUEST_MAX_PER_HOUR = 10;
+
+async function getClientIp(): Promise<string> {
+  const hdrs = await headers();
+  return hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown";
+}
 
 /**
  * Captures a "request a demo" lead from the marketing site. Auth-optional:
@@ -42,6 +49,19 @@ export async function submitDemoRequest(formData: FormData): Promise<SubmitDemoR
   }
 
   const supabase = await createClient();
+
+  const ip = await getClientIp();
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { data: recentCount } = await supabase.rpc("count_auth_attempts", {
+    p_ip_address: ip,
+    p_attempt_type: "demo_request",
+    p_since: oneHourAgo,
+  });
+  if ((recentCount ?? 0) >= DEMO_REQUEST_MAX_PER_HOUR) {
+    return { ok: false, error: "Too many requests from this network — try again in an hour." };
+  }
+  await supabase.from("auth_attempts").insert({ ip_address: ip, attempt_type: "demo_request" });
+
   const { error } = await supabase.from("marketing_leads").insert({
     name,
     company,
