@@ -17,9 +17,19 @@ export async function createApprovalRule(formData: FormData) {
   const stepOrder = Number(formData.get("step_order") ?? 1);
 
   if (!approverRole || stepOrder < 1) throw new Error("Approver role and a step order of 1 or more are required");
+  if (minAmount < 0) throw new Error("Min amount cannot be negative");
   if (maxAmount !== null && maxAmount <= minAmount) throw new Error("Max amount must be greater than min amount");
 
   const supabase = await createClient();
+
+  // departments RLS already scopes SELECT to the caller's own org, so a
+  // department_id belonging to a different org simply won't come back —
+  // same check as createUser/createBudget.
+  if (departmentId) {
+    const { data: dept } = await supabase.from("departments").select("id").eq("id", departmentId).maybeSingle();
+    if (!dept) throw new Error("Invalid department");
+  }
+
   const { error } = await supabase.from("approval_rules").insert({
     department_id: departmentId,
     min_amount: minAmount,

@@ -22,6 +22,14 @@ export async function createBudget(formData: FormData) {
   }
 
   const supabase = await createClient();
+
+  // departments RLS already scopes SELECT to the caller's own org, so a
+  // department_id belonging to a different org simply won't come back —
+  // catches a cross-org id before it reaches the insert, matching the same
+  // check in createUser.
+  const { data: dept } = await supabase.from("departments").select("id").eq("id", departmentId).maybeSingle();
+  if (!dept) throw new Error("Invalid department");
+
   const { error } = await supabase.from("budgets").upsert(
     {
       department_id: departmentId,
