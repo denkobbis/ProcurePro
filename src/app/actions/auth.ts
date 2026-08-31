@@ -18,11 +18,7 @@ async function checkSignupRateLimit(supabase: Awaited<ReturnType<typeof createCl
   const ip = await getClientIp();
 
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { count } = await supabase
-    .from("signup_attempts")
-    .select("*", { count: "exact", head: true })
-    .eq("ip_address", ip)
-    .gte("created_at", oneHourAgo);
+  const { data: count } = await supabase.rpc("count_signup_attempts", { p_ip_address: ip, p_since: oneHourAgo });
 
   if ((count ?? 0) >= SIGNUP_MAX_PER_HOUR) {
     redirect(`/signup?error=${encodeURIComponent("Too many signup attempts from this network. Please try again in an hour.")}`);
@@ -38,12 +34,11 @@ async function checkLoginRateLimit(supabase: Awaited<ReturnType<typeof createCli
   const ip = await getClientIp();
 
   const windowStart = new Date(Date.now() - LOGIN_WINDOW_MINUTES * 60 * 1000).toISOString();
-  const { count } = await supabase
-    .from("auth_attempts")
-    .select("*", { count: "exact", head: true })
-    .eq("ip_address", ip)
-    .eq("attempt_type", "login")
-    .gte("created_at", windowStart);
+  const { data: count } = await supabase.rpc("count_auth_attempts", {
+    p_ip_address: ip,
+    p_attempt_type: "login",
+    p_since: windowStart,
+  });
 
   if ((count ?? 0) >= LOGIN_MAX_PER_WINDOW) {
     redirect(`/login?error=${encodeURIComponent("Too many failed sign-in attempts from this network. Please try again in a few minutes.")}`);
@@ -56,12 +51,11 @@ async function checkPasswordResetRateLimit(supabase: Awaited<ReturnType<typeof c
   const ip = await getClientIp();
 
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { count } = await supabase
-    .from("auth_attempts")
-    .select("*", { count: "exact", head: true })
-    .eq("ip_address", ip)
-    .eq("attempt_type", "password_reset")
-    .gte("created_at", oneHourAgo);
+  const { data: count } = await supabase.rpc("count_auth_attempts", {
+    p_ip_address: ip,
+    p_attempt_type: "password_reset",
+    p_since: oneHourAgo,
+  });
 
   if ((count ?? 0) >= PASSWORD_RESET_MAX_PER_HOUR) {
     redirect(`/forgot-password?error=${encodeURIComponent("Too many reset requests from this network. Please try again in an hour.")}`);
