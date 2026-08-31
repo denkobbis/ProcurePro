@@ -53,7 +53,9 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
   const documents = (vendor.documents ?? []) as VendorDocument[];
   const documentUrls = new Map<string, string>();
   if (documents.length > 0) {
-    const { data } = await supabase.storage.from("attachments").createSignedUrls(documents.map((d) => d.file_path), 3600);
+    // Forces Content-Disposition: attachment — see the identical note on
+    // the request-attachments signed URL in requests/[id]/page.tsx.
+    const { data } = await supabase.storage.from("attachments").createSignedUrls(documents.map((d) => d.file_path), 3600, { download: true });
     for (const row of data ?? []) {
       if (row.path && row.signedUrl) documentUrls.set(row.path, row.signedUrl);
     }

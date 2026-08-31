@@ -57,7 +57,14 @@ export default async function RequestDetailPage({
   const attachmentList = (attachments ?? []) as RequestAttachment[];
   const attachmentUrls = new Map<string, string>();
   for (const a of attachmentList) {
-    const { data } = await supabase.storage.from("attachments").createSignedUrl(a.file_path, 3600);
+    // Forces Content-Disposition: attachment regardless of the uploaded
+    // file's actual content-type — an uploaded .html/.svg opened inline
+    // instead of downloaded would execute as a page in the storage
+    // origin. File-type validation at upload time couldn't fully close
+    // this either, since the browser-reported MIME type isn't trustworthy
+    // against a hand-crafted upload; forcing download is the fix that
+    // doesn't depend on trusting it.
+    const { data } = await supabase.storage.from("attachments").createSignedUrl(a.file_path, 3600, { download: a.file_name });
     if (data) attachmentUrls.set(a.id, data.signedUrl);
   }
 
