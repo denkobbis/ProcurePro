@@ -5,10 +5,17 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 const SIGNUP_MAX_PER_HOUR = 5;
+const LOGIN_MAX_PER_WINDOW = 10;
+const LOGIN_WINDOW_MINUTES = 15;
+const PASSWORD_RESET_MAX_PER_HOUR = 5;
+
+async function getClientIp(): Promise<string> {
+  const hdrs = await headers();
+  return hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown";
+}
 
 async function checkSignupRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
-  const hdrs = await headers();
-  const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown";
+  const ip = await getClientIp();
 
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { count } = await supabase
@@ -19,6 +26,45 @@ async function checkSignupRateLimit(supabase: Awaited<ReturnType<typeof createCl
 
   if ((count ?? 0) >= SIGNUP_MAX_PER_HOUR) {
     redirect(`/signup?error=${encodeURIComponent("Too many signup attempts from this network. Please try again in an hour.")}`);
+  }
+
+  return ip;
+}
+
+// Counts only failed attempts (recorded after signInWithPassword rejects),
+// so a string of legitimate successful logins from a shared office IP never
+// trips this — only repeated wrong-password/wrong-email attempts do.
+async function checkLoginRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
+  const ip = await getClientIp();
+
+  const windowStart = new Date(Date.now() - LOGIN_WINDOW_MINUTES * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("auth_attempts")
+    .select("*", { count: "exact", head: true })
+    .eq("ip_address", ip)
+    .eq("attempt_type", "login")
+    .gte("created_at", windowStart);
+
+  if ((count ?? 0) >= LOGIN_MAX_PER_WINDOW) {
+    redirect(`/login?error=${encodeURIComponent("Too many failed sign-in attempts from this network. Please try again in a few minutes.")}`);
+  }
+
+  return ip;
+}
+
+async function checkPasswordResetRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
+  const ip = await getClientIp();
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("auth_attempts")
+    .select("*", { count: "exact", head: true })
+    .eq("ip_address", ip)
+    .eq("attempt_type", "password_reset")
+    .gte("created_at", oneHourAgo);
+
+  if ((count ?? 0) >= PASSWORD_RESET_MAX_PER_HOUR) {
+    redirect(`/forgot-password?error=${encodeURIComponent("Too many reset requests from this network. Please try again in an hour.")}`);
   }
 
   return ip;
@@ -75,9 +121,11 @@ export async function signIn(formData: FormData) {
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
+  const ip = await checkLoginRateLimit(supabase);
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    await supabase.from("auth_attempts").insert({ ip_address: ip, attempt_type: "login" });
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
@@ -88,4 +136,24 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+// Always redirects with the same message regardless of whether the email
+// is registered — resetPasswordForEmail itself never reveals this either,
+// so leaking it here would undo that.
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) {
+    redirect(`/forgot-password?error=${encodeURIComponent("Enter your email")}`);
+  }
+
+  const supabase = await createClient();
+  const ip = await checkPasswordResetRateLimit(supabase);
+  await supabase.from("auth_attempts").insert({ ip_address: ip, attempt_type: "password_reset" });
+
+  const hdrs = await headers();
+  const origin = hdrs.get("origin") ?? `https://${hdrs.get("host")}`;
+  await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/reset-password` });
+
+  redirect(`/forgot-password?message=${encodeURIComponent("If an account exists for that email, we've sent a reset link.")}`);
 }
