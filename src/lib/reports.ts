@@ -164,8 +164,18 @@ export async function getExpiringCertifications(supabase: SupabaseClient, daysAh
   return rows.sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
 }
 
+// A cell opened in Excel/Sheets that starts with one of these runs as a
+// formula regardless of quoting -- label here is a department/category/
+// vendor name, so it's not something this app controls the content of.
+const FORMULA_TRIGGER_CHARS = ["=", "+", "-", "@", "\t", "\r"];
+
 export function toCsv(rows: SpendRow[]): string {
   const header = "Label,Amount\n";
-  const body = rows.map((r) => `"${r.label.replace(/"/g, '""')}",${r.amount}`).join("\n");
+  const body = rows
+    .map((r) => {
+      const label = FORMULA_TRIGGER_CHARS.some((c) => r.label.startsWith(c)) ? `'${r.label}` : r.label;
+      return `"${label.replace(/"/g, '""')}",${r.amount}`;
+    })
+    .join("\n");
   return header + body;
 }
