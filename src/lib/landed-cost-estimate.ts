@@ -23,8 +23,8 @@ export async function estimateLandedCost(supabase: SupabaseClient, category: str
   const rows = (data ?? []) as Array<{ freight_cost_ngn: number; customs_duty_ngn: number }>;
   if (rows.length < MIN_HISTORY) return null;
 
-  const avgFreight = rows.reduce((sum, r) => sum + r.freight_cost_ngn, 0) / rows.length;
-  const avgDuty = rows.reduce((sum, r) => sum + r.customs_duty_ngn, 0) / rows.length;
+  const avgFreight = rows.reduce((sum, r) => sum + Number(r.freight_cost_ngn), 0) / rows.length;
+  const avgDuty = rows.reduce((sum, r) => sum + Number(r.customs_duty_ngn), 0) / rows.length;
 
   return {
     freightCostNgn: Math.round(avgFreight),
