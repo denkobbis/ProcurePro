@@ -100,9 +100,13 @@ export default async function ApprovalsPage() {
                           <form action={actOnApproval}>
                             <input type="hidden" name="approval_id" value={a.id} />
                             <input type="hidden" name="action" value="approved" />
-                            <button className="rounded-md bg-brand-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-700">
+                            <ConfirmButton
+                              type="submit"
+                              confirmMessage={`Approve "${a.description}" (${a.request_number}) for ${formatNaira(a.qty * a.est_unit_cost)}?`}
+                              className="rounded-md bg-brand-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-700"
+                            >
                               Approve
-                            </button>
+                            </ConfirmButton>
                           </form>
                           <form action={actOnApproval}>
                             <input type="hidden" name="approval_id" value={a.id} />
@@ -118,9 +122,13 @@ export default async function ApprovalsPage() {
                           <form action={actOnApproval}>
                             <input type="hidden" name="approval_id" value={a.id} />
                             <input type="hidden" name="action" value="info_requested" />
-                            <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                            <ConfirmButton
+                              type="submit"
+                              confirmMessage={`Ask for more info on "${a.description}" (${a.request_number})? This sends it back to draft — the requester will need to resubmit it for approval.`}
+                              className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                            >
                               Ask
-                            </button>
+                            </ConfirmButton>
                           </form>
                         </div>
                       </td>
