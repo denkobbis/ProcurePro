@@ -7,8 +7,11 @@ import { formatMoney } from "@/lib/money";
 import { matchInvoiceToPo } from "@/lib/invoice-match";
 import type { PoLineItem } from "@/lib/database.types";
 
+const MAX_LINE_ITEMS = 200;
+
 function parseInvoiceLineItems(formData: FormData) {
   const descriptions = formData.getAll("line_description") as string[];
+  if (descriptions.length > MAX_LINE_ITEMS) throw new Error(`An invoice can have at most ${MAX_LINE_ITEMS} line items`);
   const qtys = formData.getAll("line_qty") as string[];
   const unitPrices = formData.getAll("line_unit_price") as string[];
 

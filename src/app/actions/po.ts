@@ -6,8 +6,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, PROCUREMENT_ROLES, requireActiveOrg } from "@/lib/auth";
 import { notifyPoSent, notifyItemsReceived } from "@/lib/notify";
 
+const MAX_LINE_ITEMS = 200;
+
 function parseLineItems(formData: FormData) {
   const descriptions = formData.getAll("line_description") as string[];
+  if (descriptions.length > MAX_LINE_ITEMS) throw new Error(`A purchase order can have at most ${MAX_LINE_ITEMS} line items`);
   const qtys = formData.getAll("line_qty") as string[];
   const unitPrices = formData.getAll("line_unit_price") as string[];
   const mpns = formData.getAll("line_mpn") as string[];
