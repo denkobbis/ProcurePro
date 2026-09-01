@@ -27,10 +27,16 @@ async function checkSignupRateLimit(supabase: Awaited<ReturnType<typeof createCl
   return ip;
 }
 
-// Counts only failed attempts (recorded after signInWithPassword rejects),
-// so a string of legitimate successful logins from a shared office IP never
-// trips this — only repeated wrong-password/wrong-email attempts do.
-async function checkLoginRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
+// Records a placeholder attempt row *before* calling signInWithPassword, not
+// after a failure -- a concurrent burst of parallel wrong-password attempts
+// would otherwise all read the same stale count before any of them recorded
+// its own failure, letting the whole burst through regardless of
+// LOGIN_MAX_PER_WINDOW. Recording up front (matching the pattern
+// checkSignupRateLimit/checkPasswordResetRateLimit already use) closes that:
+// the row exists as soon as the attempt starts, so a concurrent check for the
+// same IP sees it. signIn() deletes the row on success so a legitimate login
+// still doesn't count against the "failed attempts" limit.
+async function checkLoginRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<{ ip: string; attemptId: number | null }> {
   const ip = await getClientIp();
 
   const windowStart = new Date(Date.now() - LOGIN_WINDOW_MINUTES * 60 * 1000).toISOString();
@@ -44,7 +50,8 @@ async function checkLoginRateLimit(supabase: Awaited<ReturnType<typeof createCli
     redirect(`/login?error=${encodeURIComponent("Too many failed sign-in attempts from this network. Please try again in a few minutes.")}`);
   }
 
-  return ip;
+  const { data: attemptId } = await supabase.rpc("record_auth_attempt", { p_ip_address: ip, p_attempt_type: "login" });
+  return { ip, attemptId: attemptId ?? null };
 }
 
 async function checkPasswordResetRateLimit(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
@@ -115,12 +122,15 @@ export async function signIn(formData: FormData) {
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const ip = await checkLoginRateLimit(supabase);
+  const { attemptId } = await checkLoginRateLimit(supabase);
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    await supabase.from("auth_attempts").insert({ ip_address: ip, attempt_type: "login" });
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  }
+
+  if (attemptId != null) {
+    await supabase.rpc("clear_auth_attempt", { p_attempt_id: attemptId });
   }
 
   redirect("/dashboard");
